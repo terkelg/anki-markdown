@@ -1,0 +1,6 @@
+{
+  "name": "anki-markdown",
+  "scripts": {
+    "debug": "ln -sfn $(pwd)/anki_markdown ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 /Applications/Anki.app/Contents/MacOS/launcher"
+  }
+}
