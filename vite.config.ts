@@ -11,7 +11,8 @@ export default defineConfig({
     emptyOutDir: false,
     rollupOptions: {
       output: {
-        assetFileNames: '_anki-md[extname]'
+        assetFileNames: '_anki-md[extname]',
+        inlineDynamicImports: true
       }
     }
   }
