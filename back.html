@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview: Back</title>
+</head>
+<body>
+  <div class="card">
+    <div class="front"></div>
+    <div class="back"></div>
+  </div>
+  <script type="module">
+    import { render } from "./src/main.ts"
+    const front = `# Question\nWhat is **markdown**?`
+    const back = `# Answer\nA lightweight markup language`
+    render(front, back, true)
+  </script>
+</body>
+</html>
