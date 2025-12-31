@@ -1,21 +1,61 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="mac card card1">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: Front</title>
 </head>
-<body class="mac">
+<body>
   <div class="card card1">
     <div class="front"></div>
   </div>
   <script type="module">
     // Toggle nightMode with ?night in URL
-    if (location.search.includes('night')) document.body.classList.add('nightMode')
+    if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
 
     import { render } from "./src/main.ts"
-    const front = `# Question\nWhat is **markdown**?`
-    const back = `# Answer\nA lightweight markup language`
+    const examples = [
+      {
+        front: `What does this return?
+
+\`\`\`ts
+const add = (a: number, b: number) => a + b
+add(1, 2)
+\`\`\``,
+        back: `Returns \`3\``
+      },
+      {
+        front: `What does \`??\` do in JavaScript?
+
+\`\`\`js
+const name = null ?? "anonymous"
+\`\`\``,
+        back: `**Nullish coalescing** — returns right side if left is \`null\` or \`undefined\`
+
+Result: \`"anonymous"\``
+      },
+      {
+        front: `What's the output?
+
+\`\`\`python
+print([x**2 for x in range(4)])
+\`\`\``,
+        back: `\`[0, 1, 4, 9]\``
+      },
+      {
+        front: `Fix the bug:
+
+\`\`\`rust
+fn main() {
+    let s = String::from("hello");
+    let len = s.len();
+    println!("{}: {}", s, len);
+}
+\`\`\``,
+        back: `No bug — this compiles fine. \`len()\` borrows, doesn't move.`
+      },
+    ]
+    const { front, back } = examples[Math.floor(Math.random() * examples.length)]
     render(front, back, false)
   </script>
 </body>
