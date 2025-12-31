@@ -8,6 +8,11 @@ export default defineConfig({
       fileName: () => '_anki-md.js'
     },
     outDir: 'anki_markdown',
-    emptyOutDir: false
+    emptyOutDir: false,
+    rollupOptions: {
+      output: {
+        assetFileNames: '_anki-md[extname]'
+      }
+    }
   }
 })

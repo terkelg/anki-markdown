@@ -1,3 +1,4 @@
+import './style.css'
 import logo from './logo.jpg'
 
 export function render(front: string, back: string, isBack: boolean) {
