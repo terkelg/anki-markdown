@@ -35,14 +35,6 @@ const name = null ?? "anonymous"
 Result: \`"anonymous"\``
       },
       {
-        front: `What's the output?
-
-\`\`\`python
-print([x**2 for x in range(4)])
-\`\`\``,
-        back: `\`[0, 1, 4, 9]\``
-      },
-      {
         front: `Fix the bug:
 
 \`\`\`rust
@@ -53,6 +45,64 @@ fn main() {
 }
 \`\`\``,
         back: `No bug — this compiles fine. \`len()\` borrows, doesn't move.`
+      },
+      {
+        front: `**Line Highlighting** — What line is the bug on?
+
+\`\`\`js {3}
+function greet(name) {
+  const msg = "Hello, " + name
+  console.log(message)  // highlighted
+  return msg
+}
+\`\`\``,
+        back: `Line 3: \`message\` should be \`msg\``
+      },
+      {
+        front: `**Word Highlighting** — Which variable is unused?
+
+\`\`\`js /unused/
+const used = "hello"
+const unused = "world"
+console.log(used)
+\`\`\``,
+        back: `\`unused\` is never referenced`
+      },
+      {
+        front: `**Focus** — What does the highlighted line do?
+
+\`\`\`ts
+interface User {
+  id: number
+  name: string
+  role: "admin" | "user"  // [!code focus]
+}
+\`\`\``,
+        back: `Union type — \`role\` can only be \`"admin"\` or \`"user"\``
+      },
+      {
+        front: `**Error Levels** — Spot the issues:
+
+\`\`\`js
+const API_KEY = "sk-1234"  // [!code error]
+const timeout = 5000
+const retries = -1  // [!code warning]
+\`\`\``,
+        back: `- **Error**: Hardcoded secret
+- **Warning**: Negative retries may cause issues`
+      },
+      {
+        front: `**Combined** — Review this code:
+
+\`\`\`ts {1} /Promise/
+async function fetch(): Promise<Data> {  // [!code focus]
+  const res = await api.get("/data")
+  return res.json()  // [!code warning]
+}
+\`\`\``,
+        back: `- Line 1 highlighted + \`Promise\` word highlighted
+- Focus on function signature
+- Warning: \`res.json()\` is also async`
       },
     ]
     const { front, back } = examples[Math.floor(Math.random() * examples.length)]
