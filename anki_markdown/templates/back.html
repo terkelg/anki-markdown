@@ -9,5 +9,5 @@
   import { render } from "./_anki-md.js"
   const front = document.getElementById("data-front").textContent
   const back = document.getElementById("data-back").textContent
-  render(front, back, true)
+  await render(front, back, true)
 </script>
