@@ -21,3 +21,8 @@ ln -s "$(pwd)/anki_markdown" ~/Library/Application\ Support/Anki2/addons21/anki_
 See [Anki Add-on Debugging Docs](https://addon-docs.ankiweb.net/debugging.html).
 
 Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
+
+## Resources
+
+- [Anki Add-on Documentation](https://addon-docs.ankiweb.net/intro.html)
+- [Card Templates](https://docs.ankiweb.net/templates/intro.html)
