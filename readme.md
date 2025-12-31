@@ -4,6 +4,34 @@
 
 ## Development
 
+### Browser Preview (Recommended)
+
+For rapid iteration without restarting Anki:
+
+```bash
+bun run dev
+```
+
+Then open:
+- `http://localhost:5173/front.html` - preview front card
+- `http://localhost:5173/back.html` - preview back card
+
+Edit `src/main.ts` and the browser will hot-reload. The preview files contain sample markdown content to simulate Anki's template variables.
+
+### Build
+
+Compile TypeScript to the Anki add-on folder:
+
+```bash
+bun run build
+```
+
+This outputs `anki_markdown/_anki-md.js`.
+
+### Testing in Anki
+
+> **Note:** Anki caches the add-on. You must restart Anki for changes to take effect.
+
 ```bash
 bun run debug
 ```
