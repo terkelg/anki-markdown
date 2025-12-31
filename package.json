@@ -1,8 +1,18 @@
 {
   "name": "anki-markdown",
-  "version": "0.0.0",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "debug": "ln -sfn $(pwd)/anki_markdown ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 /Applications/Anki.app/Contents/MacOS/launcher"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "npm:rolldown-vite@7.2.5"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.2.5"
   }
 }
