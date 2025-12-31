@@ -1,5 +1,7 @@
-<div class="card"></div>
-<script src="_anki-md.js"></script>
-<script>
+<div class="card">
+  <div class="front"></div>
+</div>
+<script type="module">
+  import { render } from "./_anki-md.js"
   render(`{{text:Front}}`, `{{text:Back}}`, false)
 </script>

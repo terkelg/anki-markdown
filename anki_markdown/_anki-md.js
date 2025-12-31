@@ -1,15 +1,7 @@
-function render(front, back, isBack) {
-  const card = document.querySelector(".card")
+export function render(front, back, isBack) {
+  const frontEl = document.querySelector(".front")
+  const backEl = document.querySelector(".back")
 
-  console.log("Side:", isBack ? "back" : "front")
-  console.log("Front:", front)
-  console.log("Back:", back)
-
-  if (card) {
-    if (isBack) {
-      card.innerHTML = `<div class="front">${front}</div><div class="back">${back}</div>`
-    } else {
-      card.innerHTML = `<div class="front">${front}</div>`
-    }
-  }
+  if (frontEl) frontEl.innerHTML = front
+  if (isBack && backEl) backEl.innerHTML = back
 }
