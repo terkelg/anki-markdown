@@ -2,7 +2,11 @@
 <div class="card">
   <div class="front"></div>
 </div>
+<script id="data-front" type="text/plain">{{text:Front}}</script>
+<script id="data-back" type="text/plain">{{text:Back}}</script>
 <script type="module">
   import { render } from "./_anki-md.js"
-  render(`{{text:Front}}`, `{{text:Back}}`, false)
+  const front = document.getElementById("data-front").textContent
+  const back = document.getElementById("data-back").textContent
+  render(front, back, false)
 </script>
