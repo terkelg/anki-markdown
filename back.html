@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: Back</title>
 </head>
-<body>
-  <div class="card">
+<body class="mac">
+  <div class="card card1">
     <div class="front"></div>
     <div class="back"></div>
   </div>
   <script type="module">
+    // Toggle nightMode with ?night in URL
+    if (location.search.includes('night')) document.body.classList.add('nightMode')
+
     import { render } from "./src/main.ts"
     const front = `# Question\nWhat is **markdown**?`
     const back = `# Answer\nA lightweight markup language`

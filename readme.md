@@ -15,6 +15,7 @@ bun run dev
 Then open:
 - `http://localhost:5173/front.html` - preview front card
 - `http://localhost:5173/back.html` - preview back card
+- Add `?night` to test night mode (e.g., `/front.html?night`)
 
 Edit `src/main.ts` and the browser will hot-reload. The preview files contain sample markdown content to simulate Anki's template variables.
 
@@ -54,3 +55,4 @@ Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier d
 
 - [Anki Add-on Documentation](https://addon-docs.ankiweb.net/intro.html)
 - [Card Templates](https://docs.ankiweb.net/templates/intro.html)
+- [Card Styling](https://docs.ankiweb.net/templates/styling.html) - Anki CSS classes (`.nightMode`, `.mac`, `.win`, `.mobile`, etc.)
