@@ -130,7 +130,10 @@ md.renderer.rules.code_inline = (tokens, idx) => {
 }
 
 // Event delegation for toolbar
-document.querySelector('.card')?.addEventListener('click', (e) => {
+const card = document.querySelector('.card')
+if (navigator.clipboard) card?.classList.add('clipboard')
+
+card?.addEventListener('click', (e) => {
   const target = e.target as HTMLElement
   const block = target.closest('.code-block')
   if (!block) return

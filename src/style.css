@@ -109,12 +109,17 @@
       margin-inline-start: auto;
     }
 
-    .toggle {
+    .toggle,
+    .copy {
       display: none;
     }
   }
 
   &.has-focused .toggle {
+    display: inline;
+  }
+
+  .clipboard & .copy {
     display: inline;
   }
 }
