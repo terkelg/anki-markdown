@@ -1,5 +1,5 @@
 .card {
-  font-family: system-ui, sans-serif;
+  font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
 }
 
 /* Switch to dark shiki theme when nightMode */
@@ -32,9 +32,12 @@
 }
 
 .shiki.has-focused .line:not(.focused) {
-  opacity: 0.4;
+  opacity: 0.7;
+  filter: blur(0.095rem);
+  transition: filter 0.35s, opacity 0.35s;
 }
 
-.shiki .line.focused {
-  background: rgb(0 100 255 / 0.1);
+.shiki.has-focused:is(:hover, .revealed) .line:not(.focused) {
+  opacity: 1;
+  filter: blur(0);
 }
