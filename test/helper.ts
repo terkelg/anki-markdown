@@ -5,16 +5,14 @@ export function setup(examples: Example[], showBack: boolean, render: (f: string
   let i = +(params.get('i') ?? Math.floor(Math.random() * examples.length))
   if (!params.has('i')) { params.set('i', String(i)); history.replaceState(null, '', '?' + params) }
 
-  // Navigation
-  const nav = document.createElement('div')
-  nav.className = 'nav'
-  document.body.appendChild(nav)
+  const nav = document.querySelector('.nav')!
+  const count = nav.querySelector('.count')!
 
   const show = async (idx: number) => {
     i = (idx + examples.length) % examples.length
     params.set('i', String(i))
     history.replaceState(null, '', '?' + params)
-    nav.innerHTML = `${i + 1}/${examples.length}<span>← → enter</span>`
+    count.textContent = `${i + 1}/${examples.length}`
     await render(examples[i].front, examples[i].back, showBack)
   }
 
