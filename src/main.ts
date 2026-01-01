@@ -4,7 +4,6 @@ import MarkdownItAsync from 'markdown-it-async'
 import { fromAsyncCodeToHtml } from '@shikijs/markdown-it/async'
 import { createHighlighter, bundledLanguages } from 'shiki/bundle/web'
 import swift from 'shiki/langs/swift.mjs'
-import type { ShikiTransformer } from 'shiki'
 import {
   transformerMetaHighlight,
   transformerMetaWordHighlight,
@@ -15,13 +14,6 @@ import {
 const langs = [...Object.keys(bundledLanguages), swift]
 const themes = { light: 'vitesse-light', dark: 'vitesse-dark' } as const
 const highlighter = await createHighlighter({ langs, themes: Object.values(themes) })
-
-const wrapper: ShikiTransformer = {
-  name: 'wrapper',
-  pre(node) {
-    this.addClassToHast(node, 'code')
-  }
-}
 
 // Inline code highlighting: `code`{lang} or `code`{.lang}
 const inlineCode = (md: MarkdownIt) => {
@@ -48,7 +40,6 @@ const inlineCode = (md: MarkdownIt) => {
     }
   })
 
-  // Render with syntax highlighting
   const original = md.renderer.rules.code_inline
   md.renderer.rules.code_inline = (tokens, idx, options, env, self) => {
     const token = tokens[idx]
@@ -85,7 +76,6 @@ md.use(fromAsyncCodeToHtml((code, options) => {
   themes,
   defaultColor: false,
   transformers: [
-    wrapper,
     transformerMetaHighlight(),
     transformerMetaWordHighlight(),
     transformerNotationErrorLevel({ matchAlgorithm: 'v3' }),

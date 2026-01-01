@@ -13,37 +13,6 @@
   }
 }
 
-/* Scroll fade custom properties */
-@property --fade-left {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: #000;
-}
-
-@property --fade-right {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: #000;
-}
-
-@keyframes scroll-fade {
-  0% {
-    --fade-left: #000;
-    --fade-right: transparent;
-  }
-
-  3%,
-  97% {
-    --fade-left: transparent;
-    --fade-right: transparent;
-  }
-
-  100% {
-    --fade-left: transparent;
-    --fade-right: #000;
-  }
-}
-
 /* Shiki token colors */
 .shiki span {
   color: var(--shiki-light);
@@ -60,19 +29,21 @@
 }
 
 /* Code blocks */
-.code {
+.shiki {
+  font-size: 0.875rem;
+  inline-size: fit-content;
   max-inline-size: 100%;
+  background: var(--shiki-light-bg);
+
   border: 1px solid rgb(0 0 0 / 0.15);
-  border-radius: 6px;
-  padding: 0.75em 1em;
-  background: var(--shiki-light-bg, #fff);
+  border-radius: 8px;
+  padding: 4px;
 
   > code {
     display: block;
     overflow-x: auto;
     scrollbar-width: none;
 
-    /* Scroll fade effect */
     --fade-size: 2rem;
     mask-image: linear-gradient(to right,
         var(--fade-left),
@@ -83,9 +54,9 @@
     animation-timeline: scroll(self x);
   }
 
-  /* Line highlighting */
   .line.highlighted {
     background: rgb(255 255 0 / 0.2);
+    border-radius: 4px;
 
     &.error {
       background: rgb(255 0 0 / 0.2);
@@ -123,13 +94,38 @@
   }
 }
 
-/* Inline code */
-code.inline {
-  padding: 0.15em 0.35em;
+.shiki.inline {
+  padding: 0.15em 0.25em;
   border-radius: 4px;
-  background: rgb(0 0 0 / 0.06);
+}
 
-  .nightMode & {
-    background: rgb(255 255 255 / 0.1);
+
+@property --fade-left {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #000;
+}
+
+@property --fade-right {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #000;
+}
+
+@keyframes scroll-fade {
+  0% {
+    --fade-left: #000;
+    --fade-right: transparent;
+  }
+
+  3%,
+  97% {
+    --fade-left: transparent;
+    --fade-right: transparent;
+  }
+
+  100% {
+    --fade-left: transparent;
+    --fade-right: #000;
   }
 }
