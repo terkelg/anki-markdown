@@ -59,3 +59,44 @@ ESM works in Anki templates with placeholder elements:
 ```
 
 **Critical**: Don't replace parent `innerHTML` — mutate children instead. Anki's reviewer.js caches element references after initial parse. Using `parent.innerHTML = ...` destroys elements and invalidates those references, causing null errors. Instead, populate existing elements: `frontEl.innerHTML = content`.
+
+## Anki CSS Variables
+
+Anki provides CSS variables for theming. Use these instead of hardcoded colors for light/dark mode support. Night mode uses `:root.night-mode` selector (note: different from our `.nightMode` class on cards).
+
+### Colors
+| Variable | Light | Dark | Description |
+|----------|-------|------|-------------|
+| `--fg` | `#020202` | `#fcfcfc` | Default text/icon color |
+| `--fg-subtle` | `#737373` | `#858585` | Placeholder text, idle icons |
+| `--fg-disabled` | `#858585` | `#737373` | Disabled UI elements |
+| `--fg-faint` | `#afafaf` | `#545454` | Barely visible against canvas |
+| `--fg-link` | `#1d4ed8` | `#bfdbfe` | Hyperlink color |
+| `--canvas` | `#f5f5f5` | `#2c2c2c` | Window background |
+| `--canvas-elevated` | `white` | `#363636` | Container background |
+| `--canvas-inset` | `white` | `#2c2c2c` | Input background |
+| `--canvas-code` | `white` | `#252525` | Code editor background |
+| `--border` | `#c4c4c4` | `#202020` | Medium contrast border |
+| `--border-subtle` | `#e4e4e4` | `#252525` | Low contrast border |
+| `--border-strong` | `#858585` | `#020202` | High contrast border |
+| `--border-focus` | `#3b82f6` | `#3b82f6` | Focused input border |
+| `--shadow` | `#c4c4c4` | `#141414` | Default box-shadow |
+
+### Button Colors
+| Variable | Description |
+|----------|-------------|
+| `--button-bg` | Button background |
+| `--button-gradient-start/end` | Button gradient |
+| `--button-hover-border` | Hover state border |
+| `--button-disabled` | Disabled background |
+| `--button-primary-bg` | Primary button background |
+
+### Props
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `--border-radius` | `5px` | Default corner radius |
+| `--border-radius-medium` | `12px` | Container corners |
+| `--border-radius-large` | `15px` | Pill-shaped buttons |
+| `--transition` | `180ms` | Default transition |
+| `--transition-medium` | `500ms` | Medium transition |
+| `--transition-slow` | `1000ms` | Slow transition |
