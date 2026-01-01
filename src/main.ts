@@ -66,11 +66,11 @@ const inlineCode = (md: MarkdownIt) => {
 
 const md = MarkdownItAsync()
 md.use(inlineCode)
-md.use(fromAsyncCodeToHtml((code, options) => {
+md.use(fromAsyncCodeToHtml(async (code, options) => {
   try {
-    return Promise.resolve(highlighter.codeToHtml(code, options))
+    return highlighter.codeToHtml(code, options)
   } catch {
-    return Promise.resolve(highlighter.codeToHtml(code, { ...options, lang: 'text' }))
+    return highlighter.codeToHtml(code, { ...options, lang: 'text' })
   }
 }, {
   themes,
