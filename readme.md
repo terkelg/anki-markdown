@@ -48,7 +48,7 @@ ln -s "$(pwd)/anki_markdown" ~/Library/Application\ Support/Anki2/addons21/anki_
 ```
 
 > [!TIP]
-> **Debugging** — See [Anki Add-on Debugging Docs](https://addon-docs.ankiweb.net/debugging.html). Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
+> Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
 
 ## Resources
 
