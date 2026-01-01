@@ -128,8 +128,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius);
   padding: 0.15em 0.25em;
+  background: var(--shiki-light-bg);
 
-  background-color: var(--shiki-light-bg);
   .nightMode & {
     background: var(--shiki-dark-bg);
   }

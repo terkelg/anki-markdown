@@ -58,13 +58,11 @@ const codeBlock: ShikiTransformer = {
 
 const codeInline: ShikiTransformer = {
   name: 'code-inline',
-  root(root) {
-    root.children = [{
-      type: 'element',
-      tagName: 'code',
-      properties: { class: 'code-inline shiki' },
-      children: root.children as Element[]
-    }]
+  pre(node) {
+    node.tagName = 'span'
+  },
+  code(node) {
+    node.properties.class = 'code-inline'
   }
 }
 
@@ -111,7 +109,6 @@ md.renderer.rules.code_inline = (tokens, idx) => {
         lang: meta.lang,
         themes,
         defaultColor: false,
-        structure: 'inline',
         transformers: [codeInline],
       })
     } catch { /* fall through */ }
