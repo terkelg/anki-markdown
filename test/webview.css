@@ -1,0 +1,221 @@
+/*! Anki webview.css - colors */
+:root {
+  --fg: #020202;
+  --fg-subtle: #737373;
+  --fg-disabled: #858585;
+  --fg-faint: #afafaf;
+  --fg-link: #1d4ed8;
+  --canvas: #f5f5f5;
+  --canvas-elevated: white;
+  --canvas-inset: white;
+  --canvas-overlay: #fcfcfc;
+  --canvas-code: white;
+  --canvas-glass: rgb(255 255 255 / 0.4);
+  --border: #c4c4c4;
+  --border-subtle: #e4e4e4;
+  --border-strong: #858585;
+  --border-focus: #3b82f6;
+  --button-bg: #fcfcfc;
+  --button-gradient-start: white;
+  --button-gradient-end: #fcfcfc;
+  --button-hover-border: #999999;
+  --button-disabled: rgb(214 214 214 / 0.5);
+  --button-primary-bg: #306bec;
+  --button-primary-gradient-start: #3b82f6;
+  --button-primary-gradient-end: #306bec;
+  --button-primary-disabled: #93c5fd;
+  --scrollbar-bg: #d6d6d6;
+  --scrollbar-bg-hover: #c4c4c4;
+  --scrollbar-bg-active: #afafaf;
+  --shadow: #c4c4c4;
+  --shadow-inset: #454545;
+  --shadow-subtle: #737373;
+  --shadow-focus: #6366f1;
+  --accent-card: #60a5fa;
+  --accent-note: #22c55e;
+  --accent-danger: #ef4444;
+  --highlight-bg: rgb(37 99 235 / 0.5);
+  --highlight-fg: black;
+  --selected-bg: rgb(214 214 214 / 0.5);
+  --selected-fg: black;
+  color-scheme: light;
+}
+
+.nightMode {
+  --fg: #fcfcfc;
+  --fg-subtle: #858585;
+  --fg-disabled: #737373;
+  --fg-faint: #545454;
+  --fg-link: #bfdbfe;
+  --canvas: #2c2c2c;
+  --canvas-elevated: #363636;
+  --canvas-inset: #2c2c2c;
+  --canvas-overlay: #2c2c2c;
+  --canvas-code: #252525;
+  --canvas-glass: rgb(54 54 54 / 0.4);
+  --border: #202020;
+  --border-subtle: #252525;
+  --border-strong: #020202;
+  --border-focus: #3b82f6;
+  --button-bg: #404040;
+  --button-gradient-start: #4a4a4a;
+  --button-gradient-end: #404040;
+  --button-hover-border: #141414;
+  --button-disabled: rgb(69 69 69 / 0.5);
+  --button-primary-bg: #2652cf;
+  --button-primary-gradient-start: #2f67e1;
+  --button-primary-gradient-end: #2652cf;
+  --button-primary-disabled: #4484ed;
+  --scrollbar-bg: #454545;
+  --scrollbar-bg-hover: #545454;
+  --scrollbar-bg-active: #636363;
+  --shadow: #141414;
+  --shadow-inset: #202020;
+  --shadow-subtle: #363636;
+  --shadow-focus: #6366f1;
+  --accent-card: #93c5fd;
+  --accent-note: #4ade80;
+  --accent-danger: #f87171;
+  --highlight-bg: rgb(147 197 253 / 0.5);
+  --highlight-fg: white;
+  --selected-bg: rgb(147 197 253 / 0.5);
+  --selected-fg: white;
+  color-scheme: dark;
+}
+
+/*! props */
+:root {
+  --font-size: 15px;
+  --border-radius: 5px;
+  --border-radius-medium: 12px;
+  --border-radius-large: 15px;
+  --transition: 180ms;
+  --transition-medium: 500ms;
+  --transition-slow: 1000ms;
+  --blur: 20px;
+  --focus-color: #6366f1;
+}
+
+/*! base */
+* {
+  box-sizing: content-box;
+}
+
+html {
+  font-family: Helvetica, sans-serif;
+  font-size: var(--font-size);
+}
+
+body {
+  color: var(--fg);
+  background-color: var(--canvas);
+  margin: 20px;
+  overflow-wrap: break-word;
+  overscroll-behavior: none;
+
+  &.nightMode {
+    background-color: var(--canvas);
+    color: var(--fg);
+  }
+
+  &.fancy {
+    transition: opacity var(--transition-medium) ease-out;
+  }
+}
+
+.isMac button {
+  font-size: 13px;
+}
+
+a {
+  color: var(--fg-link);
+  text-decoration: none;
+}
+
+hr {
+  background-color: #737373;
+  margin: 1em 0;
+  border: none;
+  block-size: 1px;
+}
+
+img {
+  max-inline-size: 100%;
+  max-block-size: 95vh;
+}
+
+li {
+  text-align: start;
+}
+
+pre {
+  text-align: left;
+}
+
+button {
+  outline: none;
+  -webkit-appearance: none;
+  background: var(--button-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-subtle);
+  border-block-end-color: var(--shadow);
+  font-family: Helvetica, sans-serif;
+  font-weight: 500;
+  padding: 8px 10px;
+  margin: 1em 0.5em;
+  cursor: pointer;
+  color: var(--fg);
+
+  &:hover {
+    background: linear-gradient(180deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
+    border-color: var(--shadow);
+  }
+
+  &:active {
+    box-shadow: inset 0 calc(var(--buttons-size, 10px) / 15) calc(var(--buttons-size, 10px) / 5) rgb(0 0 0 / 0.35);
+    border-color: var(--border-subtle);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--fg-disabled);
+    box-shadow: none;
+    background-color: var(--button-gradient-end);
+    border-block-end-color: var(--border-subtle);
+  }
+
+  .nightMode & {
+    --canvas: #606060;
+    --fg: #eee;
+  }
+
+  .fancy & {
+    border-radius: var(--border-radius-large);
+    box-shadow:
+      0 2px 1px -1px rgb(20 20 20 / 0.12),
+      0 1px 1px 0 rgb(20 20 20 / 0.06),
+      0 1px 3px 0 rgb(20 20 20 / 0.04);
+
+    &:hover {
+      box-shadow:
+        0 3px 1px -2px rgb(20 20 20 / 0.2),
+        0 2px 2px 0 rgb(20 20 20 / 0.14),
+        0 1px 5px 0 rgb(20 20 20 / 0.12);
+      transition: box-shadow var(--transition) linear;
+    }
+  }
+}
+
+/* Dev pagination */
+.nav {
+  position: fixed;
+  inset-block-end: 20px;
+  inset-inline: 20px;
+  display: flex;
+  font-size: 10px;
+  opacity: 0.4;
+
+  span {
+    margin-inline-start: auto;
+  }
+}

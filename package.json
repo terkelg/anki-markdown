@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite test",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "debug": "ln -sfn \"$(pwd)/anki_markdown\" ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 open -a Anki"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
@@ -17,9 +18,7 @@
     "vite": "npm:rolldown-vite@7.2.5"
   },
   "dependencies": {
-    "@shikijs/markdown-it": "^3.20.0",
     "@shikijs/transformers": "^3.20.0",
-    "markdown-it": "^14.1.0",
-    "markdown-it-async": "^2.2.0"
+    "markdown-it": "^14.1.0"
   }
 }

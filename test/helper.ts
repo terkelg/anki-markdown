@@ -1,6 +1,6 @@
 type Example = { front: string; back: string }
 
-export function setup(examples: Example[], showBack: boolean, render: (f: string, b: string, s: boolean) => Promise<void>) {
+export function setup(examples: Example[], render: (f: string, b: string) => void) {
   const params = new URLSearchParams(location.search)
   let i = +(params.get('i') ?? Math.floor(Math.random() * examples.length))
   if (!params.has('i')) { params.set('i', String(i)); history.replaceState(null, '', '?' + params) }
@@ -8,12 +8,12 @@ export function setup(examples: Example[], showBack: boolean, render: (f: string
   const nav = document.querySelector('.nav')!
   const count = nav.querySelector('.count')!
 
-  const show = async (idx: number) => {
+  const show = (idx: number) => {
     i = (idx + examples.length) % examples.length
     params.set('i', String(i))
     history.replaceState(null, '', '?' + params)
     count.textContent = `${i + 1}/${examples.length}`
-    await render(examples[i].front, examples[i].back, showBack)
+    render(examples[i].front, examples[i].back)
   }
 
   document.addEventListener('keydown', (e) => {
