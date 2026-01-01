@@ -1,7 +1,8 @@
 import './style.css'
 import MarkdownItAsync from 'markdown-it-async'
 import { fromAsyncCodeToHtml } from '@shikijs/markdown-it/async'
-import { codeToHtml } from 'shiki'
+import { createHighlighter, bundledLanguages } from 'shiki/bundle/web'
+import swift from 'shiki/langs/swift.mjs'
 import {
   transformerMetaHighlight,
   transformerMetaWordHighlight,
@@ -9,8 +10,20 @@ import {
   transformerNotationFocus,
 } from '@shikijs/transformers'
 
+const langs = [...Object.keys(bundledLanguages), swift]
+const themes = ['vitesse-light', 'vitesse-dark']
+const highlighter = await createHighlighter({ langs, themes })
+
 const md = MarkdownItAsync()
-md.use(fromAsyncCodeToHtml(codeToHtml, {
+const highlight = (code: string, options: Parameters<typeof highlighter.codeToHtml>[1]) => {
+  try {
+    return highlighter.codeToHtml(code, options)
+  } catch {
+    return highlighter.codeToHtml(code, { ...options, lang: 'text' })
+  }
+}
+
+md.use(fromAsyncCodeToHtml((code, options) => Promise.resolve(highlight(code, options)), {
   themes: { light: 'vitesse-light', dark: 'vitesse-dark' },
   transformers: [
     transformerMetaHighlight(),
@@ -19,6 +32,11 @@ md.use(fromAsyncCodeToHtml(codeToHtml, {
     transformerNotationFocus({ matchAlgorithm: 'v3' }),
   ]
 }))
+
+document.querySelector('.card')?.addEventListener('click', (e) => {
+  const el = (e.target as Element).closest('.shiki.has-focused')
+  if (el) el.classList.toggle('revealed')
+})
 
 export async function render(front: string, back: string, _showBack: boolean) {
   const frontEl = document.querySelector(".front")
