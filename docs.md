@@ -10,6 +10,7 @@ Standard markdown syntax is supported via [markdown-it](https://github.com/markd
 - *Italic*: `*text*` or `_text_`
 - ~~Strikethrough~~: `~~text~~`
 - `Inline code`: `` `code` ``
+- Highlighted inline code: `` `code`{lang} `` (see below)
 - [Links](url): `[text](url)`
 - Images: `![alt](url)`
 - Lists, blockquotes, tables, etc.
@@ -25,17 +26,17 @@ console.log(greeting)
 ```
 ~~~
 
-### Supported Languages
 
-| Language   | Aliases     |
-|------------|-------------|
-| JavaScript | `js`        |
-| TypeScript | `ts`        |
-| Rust       |             |
-| CSS        |             |
-| HTML       |             |
-| JSON       |             |
-| Bash       | `sh`        |
+## Inline Code Highlighting
+
+Add syntax highlighting to inline code using `` `code`{lang} `` or `` `code`{.lang} ``:
+
+~~~markdown
+Use `const x = 1`{js} to declare a variable.
+In Python, use `print("hello")`{python} to output text.
+~~~
+
+Both `{lang}` and `{.lang}` (Pandoc-style) syntaxes are supported.
 
 ## Line Highlighting
 
@@ -132,16 +133,16 @@ function process(): Result<string> {
 ```
 ~~~
 
-## CSS Classes
 
-The transformers add these CSS classes for styling:
+## Customization
 
-| Feature | Class |
-|---------|-------|
-| Line highlight | `.highlighted` |
-| Word highlight | `.highlighted-word` |
-| Focus | `.focused` |
-| Error | `.highlighted.error` |
-| Warning | `.highlighted.warning` |
-| Container with focus | `.has-focused` |
-| Container with highlight | `.has-highlighted` |
+Override font size and line height in your note type's Styling section (**Browse > Cards > Styling**):
+
+```css
+.card {
+  --font-size: 1.25rem;
+  --line-height: 1.6;
+}
+```
+
+Defaults are `14px` (desktop) / `12px` (mobile) and `1.5`. All other sizes are relative to these values.

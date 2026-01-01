@@ -1,10 +1,12 @@
 # Anki Markdown
 
-> Anki markdown with beautiful code rendering using Shiki
+> Anki add-on for Markdown notes with syntax highlighting powered by Shiki
+
+Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode.
 
 ## Development
 
-### Browser Preview (Recommended)
+### Preview
 
 For rapid iteration without restarting Anki:
 
@@ -19,7 +21,7 @@ Then open:
 
 Edit `src/main.ts` and the browser will hot-reload. The preview files contain sample markdown content to simulate Anki's template variables.
 
-### Build
+## Build
 
 Compile TypeScript to the Anki add-on folder:
 
@@ -29,7 +31,7 @@ bun run build
 
 This outputs `anki_markdown/_anki-md.js`.
 
-### Testing in Anki
+## Testing in Anki
 
 > **Note:** Anki caches the add-on. You must restart Anki for changes to take effect.
 
@@ -39,17 +41,14 @@ bun run debug
 
 This creates the symlink and launches Anki with remote debugging enabled. Then open Chrome and navigate to `chrome://inspect` to access the webview console.
 
-## Manual symlink
+To do a manual symlink run the following command:
 
 ```bash
 ln -s "$(pwd)/anki_markdown" ~/Library/Application\ Support/Anki2/addons21/anki_markdown
 ```
 
-## Debugging
-
-See [Anki Add-on Debugging Docs](https://addon-docs.ankiweb.net/debugging.html).
-
-Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
+> [!TIP]
+> **Debugging** — See [Anki Add-on Debugging Docs](https://addon-docs.ankiweb.net/debugging.html). Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
 
 ## Resources
 

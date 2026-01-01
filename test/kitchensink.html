@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitchen Sink</title>
+  <link rel="stylesheet" href="./shared.css">
   <style>
-    body { max-width: 800px; margin: 0 auto; padding: 2rem; }
     h2 { margin-top: 2rem; opacity: 0.5; font-size: 0.875rem; text-transform: uppercase; }
   </style>
 </head>
@@ -29,6 +29,16 @@
 This is a paragraph with **bold text**, *italic text*, and ***bold italic***. Also ~~strikethrough~~ and ==highlighted==.
 
 Here's some \`inline code\` in a sentence.
+
+## Inline Code Highlighting
+
+Append {lang} after inline code for syntax highlighting:
+
+- JavaScript: \`const x = 42\`{js} and \`() => {}\`{.js}
+- Python: \`print("hello")\`{python} and \`lambda x: x * 2\`{.py}
+- Rust: \`fn main() {}\`{rust}
+- CSS: \`.card { display: flex }\`{css}
+- Plain inline code: \`no highlighting\`
 
 - Unordered list item
 - Another item

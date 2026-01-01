@@ -4,16 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: Front</title>
+  <link rel="stylesheet" href="./shared.css">
 </head>
 <body>
   <div class="card card1">
     <div class="front"></div>
   </div>
+  <nav class="nav"><span class="count"></span><span>← → enter</span></nav>
   <script type="module">
-    // Toggle nightMode with ?night in URL
     if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
 
     import { render } from "../src/main.ts"
+    import { setup } from "./helper.ts"
+
     const examples = [
       {
         front: `What does this return?
@@ -104,9 +107,27 @@ async function fetch(): Promise<Data> {  // [!code focus]
 - Focus on function signature
 - Warning: \`res.json()\` is also async`
       },
+      {
+        front: `What does \`Array.from()\`{.js} return when called with \`{length: 3}\`{js}?`,
+        back: `Returns \`[undefined, undefined, undefined]\`{js}
+
+It creates an array with 3 empty slots.`
+      },
+      {
+        front: `In Python, what's the difference between \`is\`{py} and \`==\`{py}?`,
+        back: `- \`is\`{py} checks **identity** (same object in memory)
+- \`==\`{py} checks **equality** (same value)
+
+\`\`\`python
+a = [1, 2]
+b = [1, 2]
+a == b  # True
+a is b  # False
+\`\`\``
+      },
     ]
-    const { front, back } = examples[Math.floor(Math.random() * examples.length)]
-    render(front, back, false)
+
+    setup(examples, false, render)
   </script>
 </body>
 </html>

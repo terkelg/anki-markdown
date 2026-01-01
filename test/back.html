@@ -4,17 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: Back</title>
+  <link rel="stylesheet" href="./shared.css">
 </head>
 <body>
   <div class="card card1">
     <div class="front"></div>
     <div class="back"></div>
   </div>
+  <nav class="nav"><span class="count"></span><span>← → enter</span></nav>
   <script type="module">
-    // Toggle nightMode with ?night in URL
     if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
 
     import { render } from "../src/main.ts"
+    import { setup } from "./helper.ts"
+
     const examples = [
       {
         front: `What does this return?
@@ -53,11 +56,17 @@ fn main() {
     println!("{}: {}", s, len);
 }
 \`\`\``,
-        back: `No bug — this compiles fine. \`len()\` borrows, doesn't move.`
+        back: `No bug — this compiles fine. \`len()\`{rust} borrows, doesn't move.`
+      },
+      {
+        front: `What does \`map()\`{js} return on an empty array?`,
+        back: `Returns \`[]\`{js} — an empty array.
+
+The callback is never called.`
       },
     ]
-    const { front, back } = examples[Math.floor(Math.random() * examples.length)]
-    render(front, back, true)
+
+    setup(examples, true, render)
   </script>
 </body>
 </html>
