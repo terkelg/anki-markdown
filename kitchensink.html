@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en" class="mac card card1">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchen Sink</title>
+  <style>
+    body { max-width: 800px; margin: 0 auto; padding: 2rem; }
+    h2 { margin-top: 2rem; opacity: 0.5; font-size: 0.875rem; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="card card1">
+    <div class="front"></div>
+  </div>
+  <script type="module">
+    if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
+
+    import { render } from "./src/main.ts"
+
+    const front = `
+## Basic Markdown
+
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+
+This is a paragraph with **bold text**, *italic text*, and ***bold italic***. Also ~~strikethrough~~ and ==highlighted==.
+
+Here's some \`inline code\` in a sentence.
+
+- Unordered list item
+- Another item
+  - Nested item
+  - Another nested
+
+1. Ordered list item
+2. Second item
+   1. Nested numbered
+   2. Another
+
+> Blockquote text here.
+> Multiple lines.
+
+[Link text](https://example.com)
+
+---
+
+## transformerMetaHighlight
+
+Single line \`{2}\`:
+\`\`\`ts {2}
+const a = 1
+const b = 2
+const c = 3
+\`\`\`
+
+Multiple lines \`{1,3}\`:
+\`\`\`ts {1,3}
+const a = 1
+const b = 2
+const c = 3
+\`\`\`
+
+Range \`{2-4}\`:
+\`\`\`ts {2-4}
+const a = 1
+const b = 2
+const c = 3
+const d = 4
+const e = 5
+\`\`\`
+
+Combined \`{1,3-4}\`:
+\`\`\`ts {1,3-4}
+const a = 1
+const b = 2
+const c = 3
+const d = 4
+\`\`\`
+
+---
+
+## transformerMetaWordHighlight
+
+Single word \`/Hello/\`:
+\`\`\`ts /Hello/
+const msg = "Hello World"
+console.log(msg)
+\`\`\`
+
+Multiple words \`/foo/ /bar/\`:
+\`\`\`ts /foo/ /bar/
+const foo = 1
+const bar = 2
+const baz = foo + bar
+\`\`\`
+
+---
+
+## transformerNotationFocus
+
+Single line \`[!code focus]\`:
+\`\`\`ts
+const a = 1
+const b = 2 // [!code focus]
+const c = 3
+\`\`\`
+
+Multiple lines \`[!code focus:3]\`:
+\`\`\`ts
+const a = 1
+// [!code focus:3]
+const b = 2
+const c = 3
+const d = 4
+const e = 5
+\`\`\`
+
+---
+
+## transformerNotationErrorLevel
+
+Error \`[!code error]\`:
+\`\`\`ts
+const valid = true
+const invalid = false // [!code error]
+\`\`\`
+
+Warning \`[!code warning]\`:
+\`\`\`ts
+const good = 1
+const risky = -1 // [!code warning]
+\`\`\`
+
+Combined:
+\`\`\`ts
+const ok = "safe"
+const bad = "secret-key" // [!code error]
+const meh = null // [!code warning]
+const fine = true
+\`\`\`
+
+---
+
+## Combined Transformers
+
+Line + word \`{1} /greet/\`:
+\`\`\`ts {1} /greet/
+function greet(name: string) {
+  return "Hello " + name
+}
+greet("world")
+\`\`\`
+
+Line + focus + error:
+\`\`\`ts {1}
+function run(cmd: string) {
+  eval(cmd) // [!code error]
+  log(cmd) // [!code focus]
+}
+\`\`\`
+
+All together \`{1} /data/\`:
+\`\`\`ts {1} /data/
+async function fetch(data: Input) { // [!code focus]
+  validate(data)
+  process(data) // [!code warning]
+  return data
+}
+\`\`\`
+
+---
+
+## Languages
+
+Swift:
+\`\`\`swift
+func greet(_ name: String) -> String {
+    return "Hello, \\(name)"
+}
+\`\`\`
+
+Python:
+\`\`\`python
+def greet(name: str) -> str:
+    return f"Hello, {name}"
+\`\`\`
+
+Fallback (unknown lang renders as plain text):
+\`\`\`foobar
+let x = 42
+print(x)
+\`\`\`
+
+CSS:
+\`\`\`css
+.card {
+  display: flex;
+  gap: 1rem;
+  color: rgb(0 0 0 / 0.8);
+}
+\`\`\`
+`
+
+    render(front, '', false)
+  </script>
+</body>
+</html>
