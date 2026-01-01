@@ -24,16 +24,22 @@ const highlighter = await createHighlighter({ langs, themes: Object.values(theme
 
 const codeBlock: ShikiTransformer = {
   name: 'code-block',
-  root(root) {
-    const pre = root.children[0] as Element
+  pre(node) {
+    // Move shiki class/styles from <pre> to <figure> wrapper
     const lang = this.options.lang
+    const classes = [node.properties.class].flat().filter(Boolean) as string[]
+    const style = node.properties.style
 
-    root.children = [{
+    // Clear shiki from pre
+    node.properties = {}
+
+    // Create figure with shiki class/styles
+    const figure: Element = {
       type: 'element',
       tagName: 'figure',
-      properties: { class: 'code-block' },
+      properties: { class: ['code-block', ...classes], style },
       children: [
-        pre,
+        { ...node } as Element,
         {
           type: 'element',
           tagName: 'figcaption',
@@ -52,17 +58,24 @@ const codeBlock: ShikiTransformer = {
           ]
         }
       ]
-    }]
+    }
+
+    // Replace node properties to become the figure
+    Object.assign(node, figure)
   }
 }
 
 const codeInline: ShikiTransformer = {
   name: 'code-inline',
   pre(node) {
-    node.tagName = 'span'
-  },
-  code(node) {
-    node.properties.class = 'code-inline'
+    const classes = [node.properties.class].flat().filter(Boolean) as string[]
+    node.tagName = 'code'
+    node.properties.class = ['code-inline', ...classes]
+    // Flatten: move inner <code> children up
+    const inner = node.children[0] as Element
+    if (inner?.tagName === 'code') {
+      node.children = inner.children
+    }
   }
 }
 
