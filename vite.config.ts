@@ -12,7 +12,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: '_anki-md[extname]',
-        inlineDynamicImports: true
+        inlineDynamicImports: true // prevent too many files being generated
       }
     }
   }
