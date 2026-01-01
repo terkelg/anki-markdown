@@ -1,43 +1,111 @@
 .card {
   font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  background: transparent;
+
+  .nightMode & {
+    color: #fff;
+  }
 }
 
-/* Switch to dark shiki theme when nightMode */
-.nightMode .shiki,
-.nightMode .shiki span {
-  color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
-  font-style: var(--shiki-dark-font-style) !important;
-  font-weight: var(--shiki-dark-font-weight) !important;
-  text-decoration: var(--shiki-dark-text-decoration) !important;
+/* Scroll fade custom properties */
+@property --fade-left {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #000;
 }
 
-/* Transformer styles (basic for testing) */
-.shiki .line.highlighted {
-  background: rgb(255 255 0 / 0.2);
+@property --fade-right {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #000;
 }
 
-.shiki .line.highlighted.error {
-  background: rgb(255 0 0 / 0.2);
+@keyframes scroll-fade {
+  0% {
+    --fade-left: #000;
+    --fade-right: transparent;
+  }
+
+  3%,
+  97% {
+    --fade-left: transparent;
+    --fade-right: transparent;
+  }
+
+  100% {
+    --fade-left: transparent;
+    --fade-right: #000;
+  }
 }
 
-.shiki .line.highlighted.warning {
-  background: rgb(255 165 0 / 0.2);
-}
+/* Code blocks */
+.code {
+  max-inline-size: 100%;
+  border: 1px solid rgb(0 0 0 / 0.15);
+  border-radius: 6px;
+  padding: 0.75em 1em;
+  background: var(--shiki-light-bg, #fff);
 
-.shiki .highlighted-word {
-  background: rgb(255 255 0 / 0.3);
-  padding: 2px;
-  border-radius: 2px;
-}
+  > code {
+    display: block;
+    overflow-x: auto;
+    scrollbar-width: none;
 
-.shiki.has-focused .line:not(.focused) {
-  opacity: 0.7;
-  filter: blur(0.095rem);
-  transition: filter 0.35s, opacity 0.35s;
-}
+    /* Scroll fade effect */
+    --fade-size: 2rem;
+    mask-image: linear-gradient(to right,
+        var(--fade-left),
+        #000 var(--fade-size),
+        #000 calc(100% - var(--fade-size)),
+        var(--fade-right));
+    animation: scroll-fade linear;
+    animation-timeline: scroll(self x);
+  }
 
-.shiki.has-focused:is(:hover, .revealed) .line:not(.focused) {
-  opacity: 1;
-  filter: blur(0);
+  /* Line highlighting */
+  .line.highlighted {
+    background: rgb(255 255 0 / 0.2);
+
+    &.error {
+      background: rgb(255 0 0 / 0.2);
+    }
+
+    &.warning {
+      background: rgb(255 165 0 / 0.2);
+    }
+  }
+
+  /* Word highlighting */
+  .highlighted-word {
+    background: rgb(255 255 0 / 0.3);
+    padding: 2px;
+    border-radius: 2px;
+  }
+
+  /* Focus blur effect */
+  &.has-focused {
+    .line:not(.focused) {
+      opacity: 0.7;
+      filter: blur(0.095rem);
+      transition: filter 0.35s, opacity 0.35s;
+    }
+
+    &:is(:hover, .revealed) .line:not(.focused) {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  .nightMode & {
+    border-color: rgb(255 255 255 / 0.15);
+
+    &,
+    span {
+      color: var(--shiki-dark);
+      background-color: var(--shiki-dark-bg);
+      font-style: var(--shiki-dark-font-style);
+      font-weight: var(--shiki-dark-font-weight);
+      text-decoration: var(--shiki-dark-text-decoration);
+    }
+  }
 }

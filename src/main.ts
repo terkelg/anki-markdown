@@ -3,12 +3,20 @@ import MarkdownItAsync from 'markdown-it-async'
 import { fromAsyncCodeToHtml } from '@shikijs/markdown-it/async'
 import { createHighlighter, bundledLanguages } from 'shiki/bundle/web'
 import swift from 'shiki/langs/swift.mjs'
+import type { ShikiTransformer } from 'shiki'
 import {
   transformerMetaHighlight,
   transformerMetaWordHighlight,
   transformerNotationErrorLevel,
   transformerNotationFocus,
 } from '@shikijs/transformers'
+
+const wrapper: ShikiTransformer = {
+  name: 'wrapper',
+  pre(node) {
+    this.addClassToHast(node, 'code')
+  }
+}
 
 const langs = [...Object.keys(bundledLanguages), swift]
 const themes = ['vitesse-light', 'vitesse-dark']
@@ -25,7 +33,9 @@ const highlight = (code: string, options: Parameters<typeof highlighter.codeToHt
 
 md.use(fromAsyncCodeToHtml((code, options) => Promise.resolve(highlight(code, options)), {
   themes: { light: 'vitesse-light', dark: 'vitesse-dark' },
+  defaultColor: false,
   transformers: [
+    wrapper,
     transformerMetaHighlight(),
     transformerMetaWordHighlight(),
     transformerNotationErrorLevel({ matchAlgorithm: 'v3' }),
