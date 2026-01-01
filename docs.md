@@ -145,3 +145,16 @@ The transformers add these CSS classes for styling:
 | Warning | `.highlighted.warning` |
 | Container with focus | `.has-focused` |
 | Container with highlight | `.has-highlighted` |
+
+## Customization
+
+Override font size and line height in your note type's Styling section (**Browse > Cards > Styling**):
+
+```css
+.card {
+  --font-size: 1.25rem;
+  --line-height: 1.6;
+}
+```
+
+Defaults are `14px` (desktop) / `12px` (mobile) and `1.5`. All other sizes are relative to these values.

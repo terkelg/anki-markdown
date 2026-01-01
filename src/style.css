@@ -1,6 +1,13 @@
+/* Customizable - override font-size/line-height in note type Styling */
 .card {
   font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  font-size: var(--font-size, 14px);
+  line-height: var(--line-height, 1.5);
   background: transparent;
+
+  .mobile & {
+    font-size: var(--font-size, 12px);
+  }
 
   .nightMode & {
     color: #fff;
