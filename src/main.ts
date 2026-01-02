@@ -3,6 +3,7 @@ import MarkdownIt from 'markdown-it'
 import mark from 'markdown-it-mark'
 import { createHighlighter, bundledLanguages } from 'shiki/bundle/web'
 import swift from 'shiki/langs/swift.mjs'
+import rust from 'shiki/langs/rust.mjs'
 import type { ShikiTransformer } from 'shiki'
 import type { Element } from 'hast'
 import {
@@ -12,7 +13,7 @@ import {
   transformerNotationFocus,
 } from '@shikijs/transformers'
 
-const langs = [...Object.keys(bundledLanguages), swift]
+const langs = [...Object.keys(bundledLanguages), swift, rust]
 const themes = { light: 'vitesse-light', dark: 'vitesse-dark' } as const
 const transformers = [
   transformerMetaHighlight(),
