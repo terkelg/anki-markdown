@@ -149,6 +149,29 @@ Combine multiple keys:
 <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> opens the command palette.
 ```
 
+## Alerts / Callouts
+
+GitHub-style alerts for highlighting important information:
+
+```markdown
+> [!NOTE]
+> Useful information the user should know.
+
+> [!TIP]
+> Helpful advice for better outcomes.
+
+> [!IMPORTANT]
+> Key information for success.
+
+> [!WARNING]
+> Urgent info requiring immediate attention.
+
+> [!CAUTION]
+> Potential negative consequences.
+```
+
+Five types available: `NOTE` (blue), `TIP` (green), `IMPORTANT` (purple), `WARNING` (yellow), `CAUTION` (red).
+
 ## Customization
 
 Override font size and line height in your note type's Styling section (**Browse > Cards > Styling**):

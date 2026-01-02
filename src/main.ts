@@ -1,6 +1,7 @@
 import './style.css'
 import MarkdownIt from 'markdown-it'
 import mark from 'markdown-it-mark'
+import alerts from 'markdown-it-github-alerts'
 import { createHighlighter, bundledLanguages } from 'shiki/bundle/web'
 import swift from 'shiki/langs/swift.mjs'
 import rust from 'shiki/langs/rust.mjs'
@@ -89,7 +90,7 @@ function highlight(code: string, lang: string, meta?: string) {
   }
 }
 
-const md = MarkdownIt({ html: true }).use(mark)
+const md = MarkdownIt({ html: true }).use(mark).use(alerts)
 
 // Fence renderer: ```lang meta
 md.renderer.rules.fence = (tokens, idx) => {

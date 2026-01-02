@@ -7,6 +7,7 @@
       "dependencies": {
         "@shikijs/transformers": "^3.20.0",
         "markdown-it": "^14.1.0",
+        "markdown-it-github-alerts": "^1.0.0",
         "markdown-it-mark": "^4.0.0",
       },
       "devDependencies": {
@@ -141,6 +142,8 @@
     "linkify-it": ["linkify-it@5.0.0", "", { "dependencies": { "uc.micro": "^2.0.0" } }, "sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ=="],
 
     "markdown-it": ["markdown-it@14.1.0", "", { "dependencies": { "argparse": "^2.0.1", "entities": "^4.4.0", "linkify-it": "^5.0.0", "mdurl": "^2.0.0", "punycode.js": "^2.3.1", "uc.micro": "^2.1.0" }, "bin": { "markdown-it": "bin/markdown-it.mjs" } }, "sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg=="],
+
+    "markdown-it-github-alerts": ["markdown-it-github-alerts@1.0.0", "", { "peerDependencies": { "markdown-it": ">= 13.0.0" } }, "sha512-RU3cbB/ewujrDpYNdyabvp4CscZ5J/3D71NWbJW+JSA0nplfutIXDMCwtGWlMLwzgBDAYkFMvYGkigq8nWOVdA=="],
 
     "markdown-it-mark": ["markdown-it-mark@4.0.0", "", {}, "sha512-YLhzaOsU9THO/cal0lUjfMjrqSMPjjyjChYM7oyj4DnyaXEzA8gnW6cVJeyCrCVeyesrY2PlEdUYJSPFYL4Nkg=="],
 

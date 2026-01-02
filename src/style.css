@@ -177,9 +177,31 @@ code:not(.shiki code) {
 }
 
 mark {
+  color: var(--fg);
   background: rgb(255 255 0 / 0.3);
   padding: 1px 2px;
   border-radius: 2px;
+
+  .nightMode & {
+    background: rgb(255 255 0 / 0.4);
+  }
+}
+
+ul, ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+li {
+  margin: 0;
+
+  p {
+    margin: 0;
+  }
+
+  ul, ol {
+    margin: 0;
+  }
 }
 
 blockquote {
@@ -201,6 +223,55 @@ kbd {
   border: 1px solid var(--border);
   border-radius: 4px;
   box-shadow: 0 1px 0 var(--border);
+}
+
+/* GitHub-style alerts */
+.markdown-alert {
+  margin: 1em 0;
+  padding: 0.35em 0.75em;
+  font-size: 0.9em;
+  border-left: 3px solid var(--alert-color, var(--border));
+  background: color-mix(in srgb, var(--alert-color, var(--border)) 10%, transparent);
+  border-radius: 4px;
+
+  .markdown-alert-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0;
+    font-weight: 600;
+    color: var(--alert-color);
+
+    svg {
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
+    }
+  }
+
+  p:last-child {
+    margin: 0;
+  }
+}
+
+.markdown-alert-note {
+  --alert-color: #2563eb;
+}
+
+.markdown-alert-tip {
+  --alert-color: #16a34a;
+}
+
+.markdown-alert-important {
+  --alert-color: #7c3aed;
+}
+
+.markdown-alert-warning {
+  --alert-color: #ca8a04;
+}
+
+.markdown-alert-caution {
+  --alert-color: #dc2626;
 }
 
 @property --fade-left {
