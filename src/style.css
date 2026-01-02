@@ -37,7 +37,7 @@
   }
 
   .highlighted-word {
-    background: rgb(255 255 0 / 0.3);
+    background: rgb(255 255 0 / 0.35);
     padding: 2px;
     border-radius: 2px;
   }
@@ -160,14 +160,20 @@
   }
 }
 
-.code-inline {
+code:not(.shiki code) {
+  font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.875em;
   border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius);
   padding: 1px 2px;
 
   .nightMode & {
-      border: 1px solid rgb(0 0 0 / 1);
+    border-color: rgb(0 0 0);
   }
+}
+
+.code-inline {
+  font-size: 0.875rem;
 }
 
 mark {
