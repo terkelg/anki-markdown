@@ -96,6 +96,10 @@
     0 1px 2px -1px rgb(0 0 0 / 0.05);
 
   .nightMode & {
+      border: 1px solid rgb(0 0 0 / 1);
+      box-shadow:
+        0 1px 3px 0 rgb(0 0 0 / 0.2),
+        0 1px 2px -1px rgb(0 0 0 / 0.2);
   }
 
   pre {
@@ -112,9 +116,11 @@
     color: var(--fg-subtle);
     background: rgb(0 0 0 / 0.03);
     border-block-start: 1px solid var(--border-subtle);
+    user-select: none;
 
     .nightMode & {
-      background: rgb(0 0 0 / 0.15);
+      border-block-start: 1px solid rgb(0 0 0 / 1);
+      background: rgb(255 255 255 / 0.025);
     }
 
     .actions {
@@ -130,7 +136,7 @@
     button {
       all: unset;
       cursor: pointer;
-      padding: 0.15rem 0.25rem;
+      padding: 2px 4px;
       border-radius: 0.25rem;
 
       &:hover {
