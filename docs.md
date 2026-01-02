@@ -10,6 +10,7 @@ Standard markdown syntax is supported via [markdown-it](https://github.com/markd
 - *Italic*: `*text*` or `_text_`
 - ~~Strikethrough~~: `~~text~~`
 - ==Highlighted==: `==text==`
+- Keyboard keys: `<kbd>Ctrl</kbd>` (see below)
 - `Inline code`: `` `code` ``
 - Highlighted inline code: `` `code`{lang} `` (see below)
 - [Links](url): `[text](url)`
@@ -134,6 +135,42 @@ function process(): Result<string> {
 ```
 ~~~
 
+## Keyboard Shortcuts
+
+Style keyboard keys using HTML `<kbd>` tags:
+
+```markdown
+Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy.
+```
+
+Combine multiple keys:
+
+```markdown
+<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> opens the command palette.
+```
+
+## Alerts / Callouts
+
+GitHub-style alerts for highlighting important information:
+
+```markdown
+> [!NOTE]
+> Useful information the user should know.
+
+> [!TIP]
+> Helpful advice for better outcomes.
+
+> [!IMPORTANT]
+> Key information for success.
+
+> [!WARNING]
+> Urgent info requiring immediate attention.
+
+> [!CAUTION]
+> Potential negative consequences.
+```
+
+Five types available: `NOTE` (blue), `TIP` (green), `IMPORTANT` (purple), `WARNING` (yellow), `CAUTION` (red).
 
 ## Customization
 
