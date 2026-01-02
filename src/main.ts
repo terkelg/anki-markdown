@@ -89,7 +89,7 @@ function highlight(code: string, lang: string, meta?: string) {
   }
 }
 
-const md = MarkdownIt().use(mark)
+const md = MarkdownIt({ html: true }).use(mark)
 
 // Fence renderer: ```lang meta
 md.renderer.rules.fence = (tokens, idx) => {
