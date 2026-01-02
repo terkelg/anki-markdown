@@ -174,7 +174,7 @@ Five types available: `NOTE` (blue), `TIP` (green), `IMPORTANT` (purple), `WARNI
 
 ## Customization
 
-Override font size and line height in your note type's Styling section (**Browse > Cards > Styling**):
+Override styles in your note type's Styling section (**Browse > Cards > Styling**):
 
 ```css
 .card {
@@ -183,4 +183,18 @@ Override font size and line height in your note type's Styling section (**Browse
 }
 ```
 
-Defaults are `14px` (desktop) / `12px` (mobile) and `1.5`. All other sizes are relative to these values.
+### Alert Colors
+
+Customize alert/callout colors:
+
+```css
+:root {
+  --note: #2563eb;
+  --tip: #16a34a;
+  --important: #7c3aed;
+  --warning: #ca8a04;
+  --caution: #dc2626;
+}
+```
+
+Night mode overrides use the same variables with brighter defaults for visibility.
