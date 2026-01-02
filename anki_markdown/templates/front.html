@@ -1,11 +1,11 @@
-<link rel="stylesheet" href="./_anki-md.css">
+<link rel="stylesheet" href="./_review.css">
 <div class="card">
   <div class="front"></div>
 </div>
 <script id="data-front" type="text/plain">{{text:Front}}</script>
 <script id="data-back" type="text/plain">{{text:Back}}</script>
 <script type="module">
-  import { render } from "./_anki-md.js"
+  import { render } from "./_review.js"
   const front = document.getElementById("data-front").textContent
   const back = document.getElementById("data-back").textContent
   render(front, back)

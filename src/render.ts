@@ -170,9 +170,15 @@ card?.addEventListener('click', (e) => {
   }
 })
 
+/** Render markdown string to HTML */
+export function renderMarkdown(text: string): string {
+  return md.render(text)
+}
+
+/** Render front/back fields to card DOM */
 export function render(front: string, back: string) {
   const frontEl = document.querySelector('.front')
   const backEl = document.querySelector('.back')
-  if (frontEl) frontEl.innerHTML = md.render(front)
-  if (backEl) backEl.innerHTML = md.render(back)
+  if (frontEl) frontEl.innerHTML = renderMarkdown(front)
+  if (backEl) backEl.innerHTML = renderMarkdown(back)
 }

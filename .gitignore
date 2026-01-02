@@ -1,6 +1,8 @@
 # Build output
-anki_markdown/_anki-md.js
-anki_markdown/_anki-md.css
+anki_markdown/_review.js
+anki_markdown/_review.css
+anki_markdown/web/editor.js
+anki_markdown/web/editor.css
 
 # Python
 __pycache__/
