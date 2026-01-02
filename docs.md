@@ -9,6 +9,7 @@ Standard markdown syntax is supported via [markdown-it](https://github.com/markd
 - **Bold**: `**text**` or `__text__`
 - *Italic*: `*text*` or `_text_`
 - ~~Strikethrough~~: `~~text~~`
+- ==Highlighted==: `==text==`
 - `Inline code`: `` `code` ``
 - Highlighted inline code: `` `code`{lang} `` (see below)
 - [Links](url): `[text](url)`
