@@ -138,8 +138,10 @@ card?.addEventListener('click', (e) => {
   const block = target.closest('.code-block')
   if (!block) return
 
-  if (target.closest('.toggle')) {
-    block.classList.toggle('revealed')
+  const toggle = target.closest('.toggle') as HTMLElement
+  if (toggle) {
+    const revealed = block.classList.toggle('revealed')
+    toggle.textContent = revealed ? 'Hide' : 'Reveal'
   }
   const copy = target.closest('.copy') as HTMLElement
   if (copy) {
