@@ -1,5 +1,5 @@
 .card {
-  font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: var(--font-size, 14px);
   line-height: var(--line-height, 1.5);
   background: transparent;
@@ -15,6 +15,7 @@
 
 /* Shared shiki styles */
 .shiki {
+  font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.875rem;
   background: var(--shiki-light-bg);
 
@@ -173,6 +174,27 @@ mark {
   background: rgb(255 255 0 / 0.3);
   padding: 1px 2px;
   border-radius: 2px;
+}
+
+blockquote {
+  margin: 0;
+  padding: 0 0.5em;
+  border-left: 3px solid var(--border);
+  font-style: italic;
+  color: var(--fg-subtle);
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 0.75em;
+  line-height: 1;
+  color: var(--fg);
+  background: var(--canvas-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--border);
 }
 
 @property --fade-left {
