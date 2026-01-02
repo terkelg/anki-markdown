@@ -1,4 +1,4 @@
-import './style.css';
+import './editor.css';
 
 // Called from Python when Anki Markdown note is loaded
 (window as any).ankiMdActivate = function() {

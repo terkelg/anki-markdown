@@ -23,7 +23,7 @@ const renderer = defineConfig({
 const editor = defineConfig({
   build: {
     lib: {
-      entry: 'src/editor/index.ts',
+      entry: 'src/editor.ts',
       formats: ['es'],
       fileName: () => 'web/editor.js'
     },
