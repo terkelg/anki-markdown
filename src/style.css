@@ -13,11 +13,15 @@
   }
 }
 
-.card {
+.anki-md-wrapper {
   font-family: system-ui, -apple-system, sans-serif;
   font-size: var(--font-size, 14px);
   line-height: var(--line-height, 1.5);
   background: transparent;
+  max-inline-size: var(--content-max-width, 30rem);
+  margin-inline: auto;
+  border: 1px solid rgb(0 0 0 / 0.1);
+  border-radius: 12px;
 
   .mobile & {
     font-size: var(--font-size, 12px);
@@ -25,6 +29,27 @@
 
   .nightMode & {
     color: #fff;
+  }
+
+  > .front,
+  > .back {
+    padding: 1rem;
+
+    > :first-child {
+      margin-block-start: 0;
+    }
+
+    > :last-child {
+      margin-block-end: 0;
+    }
+  }
+
+  > .back {
+    border-block-start: 1px solid rgb(0 0 0 / 0.1);
+
+    .nightMode & {
+      border-color: rgb(255 255 255 / 0.1);
+    }
   }
 }
 
@@ -102,8 +127,6 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
-  inline-size: fit-content;
-  max-inline-size: 100%;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   background-clip: padding-box;

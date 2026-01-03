@@ -60,6 +60,34 @@ ESM works in Anki templates with placeholder elements:
 
 **Critical**: Don't replace parent `innerHTML` — mutate children instead. Anki's reviewer.js caches element references after initial parse. Using `parent.innerHTML = ...` destroys elements and invalidates those references, causing null errors. Instead, populate existing elements: `frontEl.innerHTML = content`.
 
+## Editor Integration
+
+The editor webview (`src/editor.ts` + `src/editor.css`) hides rich-text UI for markdown-only editing.
+
+### Why visually hide instead of display:none?
+
+Anki's editor webview has many built-in features: drag-drop media upload, paste handling, undo/redo, etc. These are driven by the `.rich-text-input` element. Using `display:none` completely breaks these features because the element is removed from the render tree.
+
+After trying several approaches (custom editor, fully replacing the view), the most elegant solution is to **visually hide** the rich-text editor while keeping it functional:
+
+```css
+.rich-text-input {
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  contain: strict;
+}
+```
+
+This keeps the element in the DOM and functional (receiving events, handling drops) while being invisible. Users edit in the plain-text/source view which shows raw markdown.
+
+### Selective activation
+
+The `.anki-md-active` class is only applied when editing "Anki Markdown" note types:
+- Python detects note type changes and calls `ankiMdActivate()` / `ankiMdDeactivate()`
+- Other note types remain completely unaffected
+- The JS/CSS is injected into the editor webview on add-on load
+
 ## Anki CSS Variables
 
 Anki provides CSS variables for theming. Use these instead of hardcoded colors for light/dark mode support. Night mode uses `:root.night-mode` selector (note: different from our `.nightMode` class on cards).

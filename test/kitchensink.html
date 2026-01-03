@@ -10,13 +10,13 @@
   </style>
 </head>
 <body class="fancy">
-  <div class="card card1">
+  <div class="anki-md-wrapper">
     <div class="front"></div>
   </div>
   <script type="module">
     if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
 
-    import { render } from "../src/main.ts"
+    import { render } from "../src/render.ts"
 
     const front = `
 ## Basic Markdown
@@ -28,7 +28,7 @@
 
 This is a paragraph with **bold text**, *italic text*, and ***bold italic***. Also ~~strikethrough~~ and ==highlighted==.
 
-Press [[Cmd]]+[[Shift]]+[[P]] to open the command palette. Or [[Ctrl]]+[[C]] to copy.
+Press <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> to open the command palette. Or <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy.
 
 Here's some \`inline code\` in a sentence.
 
