@@ -35,34 +35,39 @@ Debug in Chrome at `chrome://inspect`.
 ## Architecture
 
 ```
+src/                     # TypeScript source (compiled by Vite)
+├── render.ts            # Card renderer → _review.js
+├── style.css            # Card styles → _review.css
+├── editor.ts            # Editor integration → web/editor.js
+└── editor.css           # Editor styles → web/editor.css
+
 anki_markdown/           # Anki add-on (symlinked to Anki addons folder)
 ├── __init__.py          # Python entry point - hooks into Anki, syncs media, manages note type
 ├── manifest.json        # Add-on metadata
-├── templates/           # Card templates using Anki's mustache-style syntax
-│   ├── front.html
-│   └── back.html
-└── _anki-md.js          # Client-side JS (prefixed with _ for Anki media sync)
+├── templates/           # Card templates
+├── _review.js           # Card renderer (built, syncs to mobile)
+├── _review.css          # Card styles (built, syncs to mobile)
+└── web/                 # Editor files (built, desktop only)
 ```
 
 Key patterns:
 
-- Files prefixed with `_` are auto-synced to Anki's collection.media folder
-- Templates use `{{text:Field}}` syntax to pass field content to JS
+- Files prefixed with `_` are synced to `collection.media` (works on mobile/AnkiWeb)
+- Files in `web/` use add-on exports (desktop only)
 - `ensure_notetype()` creates/updates the custom note type on profile load
-- Future: Vite will build TypeScript from `client/` to `anki_markdown/_anki-md.js`
 
 ## ESM in Anki Templates
 
 ESM works in Anki templates with placeholder elements:
 
 ```html
-<div class="card">
+<div class="anki-md-wrapper">
   <div class="front"></div>
   <div class="back"></div>
 </div>
 <script type="module">
-  import { render } from "./_anki-md.js"
-  render(...)
+  import { render } from "./_review.js";
+  render(front, back);
 </script>
 ```
 

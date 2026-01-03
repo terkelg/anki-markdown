@@ -4,6 +4,19 @@
 
 Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode.
 
+## Architecture
+
+`src/` contains TypeScript/CSS that compiles to `anki_markdown/`. Python and templates are used directly.
+
+Anki has two webview contexts with different file access:
+
+| Context       | Files          | Location            | Syncs to mobile |
+| ------------- | -------------- | ------------------- | --------------- |
+| Card reviewer | `_review.*`    | `collection.media/` | Yes             |
+| Note editor   | `web/editor.*` | Add-on exports      | No              |
+
+Files prefixed with `_` are synced to Anki's media folder, which syncs to AnkiWeb and mobile apps. Editor files use add-on web exports (desktop only).
+
 ## Development
 
 ### Preview
@@ -20,7 +33,7 @@ Then open:
 - `http://localhost:5173/back.html` - preview back card
 - Add `?night` to test night mode (e.g., `/front.html?night`)
 
-Edit `src/main.ts` and the browser will hot-reload. The preview files contain sample markdown content to simulate Anki's template variables.
+Edit files in `src/` and the browser will hot-reload.
 
 ## Build
 
@@ -30,7 +43,7 @@ Compile TypeScript to the Anki add-on folder:
 bun run build
 ```
 
-This outputs `anki_markdown/_anki-md.js`.
+This outputs `_review.js`, `_review.css`, and `web/editor.*` to `anki_markdown/`.
 
 ## Testing in Anki
 
