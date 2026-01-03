@@ -72,6 +72,10 @@ html {
     flex-flow: column;
     gap: 1em;
     padding: 1rem;
+
+    > * {
+      margin: 0;
+    }
   }
 
   > .back {
@@ -241,10 +245,6 @@ mark {
   .night-mode & {
     background: rgb(255 255 0 / 0.4);
   }
-}
-
-p {
-  margin: 0;
 }
 
 img {
