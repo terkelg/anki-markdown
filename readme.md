@@ -2,7 +2,7 @@
 
 > Anki add-on for Markdown notes with syntax highlighting powered by [Shiki](https://shiki.style)
 
-Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode.
+Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode. Requires Anki 2.1.55+.
 
 **[View Documentation](docs.md)** — Full syntax guide with examples
 
