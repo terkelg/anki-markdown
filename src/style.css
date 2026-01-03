@@ -1,24 +1,37 @@
 :root {
-  /* Anki variable fallbacks */
   --_radius: var(--border-radius, 5px);
-  --_border: var(--_border);
-  --_border-subtle: var(--_border-subtle);
-  --_fg: var(--_fg);
-  --_fg-subtle: var(--_fg-subtle);
-  --_canvas-elevated: var(--_canvas-elevated);
-
-  /* Alert colors */
-  --color-note: var(--note, #2563eb);
-  --color-tip: var(--tip, #16a34a);
-  --color-important: var(--important, #7c3aed);
-  --color-warning: var(--warning, #ca8a04);
-  --color-caution: var(--caution, #dc2626);
+  --_fg: var(--fg, #020202);
+  --_fg-subtle: var(--fg-subtle, #737373);
+  --_border: rgb(0 0 0 / 0.1);
+  --_bg: var(--canvas-elevated, #fff);
+  --_bg-inset: rgb(0 0 0 / 0.04);
+  --_shadow: 0 1px 2px 0 rgb(20 20 20 / 0.06), 0 1px 3px 0 rgb(20 20 20 / 0.04);
+  --_shadow-hover:
+    0 2px 4px 0 rgb(20 20 20 / 0.1), 0 1px 3px 0 rgb(20 20 20 / 0.06);
+  --_shadow-code:
+    0 1px 3px 0 rgb(0 0 0 / 0.025), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  --_color-note: var(--note, #2563eb);
+  --_color-tip: var(--tip, #16a34a);
+  --_color-important: var(--important, #7c3aed);
+  --_color-warning: var(--warning, #ca8a04);
+  --_color-caution: var(--caution, #dc2626);
 
   &.nightMode {
-    --color-note: var(--note, #318aff);
-    --color-tip: var(--tip, #19be56);
-    --color-important: var(--important, #965bfb);
-    --color-warning: var(--warning, #dc9703);
+    --_fg: var(--fg, #fcfcfc);
+    --_fg-subtle: var(--fg-subtle, #858585);
+    --_border: rgb(255 255 255 / 0.12);
+    --_border-code: rgb(255 255 255 / 0.22);
+    --_bg: var(--canvas-elevated, #363636);
+    --_bg-inset: rgb(255 255 255 / 0.05);
+    --_shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 2px 6px 0 rgb(0 0 0 / 0.2);
+    --_shadow-hover:
+      0 2px 6px 0 rgb(0 0 0 / 0.4), 0 4px 12px 0 rgb(0 0 0 / 0.3);
+    --_shadow-code:
+      0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+    --_color-note: var(--note, #318aff);
+    --_color-tip: var(--tip, #19be56);
+    --_color-important: var(--important, #965bfb);
+    --_color-warning: var(--warning, #dc9703);
   }
 }
 
@@ -29,12 +42,21 @@
     sans-serif;
   font-size: var(--font-size, 14px);
   line-height: var(--line-height, 1.5);
-  background: transparent;
-  max-inline-size: var(--content-max-width, 30rem);
+  text-wrap: pretty;
+  background: var(--_bg);
+  max-inline-size: var(--content-max-width, 34rem);
   margin-inline: auto;
   margin-block-start: 1rem;
-  border: 1px solid rgb(0 0 0 / 0.1);
+  border: 1px solid var(--_border);
   border-radius: 12px;
+  box-shadow: var(--_shadow);
+  transition: box-shadow var(--transition, 180ms);
+
+  @media (hover: hover) {
+    &:hover {
+      box-shadow: var(--_shadow-hover);
+    }
+  }
 
   .mobile & {
     font-size: var(--font-size, 12px);
@@ -46,7 +68,7 @@
 
   > .front,
   > .back {
-    padding: 0.5rem;
+    padding: 1rem;
 
     > :first-child {
       margin-block-start: 0;
@@ -58,11 +80,7 @@
   }
 
   > .back {
-    border-block-start: 1px solid rgb(0 0 0 / 0.1);
-
-    .nightMode & {
-      border-color: rgb(255 255 255 / 0.1);
-    }
+    border-block-start: 1px solid var(--_border);
   }
 }
 
@@ -125,11 +143,12 @@
   }
 
   pre > code {
+    --fade-size: 1.5rem;
+
     display: block;
     overflow-x: auto;
     scrollbar-width: none;
 
-    --fade-size: 1.5rem;
     mask-image: linear-gradient(
       to right,
       var(--fade-left),
@@ -146,19 +165,10 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
-  border: 1px solid var(--_border-subtle);
+  border: 1px solid var(--_border-code, var(--_border));
   border-radius: 8px;
   background-clip: padding-box;
-  box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.025),
-    0 1px 2px -1px rgb(0 0 0 / 0.05);
-
-  .nightMode & {
-    border: 1px solid rgb(0 0 0 / 1);
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.2),
-      0 1px 2px -1px rgb(0 0 0 / 0.2);
-  }
+  box-shadow: var(--_shadow-code);
 
   pre {
     margin: 0;
@@ -172,14 +182,9 @@
     padding: 4px 8px;
     font-size: 0.625rem;
     color: var(--_fg-subtle);
-    background: rgb(0 0 0 / 0.03);
-    border-block-start: 1px solid var(--_border-subtle);
+    background: var(--_bg-inset);
+    border-block-start: 1px solid var(--_border);
     user-select: none;
-
-    .nightMode & {
-      border-block-start: 1px solid rgb(0 0 0 / 1);
-      background: rgb(255 255 255 / 0.025);
-    }
 
     .actions {
       display: flex;
@@ -222,13 +227,10 @@ code:not(.shiki code) {
     "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
     monospace;
   font-size: 0.875em;
-  border: 1px solid var(--_border-subtle);
+  background: var(--_bg-inset);
+  border: 1px solid var(--_border);
   border-radius: var(--_radius);
   padding: 1px 2px;
-
-  .nightMode & {
-    border-color: rgb(0 0 0);
-  }
 }
 
 .code-inline {
@@ -248,6 +250,36 @@ mark {
 
 img {
   border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--_border);
+  border-radius: 8px;
+  font-size: 0.875em;
+  overflow: hidden;
+
+  th,
+  td {
+    padding: 0.5em 0.75em;
+    border-bottom: 1px solid var(--_border);
+    text-align: left;
+  }
+
+  th {
+    font-weight: 600;
+    background: var(--_bg-inset);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: var(--_bg-inset);
+  }
 }
 
 ul,
@@ -276,9 +308,16 @@ blockquote {
   font-style: italic;
   color: var(--_fg-subtle);
 
-  .nightMode & {
-    border-color: #666;
-    color: #aaa;
+  > * {
+    margin-block: 0.25em;
+  }
+
+  > :first-child {
+    margin-block-start: 0;
+  }
+
+  > :last-child {
+    margin-block-end: 0;
   }
 }
 
@@ -290,7 +329,7 @@ kbd {
   line-height: 1;
   text-transform: uppercase;
   color: var(--_fg);
-  background: var(--_canvas-elevated);
+  background: var(--_bg);
   border: 1px solid var(--_border);
   border-radius: 4px;
   box-shadow: 0 1px 0 var(--_border);
@@ -328,23 +367,23 @@ kbd {
   }
 
   &.markdown-alert-note {
-    --alert-color: var(--color-note);
+    --alert-color: var(--_color-note);
   }
 
   &.markdown-alert-tip {
-    --alert-color: var(--color-tip);
+    --alert-color: var(--_color-tip);
   }
 
   &.markdown-alert-important {
-    --alert-color: var(--color-important);
+    --alert-color: var(--_color-important);
   }
 
   &.markdown-alert-warning {
-    --alert-color: var(--color-warning);
+    --alert-color: var(--_color-warning);
   }
 
   &.markdown-alert-caution {
-    --alert-color: var(--color-caution);
+    --alert-color: var(--_color-caution);
   }
 }
 
