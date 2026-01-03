@@ -10,7 +10,7 @@ Write flashcards in Markdown with beautiful [code blocks](docs.md#code-blocks), 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="media/back-dark.png">
-    <img src="media/back.png" alt="Anki Markdown card example" width="500">
+    <img src="media/back.png" alt="Anki Markdown card example" width="800">
   </picture>
 </p>
 
