@@ -2,10 +2,17 @@
 
 > Anki add-on for Markdown notes with syntax highlighting powered by [Shiki](https://shiki.style)
 
-Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode. See the [documentation](docs.md) for full syntax guide.
+Write flashcards in Markdown with beautiful [code blocks](docs.md#code-blocks), [inline syntax highlighting](docs.md#inline-code-highlighting), [line/word highlighting](docs.md#line-highlighting), and [focus mode](docs.md#focus-mode). Supports light and dark mode. See the [documentation](docs.md) for all features.
 
 > [!NOTE]
-> Install: In Anki, go to `Tools → Add-ons → Get Add-ons` and enter code [`1172202975`](https://ankiweb.net/shared/info/1172202975)
+> Install: In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975)
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="media/back-dark.png">
+    <img src="media/back.png" alt="Anki Markdown card example" width="500">
+  </picture>
+</p>
 
 ## Development
 
@@ -45,7 +52,7 @@ bun run debug
 
 This creates the symlink and launches Anki with remote debugging enabled. Then open Chrome and navigate to `chrome://inspect` to access the webview console.
 
-To do a manual symlink run the following command:
+To do a manual symlink, run the following command:
 
 ```bash
 ln -s "$(pwd)/anki_markdown" ~/Library/Application\ Support/Anki2/addons21/anki_markdown
