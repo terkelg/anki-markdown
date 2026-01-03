@@ -60,6 +60,8 @@ ESM works in Anki templates with placeholder elements:
 
 **Critical**: Don't replace parent `innerHTML` — mutate children instead. Anki's reviewer.js caches element references after initial parse. Using `parent.innerHTML = ...` destroys elements and invalidates those references, causing null errors. Instead, populate existing elements: `frontEl.innerHTML = content`.
 
+**Important**: Always keep `front.html` and `back.html` templates in sync. They should have the same DOM structure — the only difference is `back.html` includes the `.back` div while `front.html` only has `.front`. Same applies to dev templates in `test/` — keep them structurally consistent with production templates.
+
 ## Editor Integration
 
 The editor webview (`src/editor.ts` + `src/editor.css`) hides rich-text UI for markdown-only editing.
