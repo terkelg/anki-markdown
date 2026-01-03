@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 
-export default defineConfig({
+const target = process.env.BUILD_TARGET || 'all'
+
+const renderer = defineConfig({
   build: {
     lib: {
       entry: 'src/render.ts',
@@ -17,3 +19,22 @@ export default defineConfig({
     }
   }
 })
+
+const editor = defineConfig({
+  build: {
+    lib: {
+      entry: 'src/editor.ts',
+      formats: ['es'],
+      fileName: () => 'web/editor.js'
+    },
+    outDir: 'anki_markdown',
+    emptyOutDir: false,
+    rollupOptions: {
+      output: {
+        assetFileNames: 'web/editor[extname]'
+      }
+    }
+  }
+})
+
+export default target === 'editor' ? editor : renderer

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite test",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && BUILD_TARGET=editor vite build",
     "package": "bun run build && cd anki_markdown && zip -r ../anki-markdown.ankiaddon . -x '__pycache__/*' '.*'",
     "preview": "vite preview",
     "debug": "ln -sfn \"$(pwd)/anki_markdown\" ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 open -a Anki"

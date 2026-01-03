@@ -2,6 +2,7 @@ from pathlib import Path
 import re
 from aqt import mw, gui_hooks
 from aqt.editor import Editor
+from aqt.webview import WebContent
 
 ADDON_DIR = Path(__file__).parent
 NOTETYPE = "Anki Markdown"
@@ -38,6 +39,7 @@ def on_munge_html(txt: str, editor: Editor) -> str:
 def on_profile_loaded():
     sync_media()
     ensure_notetype()
+    mw.addonManager.setWebExports(__name__, r"(web/.*|_review\..*)")
 
 def sync_media():
     """Copy web assets to collection.media."""
@@ -62,12 +64,31 @@ def ensure_notetype():
     back = mm.new_field("Back")
     mm.add_field(m, back)
 
-    t = mm.new_template("Card 1")
+    t = mm.new_template("Default")
     t["qfmt"] = read("templates/front.html")
     t["afmt"] = read("templates/back.html")
     mm.add_template(m, t)
 
     mm.add(m)
 
+def on_webview_set_content(content: WebContent, context):
+    """Inject editor JS/CSS."""
+    if isinstance(context, Editor):
+        addon = mw.addonManager.addonFromModule(__name__)
+        content.js.append(f"/_addons/{addon}/web/editor.js")
+        content.css.append(f"/_addons/{addon}/web/editor.css")
+
+def on_editor_load_note(editor: Editor):
+    """Notify JS when Anki Markdown note is loaded."""
+    if not editor.note:
+        return
+    notetype = editor.note.note_type()
+    if notetype and notetype["name"] == NOTETYPE:
+        editor.web.eval("window.ankiMdActivate && ankiMdActivate()")
+    else:
+        editor.web.eval("window.ankiMdDeactivate && ankiMdDeactivate()")
+
 gui_hooks.profile_did_open.append(on_profile_loaded)
 gui_hooks.editor_will_munge_html.append(on_munge_html)
+gui_hooks.webview_will_set_content.append(on_webview_set_content)
+gui_hooks.editor_did_load_note.append(on_editor_load_note)

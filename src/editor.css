@@ -1,0 +1,20 @@
+/* Anki Markdown Editor - add CSS to hide unwanted editor elements */
+.anki-md-active {
+
+  .editing-area {
+    gap: 0 !important;
+  }
+
+  .rich-text-input {
+    /* display: none !important; */
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    contain: strict;
+    padding: 0 !important;
+  }
+
+  .plain-text-badge {
+    display: none !important;
+  }
+}
