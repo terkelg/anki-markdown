@@ -10,13 +10,13 @@ NOTETYPE = "Anki Markdown"
 def read(name: str) -> str:
     return (ADDON_DIR / name).read_text(encoding="utf-8")
 
-def html_to_markdown(html: str) -> str:
+def html_to_markdown(content: str) -> str:
     """Convert basic HTML tags to markdown syntax.
 
     Not strictly required since HTML is supported in the markdown renderer,
     but keeps stored content as clean markdown without HTML tags.
     """
-    text = html
+    text = content
 
     def img_replace(m):
         src = m.group(1).replace(' ', '%20')
