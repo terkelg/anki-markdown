@@ -1,4 +1,13 @@
 :root {
+  /* Anki variable fallbacks */
+  --_radius: var(--border-radius, 5px);
+  --_border: var(--_border);
+  --_border-subtle: var(--_border-subtle);
+  --_fg: var(--_fg);
+  --_fg-subtle: var(--_fg-subtle);
+  --_canvas-elevated: var(--_canvas-elevated);
+
+  /* Alert colors */
   --color-note: var(--note, #2563eb);
   --color-tip: var(--tip, #16a34a);
   --color-important: var(--important, #7c3aed);
@@ -14,12 +23,16 @@
 }
 
 .anki-md-wrapper {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: var(--font-size, 14px);
   line-height: var(--line-height, 1.5);
   background: transparent;
   max-inline-size: var(--content-max-width, 30rem);
   margin-inline: auto;
+  margin-block-start: 1rem;
   border: 1px solid rgb(0 0 0 / 0.1);
   border-radius: 12px;
 
@@ -33,7 +46,7 @@
 
   > .front,
   > .back {
-    padding: 1rem;
+    padding: 0.5rem;
 
     > :first-child {
       margin-block-start: 0;
@@ -55,7 +68,9 @@
 
 /* Shared shiki styles */
 .shiki {
-  font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  font-family:
+    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
+    monospace;
   font-size: 0.875rem;
   background: var(--shiki-light-bg);
 
@@ -86,7 +101,9 @@
   &.has-focused .line:not(.focused) {
     opacity: 0.7;
     filter: blur(0.095rem);
-    transition: filter 0.35s, opacity 0.35s;
+    transition:
+      filter 0.35s,
+      opacity 0.35s;
 
     :is(.code-block.revealed, .shiki:hover) & {
       opacity: 1;
@@ -113,11 +130,13 @@
     scrollbar-width: none;
 
     --fade-size: 1.5rem;
-    mask-image: linear-gradient(to right,
-        var(--fade-left),
-        #000 var(--fade-size),
-        #000 calc(100% - var(--fade-size)),
-        var(--fade-right));
+    mask-image: linear-gradient(
+      to right,
+      var(--fade-left),
+      #000 var(--fade-size),
+      #000 calc(100% - var(--fade-size)),
+      var(--fade-right)
+    );
     animation: scroll-fade linear;
     animation-timeline: scroll(self x);
   }
@@ -127,7 +146,7 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--_border-subtle);
   border-radius: 8px;
   background-clip: padding-box;
   box-shadow:
@@ -152,9 +171,9 @@
     gap: 0.5rem;
     padding: 4px 8px;
     font-size: 0.625rem;
-    color: var(--fg-subtle);
+    color: var(--_fg-subtle);
     background: rgb(0 0 0 / 0.03);
-    border-block-start: 1px solid var(--border-subtle);
+    border-block-start: 1px solid var(--_border-subtle);
     user-select: none;
 
     .nightMode & {
@@ -179,7 +198,7 @@
       border-radius: 0.25rem;
 
       &:hover {
-        background: var(--border-subtle);
+        background: var(--_border-subtle);
       }
     }
 
@@ -199,10 +218,12 @@
 }
 
 code:not(.shiki code) {
-  font-family: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  font-family:
+    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
+    monospace;
   font-size: 0.875em;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--border-radius);
+  border: 1px solid var(--_border-subtle);
+  border-radius: var(--_radius);
   padding: 1px 2px;
 
   .nightMode & {
@@ -215,7 +236,7 @@ code:not(.shiki code) {
 }
 
 mark {
-  color: var(--fg);
+  color: var(--_fg);
   background: rgb(255 255 0 / 0.3);
   padding: 1px 2px;
   border-radius: 2px;
@@ -223,6 +244,10 @@ mark {
   .nightMode & {
     background: rgb(255 255 0 / 0.4);
   }
+}
+
+img {
+  border-radius: 4px;
 }
 
 ul,
@@ -247,9 +272,9 @@ li {
 blockquote {
   margin: 0;
   padding: 0 0.5em;
-  border-left: 3px solid var(--border);
+  border-left: 3px solid var(--_border);
   font-style: italic;
-  color: var(--fg-subtle);
+  color: var(--_fg-subtle);
 
   .nightMode & {
     border-color: #666;
@@ -264,19 +289,23 @@ kbd {
   font-size: 0.75em;
   line-height: 1;
   text-transform: uppercase;
-  color: var(--fg);
-  background: var(--canvas-elevated);
-  border: 1px solid var(--border);
+  color: var(--_fg);
+  background: var(--_canvas-elevated);
+  border: 1px solid var(--_border);
   border-radius: 4px;
-  box-shadow: 0 1px 0 var(--border);
+  box-shadow: 0 1px 0 var(--_border);
 }
 
 .markdown-alert {
   margin: 1em 0;
   padding: 0.35em 0.75em;
   font-size: 0.9em;
-  border-left: 3px solid var(--alert-color, var(--border));
-  background: color-mix(in srgb, var(--alert-color, var(--border)) 10%, transparent);
+  border-left: 3px solid var(--alert-color, var(--_border));
+  background: color-mix(
+    in srgb,
+    var(--alert-color, var(--_border)) 10%,
+    transparent
+  );
   border-radius: 4px;
 
   .markdown-alert-title {
