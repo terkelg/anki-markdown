@@ -1,6 +1,6 @@
 # Anki Markdown
 
-> Anki add-on for Markdown notes with syntax highlighting powered by Shiki
+> Anki add-on for Markdown notes with syntax highlighting powered by [Shiki](https://shiki.style)
 
 Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode.
 
@@ -50,6 +50,16 @@ ln -s "$(pwd)/anki_markdown" ~/Library/Application\ Support/Anki2/addons21/anki_
 
 > [!TIP]
 > Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
+
+## Release
+
+Create a new release:
+
+```bash
+bun run release 1.0.0
+```
+
+This bumps the version in `package.json` and `manifest.json`, commits, tags, and pushes. The GitHub Action automatically builds and publishes the `.ankiaddon` file to the release.
 
 ## Resources
 

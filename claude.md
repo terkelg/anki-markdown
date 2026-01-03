@@ -21,7 +21,13 @@ Key distinction: Users create **notes**, Anki generates **cards** from them. One
 ## Commands
 
 ```bash
+bun run dev      # Start dev server at localhost:5173
+bun run build    # Compile TypeScript and bundle for add-on
 bun run debug    # Symlink add-on and launch Anki with remote debugging (port 9222)
+bun run package  # Build and create .ankiaddon file
+bun run release  # Bump version, tag, and push (triggers GitHub release)
+
+# IMPORTANT: Never run `bun run release` without explicit user permission.
 ```
 
 Debug in Chrome at `chrome://inspect`.
