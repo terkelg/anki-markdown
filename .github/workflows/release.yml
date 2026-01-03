@@ -1,0 +1,19 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run package
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: anki-markdown.ankiaddon
+          generate_release_notes: true

@@ -1,4 +1,5 @@
 {
   "package": "anki_markdown",
-  "name": "Anki Markdown"
+  "name": "Anki Markdown",
+  "version": "1.0.0"
 }
