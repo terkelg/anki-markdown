@@ -20,6 +20,95 @@
       import { setup } from "./helper.ts";
 
       const examples = [
+        // Basic markdown
+        {
+          front: `**Basic Markdown** — What formatting is supported?`,
+          back: `Text styles:
+- **Bold text** and __also bold__
+- *Italic text* and _also italic_
+- ~~Strikethrough~~
+- ==Highlighted text==
+- \`inline code\`
+
+Links: [Example](https://example.com)
+
+Keyboard: <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy`,
+        },
+        // Lists
+        {
+          front: `**Lists** — Show nested list syntax`,
+          back: `Unordered:
+- First item
+- Second item
+  - Nested item
+  - Another nested
+- Third item
+
+Ordered:
+1. Step one
+2. Step two
+3. Step three`,
+        },
+        // Blockquote
+        {
+          front: `**Blockquote** — How do you quote text?`,
+          back: `Use \`>\` for blockquotes:
+
+> This is a blockquote.
+> It can span multiple lines.
+>
+> And have multiple paragraphs.`,
+        },
+        // Table
+        {
+          front: `**Tables** — Show table syntax`,
+          back: `| Method | Returns | Mutates |
+|--------|---------|---------|
+| \`map()\` | New array | No |
+| \`push()\` | Length | Yes |
+| \`slice()\` | New array | No |`,
+        },
+        // Alerts - NOTE
+        {
+          front: `**Alert: NOTE** — When to use?`,
+          back: `Use for helpful information:
+
+> [!NOTE]
+> This is useful information that users should know, even when skimming content.`,
+        },
+        // Alerts - TIP
+        {
+          front: `**Alert: TIP** — When to use?`,
+          back: `Use for helpful advice:
+
+> [!TIP]
+> Use \`const\` by default in JavaScript. Only use \`let\` when you need to reassign.`,
+        },
+        // Alerts - IMPORTANT
+        {
+          front: `**Alert: IMPORTANT** — When to use?`,
+          back: `Use for key information:
+
+> [!IMPORTANT]
+> Always validate user input before processing. Never trust client-side data.`,
+        },
+        // Alerts - WARNING
+        {
+          front: `**Alert: WARNING** — When to use?`,
+          back: `Use for urgent information:
+
+> [!WARNING]
+> This operation cannot be undone. Make sure to backup your data first.`,
+        },
+        // Alerts - CAUTION
+        {
+          front: `**Alert: CAUTION** — When to use?`,
+          back: `Use for potential negative consequences:
+
+> [!CAUTION]
+> Running this in production will delete all user data. Use only in development.`,
+        },
+        // Code block
         {
           front: `What does this return?
 
@@ -27,8 +116,12 @@
 const add = (a: number, b: number) => a + b
 add(1, 2)
 \`\`\``,
-          back: `Returns \`3\``,
+          back: `Returns \`3\`{ts}
+
+> [!TIP]
+> Arrow functions with a single expression don't need \`return\`.`,
         },
+        // Nullish coalescing
         {
           front: `What does \`??\` do in JavaScript?
 
@@ -37,33 +130,114 @@ const name = null ?? "anonymous"
 \`\`\``,
           back: `**Nullish coalescing** — returns right side if left is \`null\` or \`undefined\`
 
-Result: \`"anonymous"\``,
-        },
-        {
-          front: `What's the output?
+Result: \`"anonymous"\`{js}
 
-\`\`\`python
-print([x**2 for x in range(4)])
-\`\`\``,
-          back: `\`[0, 1, 4, 9]\``,
+> [!NOTE]
+> Unlike \`||\`, it doesn't treat \`0\` or \`""\` as falsy.`,
         },
+        // Line highlighting
         {
-          front: `Fix the bug:
+          front: `**Line Highlighting** — What line has the bug?
 
-\`\`\`rust
-fn main() {
-    let s = String::from("hello");
-    let len = s.len();
-    println!("{}: {}", s, len);
+\`\`\`js {3}
+function greet(name) {
+  const msg = "Hello, " + name
+  console.log(message)
+  return msg
 }
 \`\`\``,
-          back: `No bug — this compiles fine. \`len()\`{rust} borrows, doesn't move.`,
-        },
-        {
-          front: `What does \`map()\`{js} return on an empty array?`,
-          back: `Returns \`[]\`{js} — an empty array.
+          back: `Line 3: \`message\` should be \`msg\`
 
-The callback is never called.`,
+> [!CAUTION]
+> Undefined variables throw \`ReferenceError\` at runtime.`,
+        },
+        // Word highlighting
+        {
+          front: `**Word Highlighting** — Which variable is unused?
+
+\`\`\`js /unused/
+const used = "hello"
+const unused = "world"
+console.log(used)
+\`\`\``,
+          back: `\`unused\`{js} is never referenced
+
+> [!TIP]
+> Enable ESLint's \`no-unused-vars\` rule to catch these.`,
+        },
+        // Focus mode
+        {
+          front: `**Focus** — What does the highlighted line do?
+
+\`\`\`ts
+interface User {
+  id: number
+  name: string
+  role: "admin" | "user"  // [!code focus]
+}
+\`\`\``,
+          back: `Union type — \`role\`{ts} can only be \`"admin"\` or \`"user"\`
+
+> [!IMPORTANT]
+> Union types provide compile-time safety for valid values.`,
+        },
+        // Error levels
+        {
+          front: `**Error Levels** — Spot the issues:
+
+\`\`\`js
+const API_KEY = "sk-1234"  // [!code error]
+const timeout = 5000
+const retries = -1  // [!code warning]
+\`\`\``,
+          back: `- **Error**: Hardcoded secret
+- **Warning**: Negative retries may cause issues
+
+> [!CAUTION]
+> Never commit secrets to version control!`,
+        },
+        // Combined features
+        {
+          front: `**Combined** — Review this code:
+
+\`\`\`ts {1} /Promise/
+async function fetch(): Promise<Data> {  // [!code focus]
+  const res = await api.get("/data")
+  return res.json()  // [!code warning]
+}
+\`\`\``,
+          back: `- Line 1 highlighted + \`Promise\`{ts} word highlighted
+- Focus on function signature
+- Warning: \`res.json()\`{js} is also async
+
+> [!WARNING]
+> Missing \`await\` on \`.json()\` returns a Promise, not data!`,
+        },
+        // Inline highlighting
+        {
+          front: `What does \`Array.from()\`{js} return when called with \`{length: 3}\`{js}?`,
+          back: `Returns \`[undefined, undefined, undefined]\`{js}
+
+It creates an array with 3 empty slots.
+
+> [!TIP]
+> Add a map function: \`Array.from({length: 3}, (_, i) => i)\`{js} → \`[0, 1, 2]\``,
+        },
+        // Python example
+        {
+          front: `In Python, what's the difference between \`is\`{py} and \`==\`{py}?`,
+          back: `- \`is\`{py} checks **identity** (same object in memory)
+- \`==\`{py} checks **equality** (same value)
+
+\`\`\`python
+a = [1, 2]
+b = [1, 2]
+a == b  # True
+a is b  # False
+\`\`\`
+
+> [!IMPORTANT]
+> Use \`is\` only for \`None\`, \`True\`, \`False\` comparisons.`,
         },
       ];
 
