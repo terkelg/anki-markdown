@@ -54,7 +54,12 @@ html {
   border-radius: 12px;
   box-shadow: var(--_shadow);
   text-align: left;
+  opacity: 0;
   transition: box-shadow var(--transition, 120ms);
+
+  &.ready {
+    opacity: 1;
+  }
 
   @media (hover: hover) {
     &:hover {

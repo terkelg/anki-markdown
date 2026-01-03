@@ -5,6 +5,8 @@ import alerts from "markdown-it-github-alerts";
 import { createHighlighter, bundledLanguages } from "shiki/bundle/web";
 import swift from "shiki/langs/swift.mjs";
 import rust from "shiki/langs/rust.mjs";
+import glsl from "shiki/langs/glsl.mjs";
+import wgsl from "shiki/langs/wgsl.mjs";
 import type { ShikiTransformer } from "shiki";
 import type { Element } from "hast";
 import {
@@ -14,7 +16,7 @@ import {
   transformerNotationFocus,
 } from "@shikijs/transformers";
 
-const langs = [...Object.keys(bundledLanguages), swift, rust];
+const langs = [...Object.keys(bundledLanguages), swift, rust, glsl, wgsl];
 const themes = { light: "vitesse-light", dark: "vitesse-dark" } as const;
 const transformers = [
   transformerMetaHighlight(),
@@ -210,8 +212,10 @@ export function renderMarkdown(text: string): string {
 
 /** Render front/back fields to card DOM */
 export function render(front: string, back: string) {
+  const wrapper = document.querySelector(".anki-md-wrapper");
   const frontEl = document.querySelector(".front");
   const backEl = document.querySelector(".back");
   if (frontEl) frontEl.innerHTML = renderMarkdown(decode(front));
   if (backEl) backEl.innerHTML = renderMarkdown(decode(back));
+  wrapper?.classList.add("ready");
 }
