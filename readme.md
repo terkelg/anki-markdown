@@ -5,7 +5,7 @@
 Write flashcards in Markdown with beautiful [code blocks](docs.md#code-blocks), [inline syntax highlighting](docs.md#inline-code-highlighting), [line/word highlighting](docs.md#line-highlighting), and [focus mode](docs.md#focus-mode). Supports light and dark mode. See the [documentation](docs.md) for all features.
 
 > [!NOTE]
-> Install: In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975)
+> In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install
 
 <p align="center">
   <picture>
