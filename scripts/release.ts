@@ -15,6 +15,11 @@ if (status.trim()) {
   process.exit(1);
 }
 
+if (version === pkg.version) {
+  console.error(`Version ${version} is already current`);
+  process.exit(1);
+}
+
 pkg.version = manifest.version = version;
 await Bun.write("package.json", JSON.stringify(pkg, null, 2) + "\n");
 await Bun.write(
