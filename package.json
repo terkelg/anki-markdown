@@ -8,10 +8,12 @@
     "build": "tsc && vite build && BUILD_TARGET=editor vite build",
     "package": "bun run build && cd anki_markdown && zip -r ../anki-markdown.ankiaddon . -x '__pycache__/*' '.*'",
     "preview": "vite preview",
-    "debug": "ln -sfn \"$(pwd)/anki_markdown\" ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 open -a Anki"
+    "debug": "ln -sfn \"$(pwd)/anki_markdown\" ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 open -a Anki",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
+    "prettier": "^3.7.4",
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.2.5"
   },
