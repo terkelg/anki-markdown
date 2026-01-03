@@ -16,7 +16,7 @@
   --_color-warning: var(--warning, #ca8a04);
   --_color-caution: var(--caution, #dc2626);
 
-  &.nightMode {
+  &.night-mode {
     --_fg: var(--fg, #fcfcfc);
     --_fg-subtle: var(--fg-subtle, #858585);
     --_border: rgb(255 255 255 / 0.12);
@@ -50,7 +50,8 @@
   border: 1px solid var(--_border);
   border-radius: 12px;
   box-shadow: var(--_shadow);
-  transition: box-shadow var(--transition, 180ms);
+  text-align: left;
+  transition: box-shadow var(--transition, 120ms);
 
   @media (hover: hover) {
     &:hover {
@@ -60,10 +61,6 @@
 
   .mobile & {
     font-size: var(--font-size, 12px);
-  }
-
-  .nightMode & {
-    color: #fff;
   }
 
   > .front,
@@ -99,7 +96,7 @@
     text-decoration: var(--shiki-light-text-decoration);
   }
 
-  .nightMode & {
+  .night-mode & {
     background: var(--shiki-dark-bg);
 
     span {
@@ -243,7 +240,7 @@ mark {
   padding: 1px 2px;
   border-radius: 2px;
 
-  .nightMode & {
+  .night-mode & {
     background: rgb(255 255 0 / 0.4);
   }
 }
@@ -364,6 +361,16 @@ kbd {
 
   p:last-child {
     margin: 0;
+  }
+
+  code:not(.shiki code) {
+    background: rgb(0 0 0 / 0.06);
+    border-color: rgb(0 0 0 / 0.1);
+
+    .night-mode & {
+      background: rgb(255 255 255 / 0.1);
+      border-color: rgb(255 255 255 / 0.15);
+    }
   }
 
   &.markdown-alert-note {

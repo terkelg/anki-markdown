@@ -42,10 +42,14 @@ def on_profile_loaded():
     mw.addonManager.setWebExports(__name__, r"(web/.*|_review\..*)")
 
 def sync_media():
-    """Copy web assets to collection.media."""
-    for file in ADDON_DIR.glob("_*"):
-        if file.is_file():
-            mw.col.media.add_file(str(file))
+    """Copy web assets to collection.media (force overwrite)."""
+    files = [f for f in ADDON_DIR.glob("_*") if f.is_file()]
+    # Delete existing files first to force update
+    mw.col.media.trash_files([f.name for f in files])
+    for file in files:
+        mw.col.media.add_file(str(file))
+
+NOTETYPE_CSS = ".card { all: unset; }"
 
 def ensure_notetype():
     mm = mw.col.models
@@ -54,10 +58,12 @@ def ensure_notetype():
     if m:
         m["tmpls"][0]["qfmt"] = read("templates/front.html")
         m["tmpls"][0]["afmt"] = read("templates/back.html")
+        m["css"] = NOTETYPE_CSS
         mm.save(m)
         return
 
     m = mm.new(NOTETYPE)
+    m["css"] = NOTETYPE_CSS
     front = mm.new_field("Front")
     mm.add_field(m, front)
     back = mm.new_field("Back")

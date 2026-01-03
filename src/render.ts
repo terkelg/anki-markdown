@@ -194,6 +194,13 @@ card?.addEventListener("click", (e) => {
   }
 });
 
+/** Decode HTML entities (Anki HTML-escapes field content during template substitution) */
+function decode(text: string): string {
+  const el = document.createElement("textarea");
+  el.innerHTML = text;
+  return el.value;
+}
+
 /** Render markdown string to HTML */
 export function renderMarkdown(text: string): string {
   return md.render(text);
@@ -203,6 +210,6 @@ export function renderMarkdown(text: string): string {
 export function render(front: string, back: string) {
   const frontEl = document.querySelector(".front");
   const backEl = document.querySelector(".back");
-  if (frontEl) frontEl.innerHTML = renderMarkdown(front);
-  if (backEl) backEl.innerHTML = renderMarkdown(back);
+  if (frontEl) frontEl.innerHTML = renderMarkdown(decode(front));
+  if (backEl) backEl.innerHTML = renderMarkdown(decode(back));
 }
