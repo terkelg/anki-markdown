@@ -2,25 +2,10 @@
 
 > Anki add-on for Markdown notes with syntax highlighting powered by [Shiki](https://shiki.style)
 
-Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode. Requires Anki 2.1.55+.
+Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode. See the [documentation](docs.md) for full syntax guide.
 
 > [!NOTE]
-> **Install:** In Anki, go to **Tools → Add-ons → Get Add-ons** and enter code [`1172202975`](https://ankiweb.net/shared/info/1172202975)
-
-**[View Documentation](docs.md)** — Full syntax guide with examples
-
-## Architecture
-
-`src/` contains TypeScript/CSS that compiles to `anki_markdown/`. Python and templates are used directly.
-
-Anki has two webview contexts with different file access:
-
-| Context       | Files          | Location            | Syncs to mobile |
-| ------------- | -------------- | ------------------- | --------------- |
-| Card reviewer | `_review.*`    | `collection.media/` | Yes             |
-| Note editor   | `web/editor.*` | Add-on exports      | No              |
-
-Files prefixed with `_` are synced to Anki's media folder, which syncs to AnkiWeb and mobile apps. Editor files use add-on web exports (desktop only).
+> Install: In Anki, go to `Tools → Add-ons → Get Add-ons` and enter code [`1172202975`](https://ankiweb.net/shared/info/1172202975)
 
 ## Development
 
@@ -52,7 +37,7 @@ This outputs `_review.js`, `_review.css`, and `web/editor.*` to `anki_markdown/`
 
 ## Testing in Anki
 
-> **Note:** Anki caches the add-on. You must restart Anki for changes to take effect.
+Requires Anki 2.1.55+. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
 
 ```bash
 bun run debug
