@@ -4,6 +4,9 @@
 
 Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode. Requires Anki 2.1.55+.
 
+> [!NOTE]
+> **Install:** In Anki, go to **Tools → Add-ons → Get Add-ons** and enter code [`1172202975`](https://ankiweb.net/shared/info/1172202975)
+
 **[View Documentation](docs.md)** — Full syntax guide with examples
 
 ## Architecture
