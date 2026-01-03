@@ -45,7 +45,6 @@ def sync_media():
     """Copy web assets to collection.media."""
     for file in ADDON_DIR.glob("_*"):
         if file.is_file():
-            mw.col.media.trash_files([file.name])
             mw.col.media.add_file(str(file))
 
 def ensure_notetype():
