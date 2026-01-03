@@ -48,18 +48,13 @@ def ensure_notetype():
     if m:
         m["tmpls"][0]["qfmt"] = read("templates/front.html")
         m["tmpls"][0]["afmt"] = read("templates/back.html")
-        # Ensure fields use plain text mode
-        for field in m["flds"]:
-            field["plainText"] = True
         mm.save(m)
         return
 
     m = mm.new(NOTETYPE)
     front = mm.new_field("Front")
-    front["plainText"] = True
     mm.add_field(m, front)
     back = mm.new_field("Back")
-    back["plainText"] = True
     mm.add_field(m, back)
 
     t = mm.new_template("Card 1")

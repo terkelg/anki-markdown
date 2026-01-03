@@ -90,23 +90,13 @@ function highlight(code: string, lang: string, meta?: string) {
   }
 }
 
-const md = MarkdownIt().use(mark).use(alerts)
+const md = MarkdownIt({ html: true }).use(mark).use(alerts)
 
-// Custom [[kbd]] syntax
-md.inline.ruler.before('emphasis', 'kbd', (state, silent) => {
-  const start = state.pos
-  if (state.src.charCodeAt(start) !== 0x5B || state.src.charCodeAt(start + 1) !== 0x5B) return false // [[
-  const end = state.src.indexOf(']]', start + 2)
-  if (end === -1) return false
-  if (!silent) {
-    const token = state.push('kbd', 'kbd', 0)
-    token.content = state.src.slice(start + 2, end)
-  }
-  state.pos = end + 2
-  return true
-})
-
-md.renderer.rules.kbd = (tokens, idx) => `<kbd>${md.utils.escapeHtml(tokens[idx].content)}</kbd>`
+// Only allow safe HTML tags, strip everything else
+const ALLOWED = /^<\/?(img|a|b|i|em|strong|br|kbd)(\s[^>]*)?>$/i
+const filterHtml = (html: string) => ALLOWED.test(html.trim()) ? html : ''
+md.renderer.rules.html_inline = (tokens, idx) => filterHtml(tokens[idx].content)
+md.renderer.rules.html_block = (tokens, idx) => filterHtml(tokens[idx].content)
 
 // Fence renderer: ```lang meta
 md.renderer.rules.fence = (tokens, idx) => {
