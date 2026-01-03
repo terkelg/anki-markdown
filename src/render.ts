@@ -194,11 +194,13 @@ card?.addEventListener("click", (e) => {
   }
 });
 
-/** Decode HTML entities (Anki HTML-escapes field content during template substitution) */
+// Textarea trick: browser decodes all HTML entities when parsing innerHTML
+const decoder = document.createElement("textarea");
+
+/** Decode Anki field content: convert <br> to newlines, decode HTML entities */
 function decode(text: string): string {
-  const el = document.createElement("textarea");
-  el.innerHTML = text;
-  return el.value;
+  decoder.innerHTML = text.replace(/<br\s*\/?>/gi, "\n");
+  return decoder.value;
 }
 
 /** Render markdown string to HTML */
