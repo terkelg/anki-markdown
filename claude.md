@@ -6,6 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Anki add-on that renders markdown with code syntax highlighting using Shiki. Creates a custom "Anki Markdown" note type with Front/Back fields.
 
+## Documentation
+
+- `readme.md` — Developer documentation (architecture, build, debug)
+- `docs.md` — **End-user documentation only** (syntax guide, features, customization). Do not include developer/implementation details here.
+
 ## Anki Terminology
 
 Use correct Anki terminology in code, comments, and documentation:

@@ -4,6 +4,8 @@
 
 Write flashcards in Markdown with beautiful code blocks, inline syntax highlighting, and code annotations. Supports light and dark mode.
 
+**[View Documentation](docs.md)** — Full syntax guide with examples
+
 ## Architecture
 
 `src/` contains TypeScript/CSS that compiles to `anki_markdown/`. Python and templates are used directly.
