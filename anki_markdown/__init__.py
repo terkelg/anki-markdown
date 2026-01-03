@@ -10,21 +10,31 @@ NOTETYPE = "Anki Markdown"
 def read(name: str) -> str:
     return (ADDON_DIR / name).read_text(encoding="utf-8")
 
-def img_to_markdown(html: str) -> str:
-    """Convert <img> tags to markdown syntax."""
-    def replace(m):
+def html_to_markdown(html: str) -> str:
+    """Convert basic HTML tags to markdown syntax.
+
+    Not strictly required since HTML is supported in the markdown renderer,
+    but keeps stored content as clean markdown without HTML tags.
+    """
+    text = html
+
+    def img_replace(m):
         src = m.group(1).replace(' ', '%20')
         return f'![]({src})'
-    return re.sub(r'<img\s+src="([^"]+)"[^>]*>', replace, html, flags=re.IGNORECASE)
+    text = re.sub(r'<img\s+src="([^"]+)"[^>]*/?>', img_replace, text, flags=re.IGNORECASE)
+    text = re.sub(r'<(b|strong)>(.*?)</\1>', r'**\2**', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<(i|em)>(.*?)</\1>', r'*\2*', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<br\s*/?>', '\n', text, flags=re.IGNORECASE)
+    return text
 
 def on_munge_html(txt: str, editor: Editor) -> str:
-    """Convert img tags to markdown before saving."""
+    """Convert HTML to markdown before saving."""
     if not editor.note:
         return txt
     notetype = editor.note.note_type()
     if not notetype or notetype["name"] != NOTETYPE:
         return txt
-    return img_to_markdown(txt)
+    return html_to_markdown(txt)
 
 def on_profile_loaded():
     sync_media()
