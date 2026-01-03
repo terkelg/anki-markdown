@@ -1,24 +1,30 @@
 <!doctype html>
 <html lang="en" class="mac card card1">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kitchen Sink</title>
-  <link rel="stylesheet" href="./webview.css">
-  <style>
-    h2 { margin-top: 2rem; opacity: 0.5; font-size: 0.875rem; text-transform: uppercase; }
-  </style>
-</head>
-<body class="fancy">
-  <div class="anki-md-wrapper">
-    <div class="front"></div>
-  </div>
-  <script type="module">
-    if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kitchen Sink</title>
+    <link rel="stylesheet" href="./webview.css" />
+    <style>
+      h2 {
+        margin-top: 2rem;
+        opacity: 0.5;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body class="fancy">
+    <div class="anki-md-wrapper">
+      <div class="front"></div>
+    </div>
+    <script type="module">
+      if (location.search.includes("night"))
+        document.documentElement.classList.add("nightMode");
 
-    import { render } from "../src/render.ts"
+      import { render } from "../src/render.ts";
 
-    const front = `
+      const front = `
 ## Basic Markdown
 
 # Heading 1
@@ -233,9 +239,9 @@ CSS:
 
 > [!CAUTION]
 > This is a caution about negative consequences.
-`
+`;
 
-    render(front, '')
-  </script>
-</body>
+      render(front, "");
+    </script>
+  </body>
 </html>

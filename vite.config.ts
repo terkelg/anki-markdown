@@ -1,40 +1,40 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from "vite";
 
-const target = process.env.BUILD_TARGET || 'all'
+const target = process.env.BUILD_TARGET || "all";
 
 const renderer = defineConfig({
   build: {
     lib: {
-      entry: 'src/render.ts',
-      formats: ['es'],
-      fileName: () => '_review.js'
+      entry: "src/render.ts",
+      formats: ["es"],
+      fileName: () => "_review.js",
     },
-    outDir: 'anki_markdown',
+    outDir: "anki_markdown",
     emptyOutDir: false,
     rollupOptions: {
       output: {
-        assetFileNames: '_review[extname]',
-        inlineDynamicImports: true
-      }
-    }
-  }
-})
+        assetFileNames: "_review[extname]",
+        inlineDynamicImports: true,
+      },
+    },
+  },
+});
 
 const editor = defineConfig({
   build: {
     lib: {
-      entry: 'src/editor.ts',
-      formats: ['es'],
-      fileName: () => 'web/editor.js'
+      entry: "src/editor.ts",
+      formats: ["es"],
+      fileName: () => "web/editor.js",
     },
-    outDir: 'anki_markdown',
+    outDir: "anki_markdown",
     emptyOutDir: false,
     rollupOptions: {
       output: {
-        assetFileNames: 'web/editor[extname]'
-      }
-    }
-  }
-})
+        assetFileNames: "web/editor[extname]",
+      },
+    },
+  },
+});
 
-export default target === 'editor' ? editor : renderer
+export default target === "editor" ? editor : renderer;

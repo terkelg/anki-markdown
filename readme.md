@@ -15,6 +15,7 @@ bun run dev
 ```
 
 Then open:
+
 - `http://localhost:5173/front.html` - preview front card
 - `http://localhost:5173/back.html` - preview back card
 - Add `?night` to test night mode (e.g., `/front.html?night`)

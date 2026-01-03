@@ -7,7 +7,7 @@ This document covers all supported markdown and code highlighting features.
 Standard markdown syntax is supported via [markdown-it](https://github.com/markdown-it/markdown-it):
 
 - **Bold**: `**text**` or `__text__`
-- *Italic*: `*text*` or `_text_`
+- _Italic_: `*text*` or `_text_`
 - ~~Strikethrough~~: `~~text~~`
 - ==Highlighted==: `==text==`
 - Keyboard keys: `<kbd>Ctrl</kbd>` (HTML)
@@ -21,22 +21,21 @@ Standard markdown syntax is supported via [markdown-it](https://github.com/markd
 
 Fenced code blocks with syntax highlighting:
 
-~~~markdown
+````markdown
 ```javascript
-const greeting = "Hello, World!"
-console.log(greeting)
+const greeting = "Hello, World!";
+console.log(greeting);
 ```
-~~~
-
+````
 
 ## Inline Code Highlighting
 
 Add syntax highlighting to inline code using `` `code`{lang} `` or `` `code`{.lang} ``:
 
-~~~markdown
+```markdown
 Use `const x = 1`{js} to declare a variable.
 In Python, use `print("hello")`{python} to output text.
-~~~
+```
 
 Both `{lang}` and `{.lang}` (Pandoc-style) syntaxes are supported.
 
@@ -44,17 +43,17 @@ Both `{lang}` and `{.lang}` (Pandoc-style) syntaxes are supported.
 
 Highlight specific lines using `{lines}` in the meta string:
 
-~~~markdown
+````markdown
 ```js {2}
-const a = 1
-const b = 2  // this line highlighted
-const c = 3
+const a = 1;
+const b = 2; // this line highlighted
+const c = 3;
 ```
-~~~
+````
 
 ### Line Ranges
 
-~~~markdown
+````markdown
 ```js {1,3-5}
 line 1  // highlighted
 line 2
@@ -63,27 +62,27 @@ line 4  // highlighted
 line 5  // highlighted
 line 6
 ```
-~~~
+````
 
 ## Word Highlighting
 
 Highlight specific words using `/pattern/` in the meta string:
 
-~~~markdown
+````markdown
 ```js /greeting/
-const greeting = "Hello"
-console.log(greeting)
+const greeting = "Hello";
+console.log(greeting);
 ```
-~~~
+````
 
 Multiple patterns:
 
-~~~markdown
+````markdown
 ```js /hello/ /world/
-const hello = "Hello"
-const world = "World"
+const hello = "Hello";
+const world = "World";
 ```
-~~~
+````
 
 ## Focus
 
@@ -91,49 +90,49 @@ Draw attention to specific lines. Other lines are dimmed.
 
 ### Single Line
 
-~~~markdown
+````markdown
 ```js
-const a = 1
-const b = 2 // [!code focus]
-const c = 3
+const a = 1;
+const b = 2; // [!code focus]
+const c = 3;
 ```
-~~~
+````
 
 ### Multiple Lines
 
-~~~markdown
+````markdown
 ```js
-const a = 1 // [!code focus:3]
-const b = 2
-const c = 3
-const d = 4
+const a = 1; // [!code focus:3]
+const b = 2;
+const c = 3;
+const d = 4;
 ```
-~~~
+````
 
 ## Error & Warning Levels
 
 Mark lines with error or warning indicators:
 
-~~~markdown
+````markdown
 ```js
-const valid = true
-const bug = false // [!code error]
-const risky = maybe // [!code warning]
+const valid = true;
+const bug = false; // [!code error]
+const risky = maybe; // [!code warning]
 ```
-~~~
+````
 
 ## Combining Features
 
 Features can be combined:
 
-~~~markdown
+````markdown
 ```ts {1} /Result/
-type Result<T> = T | Error  // highlighted line + word
+type Result<T> = T | Error; // highlighted line + word
 function process(): Result<string> {
-  return "ok" // [!code focus]
+  return "ok"; // [!code focus]
 }
 ```
-~~~
+````
 
 ## Alerts / Callouts
 

@@ -1,13 +1,17 @@
-<link rel="stylesheet" href="./_review.css">
+<link rel="stylesheet" href="./_review.css" />
 <div class="anki-md-wrapper">
   <div class="front"></div>
   <div class="back"></div>
 </div>
-<script id="data-front" type="text/plain">{{Front}}</script>
-<script id="data-back" type="text/plain">{{Back}}</script>
+<script id="data-front" type="text/plain">
+  {{Front}}
+</script>
+<script id="data-back" type="text/plain">
+  {{Back}}
+</script>
 <script type="module">
-  import { render } from "./_review.js"
-  const front = document.getElementById("data-front").textContent
-  const back = document.getElementById("data-back").textContent
-  render(front, back)
+  import { render } from "./_review.js";
+  const front = document.getElementById("data-front").textContent;
+  const back = document.getElementById("data-back").textContent;
+  render(front, back);
 </script>

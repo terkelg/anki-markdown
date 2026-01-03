@@ -1,53 +1,54 @@
 <!doctype html>
 <html lang="en" class="mac card card1">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preview: Back</title>
-  <link rel="stylesheet" href="./webview.css">
-</head>
-<body class="fancy">
-  <div class="anki-md-wrapper">
-    <div class="front"></div>
-    <div class="back"></div>
-  </div>
-  <nav class="nav"><span class="count"></span><span>← → enter</span></nav>
-  <script type="module">
-    if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview: Back</title>
+    <link rel="stylesheet" href="./webview.css" />
+  </head>
+  <body class="fancy">
+    <div class="anki-md-wrapper">
+      <div class="front"></div>
+      <div class="back"></div>
+    </div>
+    <nav class="nav"><span class="count"></span><span>← → enter</span></nav>
+    <script type="module">
+      if (location.search.includes("night"))
+        document.documentElement.classList.add("nightMode");
 
-    import { render } from "../src/render.ts"
-    import { setup } from "./helper.ts"
+      import { render } from "../src/render.ts";
+      import { setup } from "./helper.ts";
 
-    const examples = [
-      {
-        front: `What does this return?
+      const examples = [
+        {
+          front: `What does this return?
 
 \`\`\`ts
 const add = (a: number, b: number) => a + b
 add(1, 2)
 \`\`\``,
-        back: `Returns \`3\``
-      },
-      {
-        front: `What does \`??\` do in JavaScript?
+          back: `Returns \`3\``,
+        },
+        {
+          front: `What does \`??\` do in JavaScript?
 
 \`\`\`js
 const name = null ?? "anonymous"
 \`\`\``,
-        back: `**Nullish coalescing** — returns right side if left is \`null\` or \`undefined\`
+          back: `**Nullish coalescing** — returns right side if left is \`null\` or \`undefined\`
 
-Result: \`"anonymous"\``
-      },
-      {
-        front: `What's the output?
+Result: \`"anonymous"\``,
+        },
+        {
+          front: `What's the output?
 
 \`\`\`python
 print([x**2 for x in range(4)])
 \`\`\``,
-        back: `\`[0, 1, 4, 9]\``
-      },
-      {
-        front: `Fix the bug:
+          back: `\`[0, 1, 4, 9]\``,
+        },
+        {
+          front: `Fix the bug:
 
 \`\`\`rust
 fn main() {
@@ -56,17 +57,17 @@ fn main() {
     println!("{}: {}", s, len);
 }
 \`\`\``,
-        back: `No bug — this compiles fine. \`len()\`{rust} borrows, doesn't move.`
-      },
-      {
-        front: `What does \`map()\`{js} return on an empty array?`,
-        back: `Returns \`[]\`{js} — an empty array.
+          back: `No bug — this compiles fine. \`len()\`{rust} borrows, doesn't move.`,
+        },
+        {
+          front: `What does \`map()\`{js} return on an empty array?`,
+          back: `Returns \`[]\`{js} — an empty array.
 
-The callback is never called.`
-      },
-    ]
+The callback is never called.`,
+        },
+      ];
 
-    setup(examples, render)
-  </script>
-</body>
+      setup(examples, render);
+    </script>
+  </body>
 </html>

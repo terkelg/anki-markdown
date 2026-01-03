@@ -1,44 +1,45 @@
 <!doctype html>
 <html lang="en" class="mac card card1">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preview: Front</title>
-  <link rel="stylesheet" href="./webview.css">
-</head>
-<body class="fancy">
-  <div class="anki-md-wrapper">
-    <div class="front"></div>
-  </div>
-  <nav class="nav"><span class="count"></span><span>← → enter</span></nav>
-  <script type="module">
-    if (location.search.includes('night')) document.documentElement.classList.add('nightMode')
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview: Front</title>
+    <link rel="stylesheet" href="./webview.css" />
+  </head>
+  <body class="fancy">
+    <div class="anki-md-wrapper">
+      <div class="front"></div>
+    </div>
+    <nav class="nav"><span class="count"></span><span>← → enter</span></nav>
+    <script type="module">
+      if (location.search.includes("night"))
+        document.documentElement.classList.add("nightMode");
 
-    import { render } from "../src/render.ts"
-    import { setup } from "./helper.ts"
+      import { render } from "../src/render.ts";
+      import { setup } from "./helper.ts";
 
-    const examples = [
-      {
-        front: `What does this return?
+      const examples = [
+        {
+          front: `What does this return?
 
 \`\`\`ts
 const add = (a: number, b: number) => a + b
 add(1, 2)
 \`\`\``,
-        back: `Returns \`3\``
-      },
-      {
-        front: `What does \`??\` do in JavaScript?
+          back: `Returns \`3\``,
+        },
+        {
+          front: `What does \`??\` do in JavaScript?
 
 \`\`\`js
 const name = null ?? "anonymous"
 \`\`\``,
-        back: `**Nullish coalescing** — returns right side if left is \`null\` or \`undefined\`
+          back: `**Nullish coalescing** — returns right side if left is \`null\` or \`undefined\`
 
-Result: \`"anonymous"\``
-      },
-      {
-        front: `Fix the bug:
+Result: \`"anonymous"\``,
+        },
+        {
+          front: `Fix the bug:
 
 \`\`\`rust
 fn main() {
@@ -47,10 +48,10 @@ fn main() {
     println!("{}: {}", s, len);
 }
 \`\`\``,
-        back: `No bug — this compiles fine. \`len()\` borrows, doesn't move.`
-      },
-      {
-        front: `**Line Highlighting** — What line is the bug on?
+          back: `No bug — this compiles fine. \`len()\` borrows, doesn't move.`,
+        },
+        {
+          front: `**Line Highlighting** — What line is the bug on?
 
 \`\`\`js {3}
 function greet(name) {
@@ -59,20 +60,20 @@ function greet(name) {
   return msg
 }
 \`\`\``,
-        back: `Line 3: \`message\` should be \`msg\``
-      },
-      {
-        front: `**Word Highlighting** — Which variable is unused?
+          back: `Line 3: \`message\` should be \`msg\``,
+        },
+        {
+          front: `**Word Highlighting** — Which variable is unused?
 
 \`\`\`js /unused/
 const used = "hello"
 const unused = "world"
 console.log(used)
 \`\`\``,
-        back: `\`unused\` is never referenced`
-      },
-      {
-        front: `**Focus** — What does the highlighted line do?
+          back: `\`unused\` is never referenced`,
+        },
+        {
+          front: `**Focus** — What does the highlighted line do?
 
 \`\`\`ts
 interface User {
@@ -81,21 +82,21 @@ interface User {
   role: "admin" | "user"  // [!code focus]
 }
 \`\`\``,
-        back: `Union type — \`role\` can only be \`"admin"\` or \`"user"\``
-      },
-      {
-        front: `**Error Levels** — Spot the issues:
+          back: `Union type — \`role\` can only be \`"admin"\` or \`"user"\``,
+        },
+        {
+          front: `**Error Levels** — Spot the issues:
 
 \`\`\`js
 const API_KEY = "sk-1234"  // [!code error]
 const timeout = 5000
 const retries = -1  // [!code warning]
 \`\`\``,
-        back: `- **Error**: Hardcoded secret
-- **Warning**: Negative retries may cause issues`
-      },
-      {
-        front: `**Combined** — Review this code:
+          back: `- **Error**: Hardcoded secret
+- **Warning**: Negative retries may cause issues`,
+        },
+        {
+          front: `**Combined** — Review this code:
 
 \`\`\`ts {1} /Promise/
 async function fetch(): Promise<Data> {  // [!code focus]
@@ -103,19 +104,19 @@ async function fetch(): Promise<Data> {  // [!code focus]
   return res.json()  // [!code warning]
 }
 \`\`\``,
-        back: `- Line 1 highlighted + \`Promise\` word highlighted
+          back: `- Line 1 highlighted + \`Promise\` word highlighted
 - Focus on function signature
-- Warning: \`res.json()\` is also async`
-      },
-      {
-        front: `What does \`Array.from()\`{.js} return when called with \`{length: 3}\`{js}?`,
-        back: `Returns \`[undefined, undefined, undefined]\`{js}
+- Warning: \`res.json()\` is also async`,
+        },
+        {
+          front: `What does \`Array.from()\`{.js} return when called with \`{length: 3}\`{js}?`,
+          back: `Returns \`[undefined, undefined, undefined]\`{js}
 
-It creates an array with 3 empty slots.`
-      },
-      {
-        front: `In Python, what's the difference between \`is\`{py} and \`==\`{py}?`,
-        back: `- \`is\`{py} checks **identity** (same object in memory)
+It creates an array with 3 empty slots.`,
+        },
+        {
+          front: `In Python, what's the difference between \`is\`{py} and \`==\`{py}?`,
+          back: `- \`is\`{py} checks **identity** (same object in memory)
 - \`==\`{py} checks **equality** (same value)
 
 \`\`\`python
@@ -123,11 +124,11 @@ a = [1, 2]
 b = [1, 2]
 a == b  # True
 a is b  # False
-\`\`\``
-      },
-    ]
+\`\`\``,
+        },
+      ];
 
-    setup(examples, render)
-  </script>
-</body>
+      setup(examples, render);
+    </script>
+  </body>
 </html>

@@ -167,12 +167,17 @@ button {
   color: var(--fg);
 
   &:hover {
-    background: linear-gradient(180deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--button-gradient-start) 0%,
+      var(--button-gradient-end) 100%
+    );
     border-color: var(--shadow);
   }
 
   &:active {
-    box-shadow: inset 0 calc(var(--buttons-size, 10px) / 15) calc(var(--buttons-size, 10px) / 5) rgb(0 0 0 / 0.35);
+    box-shadow: inset 0 calc(var(--buttons-size, 10px) / 15)
+      calc(var(--buttons-size, 10px) / 5) rgb(0 0 0 / 0.35);
     border-color: var(--border-subtle);
   }
 
