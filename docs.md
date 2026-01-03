@@ -4,7 +4,7 @@ A modern Anki add-on that transforms your flashcards with full markdown support 
 
 ## Why Use This Add-on?
 
-- **Clean, Modern Styling** — Cards feature a polished design with proper typography, subtle shadows, and light/dark mode support that matches Anki's native UI
+- **Clean, Modern Styling** — Cards feature a polished design with light/dark mode support that matches Anki's native UI
 - **Full Markdown Support** — Write cards using familiar markdown syntax including bold, italic, lists, blockquotes, tables, and more
 - **Beautiful Code Highlighting** — Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with support for 100+ languages
 - **Advanced Code Features** — Line highlighting, word highlighting, focus mode, error/warning annotations, and a copy button
@@ -91,13 +91,13 @@ Use `const x = 1`{js} for constants and `let y = 2`{js} for variables.
 In Python, use `print("hello")`{python} to output text.
 ```
 
-Both `{lang}` and `{.lang}` (Pandoc-style) syntaxes work.
+Both `{lang}` and `{.lang}` (Pandoc-style) syntax work.
 
 ---
 
 ## Line Highlighting
 
-Highlight specific lines using `{lines}` in the code fence meta:
+Highlight specific lines using `{lines}` after the language:
 
 ````markdown
 ```js {2}
