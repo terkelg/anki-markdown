@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 from aqt import mw, gui_hooks
 from aqt.editor import Editor
 from aqt.webview import WebContent
@@ -8,6 +9,22 @@ NOTETYPE = "Anki Markdown"
 
 def read(name: str) -> str:
     return (ADDON_DIR / name).read_text(encoding="utf-8")
+
+def img_to_markdown(html: str) -> str:
+    """Convert <img> tags to markdown syntax."""
+    def replace(m):
+        src = m.group(1).replace(' ', '%20')
+        return f'![]({src})'
+    return re.sub(r'<img\s+src="([^"]+)"[^>]*>', replace, html, flags=re.IGNORECASE)
+
+def on_munge_html(txt: str, editor: Editor) -> str:
+    """Convert img tags to markdown before saving."""
+    if not editor.note:
+        return txt
+    notetype = editor.note.note_type()
+    if not notetype or notetype["name"] != NOTETYPE:
+        return txt
+    return img_to_markdown(txt)
 
 def on_profile_loaded():
     sync_media()
@@ -67,3 +84,4 @@ def ensure_notetype():
 gui_hooks.profile_did_open.append(on_profile_loaded)
 gui_hooks.webview_will_set_content.append(on_webview_content)
 gui_hooks.editor_did_load_note.append(on_editor_load_note)
+gui_hooks.editor_will_munge_html.append(on_munge_html)
