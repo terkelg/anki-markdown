@@ -35,6 +35,10 @@
   }
 }
 
+html {
+  padding: 12px;
+}
+
 .anki-md-wrapper {
   font-family:
     system-ui,
@@ -46,7 +50,6 @@
   background: var(--_bg);
   max-inline-size: var(--content-max-width, 34rem);
   margin-inline: auto;
-  margin-block-start: 1rem;
   border: 1px solid var(--_border);
   border-radius: 12px;
   box-shadow: var(--_shadow);
@@ -65,15 +68,10 @@
 
   > .front,
   > .back {
+    display: flex;
+    flex-flow: column;
+    gap: 1em;
     padding: 1rem;
-
-    > :first-child {
-      margin-block-start: 0;
-    }
-
-    > :last-child {
-      margin-block-end: 0;
-    }
   }
 
   > .back {
@@ -159,8 +157,8 @@
 }
 
 .code-block {
-  padding: 0;
   margin: 0;
+  padding: 0;
   overflow: hidden;
   border: 1px solid var(--_border-code, var(--_border));
   border-radius: 8px;
@@ -245,6 +243,10 @@ mark {
   }
 }
 
+p {
+  margin: 0;
+}
+
 img {
   border-radius: 4px;
 }
@@ -281,7 +283,6 @@ table {
 
 ul,
 ol {
-  margin: 1em 0;
   padding-left: 1.5em;
 }
 
@@ -333,7 +334,6 @@ kbd {
 }
 
 .markdown-alert {
-  margin: 1em 0;
   padding: 0.35em 0.75em;
   font-size: 0.9em;
   border-left: 3px solid var(--alert-color, var(--_border));
