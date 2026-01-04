@@ -4,7 +4,7 @@ from aqt import mw, gui_hooks
 from aqt.editor import Editor
 from aqt.webview import WebContent
 
-from .shiki import sync_shiki_files, generate_config_json, get_config
+from .shiki import sync_shiki_files, generate_config_json
 from .settings import show_settings
 
 ADDON_DIR = Path(__file__).parent

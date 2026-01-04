@@ -6,7 +6,6 @@ in collection.media for mobile sync.
 
 from pathlib import Path
 import urllib.request
-import urllib.error
 import ssl
 import json
 
@@ -204,11 +203,6 @@ def sync_shiki_files() -> tuple[list[str], list[str]]:
                 errors.append(f"Failed to download theme {theme}: {e}")
 
     return downloaded, errors
-
-
-def get_shiki_files() -> list[Path]:
-    """Get all shiki-related files (langs + themes)."""
-    return list(ADDON_DIR.glob("_lang-*.js")) + list(ADDON_DIR.glob("_theme-*.js"))
 
 
 def generate_config_json() -> str:
