@@ -196,9 +196,9 @@ class ShikiSettingsDialog(QDialog):
 
             progress.close()
 
-            # Sync to collection.media
+            # Sync to collection.media (pass removed files to trash from media)
             from . import sync_media
-            sync_media()
+            sync_media(removed)
 
             # Update note type templates
             from . import ensure_notetype

@@ -62,11 +62,18 @@ def on_profile_loaded():
     mw.addonManager.setConfigAction(__name__, show_settings)
 
 
-def sync_media():
-    """Copy web assets to collection.media (force overwrite)."""
+def sync_media(removed: list[str] = None):
+    """Copy web assets to collection.media (force overwrite).
+
+    Args:
+        removed: Optional list of filenames that were removed and should be trashed.
+    """
     files = [f for f in ADDON_DIR.glob("_*") if f.is_file()]
-    # Delete existing files first to force update
-    mw.col.media.trash_files([f.name for f in files])
+    # Trash files to force update, plus any removed files
+    to_trash = [f.name for f in files]
+    if removed:
+        to_trash.extend(removed)
+    mw.col.media.trash_files(to_trash)
     for file in files:
         mw.col.media.add_file(str(file))
 
