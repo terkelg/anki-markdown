@@ -2,11 +2,9 @@ import "./style.css";
 import MarkdownIt from "markdown-it";
 import mark from "markdown-it-mark";
 import alerts from "markdown-it-github-alerts";
-import { createHighlighter, bundledLanguages } from "shiki/bundle/web";
-import swift from "shiki/langs/swift.mjs";
-import rust from "shiki/langs/rust.mjs";
-import glsl from "shiki/langs/glsl.mjs";
-import wgsl from "shiki/langs/wgsl.mjs";
+import { createHighlighterCore } from "@shikijs/core";
+import { createJavaScriptRegexEngine } from "@shikijs/engine-javascript";
+import type { HighlighterCore, LanguageRegistration, ThemeRegistration } from "@shikijs/core";
 import type { ShikiTransformer } from "shiki";
 import type { Element } from "hast";
 import {
@@ -16,8 +14,67 @@ import {
   transformerNotationFocus,
 } from "@shikijs/transformers";
 
-const langs = [...Object.keys(bundledLanguages), swift, rust, glsl, wgsl];
-const themes = { light: "vitesse-light", dark: "vitesse-dark" } as const;
+// Config from inline JSON (injected by Python)
+interface Config {
+  languages: string[];
+  themes: { light: string; dark: string };
+}
+
+function getConfig(): Config {
+  const el = document.getElementById("anki-md-config");
+  if (!el?.textContent) {
+    return {
+      languages: ["text"],
+      themes: { light: "vitesse-light", dark: "vitesse-dark" },
+    };
+  }
+  return JSON.parse(el.textContent);
+}
+
+const config = getConfig();
+console.log("[anki-md] Config:", config);
+const themes = { light: config.themes.light, dark: config.themes.dark };
+
+// Load languages dynamically
+async function loadLanguages(): Promise<LanguageRegistration[]> {
+  const langs: LanguageRegistration[] = [];
+  for (const name of config.languages) {
+    try {
+      // esm.sh lang modules export array: export { n as default } where n = [grammar]
+      const mod = await import(/* @vite-ignore */ `./_lang-${name}.js`);
+      const grammar = mod.default;
+      // Handle both array and single object exports
+      if (Array.isArray(grammar)) {
+        langs.push(...grammar);
+      } else {
+        langs.push(grammar);
+      }
+    } catch (e) {
+      console.warn(`Failed to load language: ${name}`, e);
+    }
+  }
+  return langs;
+}
+
+// Load themes dynamically
+async function loadThemes(): Promise<ThemeRegistration[]> {
+  const themeList: ThemeRegistration[] = [];
+  const themeNames = new Set([config.themes.light, config.themes.dark]);
+  console.log("[anki-md] Loading themes:", [...themeNames]);
+  for (const name of themeNames) {
+    try {
+      // esm.sh theme modules export object: export { e as default }
+      const mod = await import(/* @vite-ignore */ `./_theme-${name}.js`);
+      console.log(`[anki-md] Loaded theme: ${name}`, mod.default?.name);
+      themeList.push(mod.default);
+    } catch (e) {
+      console.error(`[anki-md] Failed to load theme: ${name}`, e);
+    }
+  }
+  console.log("[anki-md] Loaded themes count:", themeList.length);
+  return themeList;
+}
+
 const transformers = [
   transformerMetaHighlight(),
   transformerMetaWordHighlight(),
@@ -25,9 +82,22 @@ const transformers = [
   transformerNotationFocus({ matchAlgorithm: "v3" }),
 ];
 
-const highlighter = await createHighlighter({
-  langs,
-  themes: Object.values(themes),
+// Initialize highlighter with dynamic languages/themes
+let highlighter: HighlighterCore;
+
+async function initHighlighter(): Promise<HighlighterCore> {
+  const [langs, themeList] = await Promise.all([loadLanguages(), loadThemes()]);
+
+  return createHighlighterCore({
+    langs,
+    themes: themeList,
+    engine: createJavaScriptRegexEngine(),
+  });
+}
+
+const highlighterPromise = initHighlighter();
+highlighterPromise.then((h) => {
+  highlighter = h;
 });
 
 const codeBlock: ShikiTransformer = {
@@ -103,9 +173,15 @@ const codeInline: ShikiTransformer = {
 };
 
 function highlight(code: string, lang: string, meta?: string) {
+  if (!highlighter) return `<pre><code>${code}</code></pre>`;
+
+  // Check if language is loaded
+  const loadedLangs = highlighter.getLoadedLanguages();
+  const effectiveLang = loadedLangs.includes(lang) ? lang : "text";
+
   try {
     return highlighter.codeToHtml(code, {
-      lang,
+      lang: effectiveLang,
       themes,
       meta: { __raw: meta },
       defaultColor: false,
@@ -157,16 +233,19 @@ md.core.ruler.after("inline", "inline-code-lang", (state) => {
 
 md.renderer.rules.code_inline = (tokens, idx) => {
   const { content, meta } = tokens[idx];
-  if (meta?.lang) {
-    try {
-      return highlighter.codeToHtml(content, {
-        lang: meta.lang,
-        themes,
-        defaultColor: false,
-        transformers: [codeInline],
-      });
-    } catch {
-      /* fall through */
+  if (meta?.lang && highlighter) {
+    const loadedLangs = highlighter.getLoadedLanguages();
+    if (loadedLangs.includes(meta.lang)) {
+      try {
+        return highlighter.codeToHtml(content, {
+          lang: meta.lang,
+          themes,
+          defaultColor: false,
+          transformers: [codeInline],
+        });
+      } catch {
+        /* fall through */
+      }
     }
   }
   return `<code>${md.utils.escapeHtml(content)}</code>`;
@@ -211,7 +290,10 @@ export function renderMarkdown(text: string): string {
 }
 
 /** Render front/back fields to card DOM */
-export function render(front: string, back: string) {
+export async function render(front: string, back: string) {
+  // Wait for highlighter to be ready
+  await highlighterPromise;
+
   const wrapper = document.querySelector(".anki-md-wrapper");
   const frontEl = document.querySelector(".front");
   const backEl = document.querySelector(".back");

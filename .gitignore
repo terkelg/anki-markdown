@@ -1,9 +1,16 @@
 # Build output
 anki_markdown/_review.js
-.DS_Store
 anki_markdown/_review.css
 anki_markdown/web/editor.js
 anki_markdown/web/editor.css
+
+# Downloaded shiki files (fetched at runtime by Python)
+anki_markdown/_lang-*.js
+anki_markdown/_theme-*.js
+
+# User config (managed by Anki)
+anki_markdown/meta.json
+
 *.ankiaddon
 node_modules
 __pycache__/

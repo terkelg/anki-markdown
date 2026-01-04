@@ -1,0 +1,8 @@
+{
+  "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown"],
+  "themes": {
+    "light": "vitesse-light",
+    "dark": "vitesse-dark"
+  },
+  "shikiVersion": "3.20.0"
+}
