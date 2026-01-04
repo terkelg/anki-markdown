@@ -8,7 +8,6 @@ import { rmSync, readdirSync } from "fs";
 
 const ADDON_DIR = "anki_markdown";
 
-// Get shiki version from package.json (expects exact version, no ^ or ~)
 const pkg = await Bun.file("package.json").json();
 const shikiVersion = pkg.dependencies?.shiki || pkg.dependencies?.["@shikijs/core"];
 
@@ -17,7 +16,6 @@ if (!shikiVersion) {
   process.exit(1);
 }
 
-// Build complete language list including aliases
 const allLanguages = new Set<string>();
 for (const lang of bundledLanguagesInfo) {
   allLanguages.add(lang.id);
@@ -29,17 +27,14 @@ for (const lang of bundledLanguagesInfo) {
 }
 const languageNames = [...allLanguages].sort();
 
-// Build theme list
 const themeNames = bundledThemesInfo.map((t) => t.id).sort();
 
-// Read config
 const config = await Bun.file("config.json").json();
 
-// Validate config
 for (const lang of config.languages) {
   if (!allLanguages.has(lang)) {
     console.error(`Unknown language: ${lang}`);
-    console.error(`Available: ${[...allLanguages].sort().join(", ")}`);
+    console.error(`Available: ${languageNames.join(", ")}`);
     process.exit(1);
   }
 }
@@ -52,24 +47,21 @@ for (const theme of [config.themes.light, config.themes.dark]) {
   }
 }
 
-// Generate Python list formatting
 function formatPyList(items: string[], indent = 4): string {
   const lines: string[] = [];
   let line = "";
   for (const item of items) {
     const quoted = `"${item}"`;
     if (line.length + quoted.length + 2 > 80 - indent) {
-      lines.push(line.slice(0, -1)); // remove trailing space
+      lines.push(line.slice(0, -1));
       line = "";
     }
     line += quoted + ", ";
   }
-  if (line) lines.push(line.slice(0, -2)); // remove trailing comma+space
-  const indentStr = " ".repeat(indent);
-  return lines.map((l) => indentStr + l).join("\n");
+  if (line) lines.push(line.slice(0, -2));
+  return lines.map((l) => " ".repeat(indent) + l).join("\n");
 }
 
-// Update shiki.py with generated constants
 const shikiPy = await Bun.file(`${ADDON_DIR}/shiki.py`).text();
 
 const langsMarker = /^AVAILABLE_LANGS = \[[\s\S]*?\]$/m;
@@ -87,17 +79,11 @@ let updatedPy = shikiPy
 
 await Bun.write(`${ADDON_DIR}/shiki.py`, updatedPy);
 
-// Update addon config.json
-const ankiConfig = {
-  languages: config.languages,
-  themes: config.themes,
-};
 await Bun.write(
   `${ADDON_DIR}/config.json`,
-  JSON.stringify(ankiConfig, null, 2) + "\n",
+  JSON.stringify({ languages: config.languages, themes: config.themes }, null, 2) + "\n",
 );
 
-// Clean stray language/theme files from addon directory
 const files = readdirSync(ADDON_DIR);
 let cleaned = 0;
 for (const file of files) {
