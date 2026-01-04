@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 from aqt import mw, gui_hooks
+from aqt.qt import QMessageBox
 from aqt.editor import Editor
 from aqt.webview import WebContent
 
@@ -52,7 +53,16 @@ def on_munge_html(txt: str, editor: Editor) -> str:
 
 def on_profile_loaded():
     # Download any missing language/theme files
-    sync_shiki_files()
+    _, errors = sync_shiki_files()
+    if errors:
+        details = "\n".join(f"- {err}" for err in errors)
+        QMessageBox.warning(
+            mw,
+            "Anki Markdown",
+            "Failed to download some syntax highlighting files.\n"
+            "Open the add-on settings to retry.\n\n"
+            f"{details}",
+        )
     # Sync all media files to collection.media
     sync_media()
     # Create/update note type with current config
