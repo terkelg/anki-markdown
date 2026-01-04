@@ -13,6 +13,7 @@ from aqt import mw
 
 ADDON_DIR = Path(__file__).parent
 ESM_BASE = "https://esm.sh/@shikijs"
+SHIKI_VERSION = "3.20.0"
 
 # All available Shiki languages (subset of most common)
 AVAILABLE_LANGS = [
@@ -75,7 +76,6 @@ def get_config() -> dict:
         config = {
             "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown", "glsl", "wgsl", "rust", "swift", "go"],
             "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
-            "shikiVersion": "3.20.0",
         }
     return config
 
@@ -177,8 +177,6 @@ def sync_shiki_files() -> tuple[list[str], list[str]]:
     Returns (downloaded, errors) lists.
     """
     config = get_config()
-    version = config.get("shikiVersion", "3.20.0")
-
     downloaded = []
     errors = []
 
@@ -187,7 +185,7 @@ def sync_shiki_files() -> tuple[list[str], list[str]]:
     for lang in config.get("languages", []):
         if lang not in local_langs:
             try:
-                download_lang(lang, version)
+                download_lang(lang, SHIKI_VERSION)
                 downloaded.append(f"_lang-{lang}.js")
             except Exception as e:
                 errors.append(f"Failed to download {lang}: {e}")
@@ -197,7 +195,7 @@ def sync_shiki_files() -> tuple[list[str], list[str]]:
     for theme in [config["themes"]["light"], config["themes"]["dark"]]:
         if theme not in local_themes:
             try:
-                download_theme(theme, version)
+                download_theme(theme, SHIKI_VERSION)
                 downloaded.append(f"_theme-{theme}.js")
             except Exception as e:
                 errors.append(f"Failed to download theme {theme}: {e}")

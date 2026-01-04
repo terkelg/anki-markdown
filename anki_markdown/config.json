@@ -17,6 +17,5 @@
   "themes": {
     "light": "vitesse-light",
     "dark": "vitesse-dark"
-  },
-  "shikiVersion": "3.20.0"
+  }
 }
