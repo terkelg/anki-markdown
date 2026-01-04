@@ -66,14 +66,20 @@ def sync_media(removed: list[str] = None):
     """Copy web assets to collection.media (force overwrite).
 
     Args:
-        removed: Optional list of filenames that were removed and should be trashed.
+        removed: Optional list of filenames that were removed and should be deleted.
     """
-    files = [f for f in ADDON_DIR.glob("_*") if f.is_file()]
-    # Trash files to force update, plus any removed files
-    to_trash = [f.name for f in files]
+    media_dir = Path(mw.col.media.dir())
+
+    # Delete removed files directly (trash_files doesn't work on _ prefixed files)
     if removed:
-        to_trash.extend(removed)
-    mw.col.media.trash_files(to_trash)
+        for name in removed:
+            media_file = media_dir / name
+            if media_file.exists():
+                media_file.unlink()
+
+    # Sync current files
+    files = [f for f in ADDON_DIR.glob("_*") if f.is_file()]
+    mw.col.media.trash_files([f.name for f in files])
     for file in files:
         mw.col.media.add_file(str(file))
 
