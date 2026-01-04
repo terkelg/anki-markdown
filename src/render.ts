@@ -275,7 +275,7 @@ function decode(text: string): string {
 }
 
 /** Render markdown string to HTML */
-export function renderMarkdown(text: string): string {
+function renderMarkdown(text: string): string {
   return md.render(text);
 }
 
