@@ -256,6 +256,7 @@ All [Shiki themes](https://shiki.style/themes) are available including GitHub, D
 ### How It Works
 
 When you apply settings:
+
 1. Missing language/theme files are downloaded from the internet
 2. Files are synced to `collection.media` for mobile compatibility
 3. Unused files are automatically removed
