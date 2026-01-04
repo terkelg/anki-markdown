@@ -32,7 +32,6 @@ function getConfig(): Config {
 }
 
 const config = getConfig();
-console.log("[anki-md] Config:", config);
 const themes = { light: config.themes.light, dark: config.themes.dark };
 
 // Load languages dynamically
@@ -49,8 +48,8 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
       } else {
         langs.push(grammar);
       }
-    } catch (e) {
-      console.warn(`Failed to load language: ${name}`, e);
+    } catch {
+      // Silently skip - language file may not exist
     }
   }
   return langs;
@@ -60,18 +59,15 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
 async function loadThemes(): Promise<ThemeRegistration[]> {
   const themeList: ThemeRegistration[] = [];
   const themeNames = new Set([config.themes.light, config.themes.dark]);
-  console.log("[anki-md] Loading themes:", [...themeNames]);
   for (const name of themeNames) {
     try {
       // esm.sh theme modules export object: export { e as default }
       const mod = await import(/* @vite-ignore */ `./_theme-${name}.js`);
-      console.log(`[anki-md] Loaded theme: ${name}`, mod.default?.name);
       themeList.push(mod.default);
-    } catch (e) {
-      console.error(`[anki-md] Failed to load theme: ${name}`, e);
+    } catch {
+      // Silently skip - theme file may not exist
     }
   }
-  console.log("[anki-md] Loaded themes count:", themeList.length);
   return themeList;
 }
 

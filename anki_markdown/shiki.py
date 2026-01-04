@@ -82,9 +82,10 @@ def get_config() -> dict:
 
 
 def esm_url(kind: str, name: str, version: str) -> str:
-    """Generate esm.sh URL for a language or theme."""
+    """Generate esm.sh URL for a language or theme (bundled, self-contained)."""
     pkg = "langs" if kind == "lang" else "themes"
-    return f"{ESM_BASE}/{pkg}@{version}/es2022/dist/{name}.mjs"
+    # Use .bundle.mjs to get self-contained files with all dependencies inlined
+    return f"{ESM_BASE}/{pkg}@{version}/es2022/{name}.bundle.mjs"
 
 
 def fetch_module(url: str) -> bytes:
