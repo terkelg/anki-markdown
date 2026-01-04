@@ -12,6 +12,11 @@ const renderer = defineConfig({
     outDir: "anki_markdown",
     emptyOutDir: false,
     rollupOptions: {
+      // Keep dynamic imports external - they load from collection.media at runtime
+      external: (id) => {
+        // Match ./_lang-*.js and ./_theme-*.js dynamic imports
+        return /^\.\/_(?:lang|theme)-.*\.js$/.test(id);
+      },
       output: {
         assetFileNames: "_review[extname]",
         inlineDynamicImports: true,

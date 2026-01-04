@@ -42,6 +42,23 @@ bun run build
 
 This outputs `_review.js`, `_review.css`, and `web/editor.*` to `anki_markdown/`.
 
+### Configuration
+
+Default languages and themes are configured in `config.json`:
+
+```json
+{
+  "languages": ["javascript", "typescript", "python", ...],
+  "themes": { "light": "vitesse-light", "dark": "vitesse-dark" }
+}
+```
+
+The build runs `bun run generate` which:
+- Generates `AVAILABLE_LANGS` and `AVAILABLE_THEMES` lists in `shiki.py` (including all aliases)
+- Updates `anki_markdown/config.json` with defaults
+- Sets `SHIKI_VERSION` from `package.json` dependencies
+- Cleans stray `_lang-*.js` / `_theme-*.js` files
+
 ## Testing in Anki
 
 Requires Anki 2.1.55+. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
