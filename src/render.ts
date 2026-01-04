@@ -78,7 +78,7 @@ async function initHighlighter(): Promise<HighlighterCore> {
   return createHighlighterCore({
     langs,
     themes: themeList,
-    engine: createJavaScriptRegexEngine(),
+    engine: createJavaScriptRegexEngine({ forgiving: true }),
   });
 }
 
@@ -162,7 +162,7 @@ const codeInline: ShikiTransformer = {
 function highlight(code: string, lang: string, meta?: string) {
   if (!highlighter) return `<pre><code>${code}</code></pre>`;
 
-  // Check if language is loaded
+  // Check if language is loaded, fallback to text
   const loadedLangs = highlighter.getLoadedLanguages();
   const effectiveLang = loadedLangs.includes(lang) ? lang : "text";
 
