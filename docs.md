@@ -6,7 +6,7 @@ A modern Anki add-on that transforms your flashcards with full markdown support 
 
 - **Clean, Modern Styling** — Cards feature a polished design with light/dark mode support that matches Anki's native UI
 - **Full Markdown Support** — Write cards using familiar markdown syntax including bold, italic, lists, blockquotes, tables, and more
-- **Beautiful Code Highlighting** — Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with support for 100+ languages
+- **Beautiful Code Highlighting** — Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with 200+ languages and 50+ themes to choose from
 - **Advanced Code Features** — Line highlighting, word highlighting, focus mode, error/warning annotations, and a copy button
 - **Mobile Compatible** — Works seamlessly on AnkiMobile and AnkiDroid
 
@@ -228,6 +228,39 @@ GitHub-style alerts for highlighting important information:
 ```
 
 Five types: `NOTE` (blue), `TIP` (green), `IMPORTANT` (purple), `WARNING` (yellow), `CAUTION` (red).
+
+---
+
+## Settings
+
+Configure syntax highlighting languages and themes via **Tools → Add-ons → Anki Markdown → Config**.
+
+### Languages
+
+Select which programming languages to enable for syntax highlighting. Only selected languages are downloaded and synced to your devices.
+
+**Default languages:** JavaScript, TypeScript, Python, HTML, CSS, JSON, Bash, Markdown, GLSL, WGSL, Rust, Swift, Go
+
+**Trade-off:** Each language adds ~20-100KB to your sync size. Enable only languages you actually use to keep sync times fast, especially on mobile.
+
+All [Shiki languages](https://shiki.style/languages) (200+) are available including C/C++, Java, Ruby, PHP, SQL, Kotlin, Scala, Haskell, and many more.
+
+### Themes
+
+Choose separate themes for light and dark mode. Changes apply immediately after clicking **Apply & Download**.
+
+**Default themes:** Vitesse Light / Vitesse Dark
+
+All [Shiki themes](https://shiki.style/themes) are available including GitHub, Dracula, Nord, One Dark Pro, Tokyo Night, and more.
+
+### How It Works
+
+When you apply settings:
+1. Missing language/theme files are downloaded from the internet
+2. Files are synced to `collection.media` for mobile compatibility
+3. Unused files are automatically removed
+
+Files are only downloaded once and cached locally.
 
 ---
 
