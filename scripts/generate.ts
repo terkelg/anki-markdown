@@ -72,7 +72,7 @@ const newLangs = `AVAILABLE_LANGS = [\n${formatPyList(languageNames)},\n]`;
 const newThemes = `AVAILABLE_THEMES = [\n${formatPyList(themeNames)},\n]`;
 const newVersion = `SHIKI_VERSION = "${shikiVersion}"`;
 
-let updatedPy = shikiPy
+const updatedPy = shikiPy
   .replace(langsMarker, newLangs)
   .replace(themesMarker, newThemes)
   .replace(versionMarker, newVersion);
