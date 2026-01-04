@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite test",
-    "build": "tsc && vite build && BUILD_TARGET=editor vite build",
+    "prepare": "bun scripts/prepare.ts",
+    "build": "bun run prepare && tsc && vite build && BUILD_TARGET=editor vite build",
     "package": "bun run build && cd anki_markdown && zip -r ../anki-markdown.ankiaddon . -x '__pycache__/*' '.*'",
     "preview": "vite preview",
     "debug": "ln -sfn \"$(pwd)/anki_markdown\" ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 open -a Anki",
@@ -13,6 +14,8 @@
     "release": "bun scripts/release.ts"
   },
   "devDependencies": {
+    "@shikijs/langs": "^3.20.0",
+    "@shikijs/themes": "^3.20.0",
     "@types/bun": "^1.3.5",
     "@types/markdown-it": "^14.1.2",
     "prettier": "^3.7.4",

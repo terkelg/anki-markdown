@@ -41,8 +41,8 @@ const themes = config.themes;
 // Load languages dynamically (parallel)
 async function loadLanguages(): Promise<LanguageRegistration[]> {
   const results = await Promise.allSettled(
-    config.languages.map((name) =>
-      import(/* @vite-ignore */ `./_lang-${name}.js`),
+    config.languages.map(
+      (name) => import(/* @vite-ignore */ `./_lang-${name}.js`),
     ),
   );
   return results.flatMap((r, i) => {

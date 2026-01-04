@@ -1,0 +1,22 @@
+{
+  "shikiVersion": "3.20.0",
+  "defaultLanguages": [
+    "javascript",
+    "typescript",
+    "python",
+    "html",
+    "css",
+    "json",
+    "bash",
+    "markdown",
+    "glsl",
+    "wgsl",
+    "rust",
+    "swift",
+    "go"
+  ],
+  "defaultThemes": {
+    "light": "vitesse-light",
+    "dark": "vitesse-dark"
+  }
+}
