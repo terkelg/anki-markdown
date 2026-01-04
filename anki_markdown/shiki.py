@@ -74,7 +74,7 @@ def get_config() -> dict:
     config = mw.addonManager.getConfig(__name__.split(".")[0])
     if config is None:
         config = {
-            "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown"],
+            "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown", "glsl", "wgsl", "rust", "swift", "go"],
             "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
             "shikiVersion": "3.20.0",
         }

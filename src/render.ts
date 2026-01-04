@@ -39,17 +39,10 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
   const langs: LanguageRegistration[] = [];
   for (const name of config.languages) {
     try {
-      // esm.sh lang modules export array: export { n as default } where n = [grammar]
       const mod = await import(/* @vite-ignore */ `./_lang-${name}.js`);
-      const grammar = mod.default;
-      // Handle both array and single object exports
-      if (Array.isArray(grammar)) {
-        langs.push(...grammar);
-      } else {
-        langs.push(grammar);
-      }
-    } catch {
-      // Silently skip - language file may not exist
+      langs.push(...[mod.default].flat());
+    } catch (e) {
+      console.log(`[anki-md] Failed to load language: ${name}`, e);
     }
   }
   return langs;
@@ -57,18 +50,16 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
 
 // Load themes dynamically
 async function loadThemes(): Promise<ThemeRegistration[]> {
-  const themeList: ThemeRegistration[] = [];
-  const themeNames = new Set([config.themes.light, config.themes.dark]);
-  for (const name of themeNames) {
+  const themes: ThemeRegistration[] = [];
+  for (const name of new Set([config.themes.light, config.themes.dark])) {
     try {
-      // esm.sh theme modules export object: export { e as default }
       const mod = await import(/* @vite-ignore */ `./_theme-${name}.js`);
-      themeList.push(mod.default);
-    } catch {
-      // Silently skip - theme file may not exist
+      themes.push(mod.default);
+    } catch (e) {
+      console.log(`[anki-md] Failed to load theme: ${name}`, e);
     }
   }
-  return themeList;
+  return themes;
 }
 
 const transformers = [

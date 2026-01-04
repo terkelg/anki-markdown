@@ -1,5 +1,5 @@
 {
-  "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown"],
+  "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown", "glsl", "wgsl", "rust", "swift", "go"],
   "themes": {
     "light": "vitesse-light",
     "dark": "vitesse-dark"
