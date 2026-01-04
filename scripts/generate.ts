@@ -38,17 +38,17 @@ const themeNames = bundledThemesInfo.map((t) => t.id).sort();
 const config = await Bun.file("config.json").json();
 
 // Validate config
-for (const lang of config.defaultLanguages) {
+for (const lang of config.languages) {
   if (!allLanguages.has(lang)) {
-    console.error(`Unknown language in defaultLanguages: ${lang}`);
+    console.error(`Unknown language: ${lang}`);
     console.error(`Available: ${[...allLanguages].sort().join(", ")}`);
     process.exit(1);
   }
 }
 const themeSet = new Set(themeNames);
-for (const theme of [config.defaultThemes.light, config.defaultThemes.dark]) {
+for (const theme of [config.themes.light, config.themes.dark]) {
   if (!themeSet.has(theme)) {
-    console.error(`Unknown theme in defaultThemes: ${theme}`);
+    console.error(`Unknown theme: ${theme}`);
     console.error(`Available: ${themeNames.join(", ")}`);
     process.exit(1);
   }
@@ -91,8 +91,8 @@ await Bun.write(`${ADDON_DIR}/shiki.py`, updatedPy);
 
 // Update addon config.json
 const ankiConfig = {
-  languages: config.defaultLanguages,
-  themes: config.defaultThemes,
+  languages: config.languages,
+  themes: config.themes,
 };
 await Bun.write(
   `${ADDON_DIR}/config.json`,

@@ -1,5 +1,5 @@
 {
-  "defaultLanguages": [
+  "languages": [
     "javascript",
     "typescript",
     "python",
@@ -14,7 +14,7 @@
     "swift",
     "go"
   ],
-  "defaultThemes": {
+  "themes": {
     "light": "vitesse-light",
     "dark": "vitesse-dark"
   }
