@@ -80,6 +80,11 @@ ESM works in Anki templates with placeholder elements:
 
 **Important**: Always keep `front.html` and `back.html` templates in sync. They should have the same DOM structure — the only difference is `back.html` includes the `.back` div while `front.html` only has `.front`. Same applies to dev templates in `test/` — keep them structurally consistent with production templates.
 
+## Shiki Notes
+
+- `@shikijs/core` treats `text`/`plaintext`/`plain`/`txt` as built-in plain languages, so no language import is required for the fallback.
+- If theme imports fail, skip Shiki highlighting and render plain markdown to avoid blocking card rendering.
+
 ## Editor Integration
 
 The editor webview (`src/editor.ts` + `src/editor.css`) hides rich-text UI for markdown-only editing.
