@@ -12,8 +12,8 @@ from aqt.qt import (
     QLineEdit,
     QCheckBox,
     QAbstractItemView,
-    QProgressDialog,
     QMessageBox,
+    QApplication,
     Qt,
 )
 from aqt import mw
@@ -180,12 +180,11 @@ class ShikiSettingsDialog(QDialog):
         addon_name = __name__.split(".")[0]
         mw.addonManager.writeConfig(addon_name, config)
 
-        # Show progress
-        progress = QProgressDialog("Downloading language files...", "Cancel", 0, 0, self)
-        progress.setWindowModality(Qt.WindowModality.WindowModal)
-        progress.setMinimumDuration(0)
-        progress.setValue(0)
-        progress.show()
+        # Show loading state
+        self.apply_btn.setText("Loading...")
+        self.apply_btn.setEnabled(False)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        QApplication.processEvents()
 
         try:
             # Download missing files
@@ -194,8 +193,6 @@ class ShikiSettingsDialog(QDialog):
             # Cleanup unused files
             removed = cleanup_unused(config)
 
-            progress.close()
-
             # Sync to collection.media (pass removed files to trash from media)
             from . import sync_media
             sync_media(removed)
@@ -203,6 +200,8 @@ class ShikiSettingsDialog(QDialog):
             # Update note type templates
             from . import ensure_notetype
             ensure_notetype()
+
+            QApplication.restoreOverrideCursor()
 
             # Show result
             msg_parts = []
@@ -221,7 +220,9 @@ class ShikiSettingsDialog(QDialog):
             self.accept()
 
         except Exception as e:
-            progress.close()
+            QApplication.restoreOverrideCursor()
+            self.apply_btn.setText("Apply && Download")
+            self.apply_btn.setEnabled(True)
             QMessageBox.critical(self, "Error", f"Failed to sync: {e}")
 
 
