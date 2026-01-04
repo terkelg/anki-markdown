@@ -8,11 +8,9 @@ import { rmSync, readdirSync } from "fs";
 
 const ADDON_DIR = "anki_markdown";
 
-// Get shiki version from package.json
+// Get shiki version from package.json (expects exact version, no ^ or ~)
 const pkg = await Bun.file("package.json").json();
-const shikiVersion =
-  pkg.dependencies?.shiki?.replace("^", "") ||
-  pkg.dependencies?.["@shikijs/core"]?.replace("^", "");
+const shikiVersion = pkg.dependencies?.shiki || pkg.dependencies?.["@shikijs/core"];
 
 if (!shikiVersion) {
   console.error("Could not find shiki version in package.json");

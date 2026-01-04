@@ -14,8 +14,8 @@
     "release": "bun scripts/release.ts"
   },
   "devDependencies": {
-    "@shikijs/langs": "^3.20.0",
-    "@shikijs/themes": "^3.20.0",
+    "@shikijs/langs": "3.20.0",
+    "@shikijs/themes": "3.20.0",
     "@types/bun": "^1.3.5",
     "@types/markdown-it": "^14.1.2",
     "prettier": "^3.7.4",
@@ -26,12 +26,12 @@
     "vite": "npm:rolldown-vite@7.2.5"
   },
   "dependencies": {
-    "@shikijs/core": "^3.20.0",
-    "@shikijs/engine-javascript": "^3.20.0",
-    "@shikijs/transformers": "^3.20.0",
+    "@shikijs/core": "3.20.0",
+    "@shikijs/engine-javascript": "3.20.0",
+    "@shikijs/transformers": "3.20.0",
     "markdown-it": "^14.1.0",
     "markdown-it-github-alerts": "^1.0.0",
     "markdown-it-mark": "^4.0.0",
-    "shiki": "^3.20.0"
+    "shiki": "3.20.0"
   }
 }
