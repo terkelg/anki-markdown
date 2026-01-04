@@ -4,7 +4,11 @@ import mark from "markdown-it-mark";
 import alerts from "markdown-it-github-alerts";
 import { createHighlighterCore } from "@shikijs/core";
 import { createJavaScriptRegexEngine } from "@shikijs/engine-javascript";
-import type { HighlighterCore, LanguageRegistration, ThemeRegistration } from "@shikijs/core";
+import type {
+  HighlighterCore,
+  LanguageRegistration,
+  ThemeRegistration,
+} from "@shikijs/core";
 import type { ShikiTransformer } from "shiki";
 import type { Element } from "hast";
 import {
@@ -32,34 +36,33 @@ function getConfig(): Config {
 }
 
 const config = getConfig();
-const themes = { light: config.themes.light, dark: config.themes.dark };
+const themes = config.themes;
 
-// Load languages dynamically
+// Load languages dynamically (parallel)
 async function loadLanguages(): Promise<LanguageRegistration[]> {
-  const langs: LanguageRegistration[] = [];
-  for (const name of config.languages) {
-    try {
-      const mod = await import(/* @vite-ignore */ `./_lang-${name}.js`);
-      langs.push(...[mod.default].flat());
-    } catch (e) {
-      console.log(`[anki-md] Failed to load language: ${name}`, e);
-    }
-  }
-  return langs;
+  const results = await Promise.allSettled(
+    config.languages.map((name) =>
+      import(/* @vite-ignore */ `./_lang-${name}.js`),
+    ),
+  );
+  return results.flatMap((r, i) => {
+    if (r.status === "fulfilled") return [r.value.default].flat();
+    console.log(`[anki-md] Failed to load language: ${config.languages[i]}`);
+    return [];
+  });
 }
 
-// Load themes dynamically
+// Load themes dynamically (parallel)
 async function loadThemes(): Promise<ThemeRegistration[]> {
-  const themes: ThemeRegistration[] = [];
-  for (const name of new Set([config.themes.light, config.themes.dark])) {
-    try {
-      const mod = await import(/* @vite-ignore */ `./_theme-${name}.js`);
-      themes.push(mod.default);
-    } catch (e) {
-      console.log(`[anki-md] Failed to load theme: ${name}`, e);
-    }
-  }
-  return themes;
+  const names = [...new Set([config.themes.light, config.themes.dark])];
+  const results = await Promise.allSettled(
+    names.map((name) => import(/* @vite-ignore */ `./_theme-${name}.js`)),
+  );
+  return results.flatMap((r, i) => {
+    if (r.status === "fulfilled") return [r.value.default];
+    console.log(`[anki-md] Failed to load theme: ${names[i]}`);
+    return [];
+  });
 }
 
 const transformers = [
