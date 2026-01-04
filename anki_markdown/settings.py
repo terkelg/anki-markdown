@@ -10,6 +10,7 @@ from aqt.qt import (
     QPushButton,
     QLabel,
     QLineEdit,
+    QCheckBox,
     QAbstractItemView,
     QProgressDialog,
     QMessageBox,
@@ -44,13 +45,20 @@ class ShikiSettingsDialog(QDialog):
         layout.addWidget(QLabel("<b>Languages</b>"))
         layout.addWidget(QLabel("Select languages for syntax highlighting:"))
 
+        filter_row = QHBoxLayout()
         self.lang_filter = QLineEdit()
         self.lang_filter.setPlaceholderText("Filter languages...")
         self.lang_filter.textChanged.connect(self.filter_languages)
-        layout.addWidget(self.lang_filter)
+        filter_row.addWidget(self.lang_filter)
+
+        self.show_selected = QCheckBox("Selected only")
+        self.show_selected.toggled.connect(self.filter_languages)
+        filter_row.addWidget(self.show_selected)
+        layout.addLayout(filter_row)
 
         self.lang_list = QListWidget()
         self.lang_list.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        self.lang_list.itemSelectionChanged.connect(self.on_selection_changed)
         for lang in sorted(AVAILABLE_LANGS):
             item = QListWidgetItem(lang)
             item.setData(Qt.ItemDataRole.UserRole, lang)
@@ -92,13 +100,22 @@ class ShikiSettingsDialog(QDialog):
 
         layout.addLayout(buttons)
 
-    def filter_languages(self, text: str):
-        """Filter language list based on search text."""
-        text = text.lower()
+    def filter_languages(self, _=None):
+        """Filter language list based on search text and selected-only toggle."""
+        text = self.lang_filter.text().lower()
+        selected_only = self.show_selected.isChecked()
         for i in range(self.lang_list.count()):
             item = self.lang_list.item(i)
             lang = item.data(Qt.ItemDataRole.UserRole)
-            item.setHidden(text not in lang.lower())
+            matches_text = text in lang.lower()
+            matches_selected = not selected_only or item.isSelected()
+            item.setHidden(not (matches_text and matches_selected))
+
+    def on_selection_changed(self):
+        """Handle selection changes - update info and re-filter if needed."""
+        self.update_info()
+        if self.show_selected.isChecked():
+            self.filter_languages()
 
     def load_config(self):
         """Load current config into UI."""
