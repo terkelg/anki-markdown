@@ -1,6 +1,7 @@
 # Build output
 anki_markdown/_review.js
 anki_markdown/_review.css
+.DS_Store
 anki_markdown/web/editor.js
 anki_markdown/web/editor.css
 

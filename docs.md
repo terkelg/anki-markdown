@@ -6,7 +6,7 @@ A modern Anki add-on that transforms your flashcards with full markdown support 
 
 - **Clean, Modern Styling** — Cards feature a polished design with light/dark mode support that matches Anki's native UI
 - **Full Markdown Support** — Write cards using familiar markdown syntax including bold, italic, lists, blockquotes, tables, and more
-- **Beautiful Code Highlighting** — Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with 200+ languages and 50+ themes to choose from
+- **Beautiful Code Highlighting** — Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with 300+ languages and 60+ themes to choose from
 - **Advanced Code Features** — Line highlighting, word highlighting, focus mode, error/warning annotations, and a copy button
 - **Mobile Compatible** — Works seamlessly on AnkiMobile and AnkiDroid
 
@@ -243,7 +243,7 @@ Select which programming languages to enable for syntax highlighting. Only selec
 
 **Trade-off:** Each language adds ~20-100KB to your sync size. Enable only languages you actually use to keep sync times fast, especially on mobile.
 
-All [Shiki languages](https://shiki.style/languages) (200+) are available including C/C++, Java, Ruby, PHP, SQL, Kotlin, Scala, Haskell, and many more.
+All [Shiki languages](https://shiki.style/languages) (300+) are available including C/C++, Java, Ruby, PHP, SQL, Kotlin, Scala, Haskell, and many more.
 
 ### Themes
 
