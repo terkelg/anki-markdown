@@ -157,3 +157,272 @@ Anki provides CSS variables for theming. Use these instead of hardcoded colors f
 | `--transition`           | `180ms`  | Default transition    |
 | `--transition-medium`    | `500ms`  | Medium transition     |
 | `--transition-slow`      | `1000ms` | Slow transition       |
+
+## Anki JavaScript API Reference
+
+Anki exposes several packages to webviews via a global `require()` function. These APIs allow add-ons to hook into the editor, access Svelte stores, and integrate with Anki's UI components.
+
+### Discovery & Research
+
+**How to explore available APIs:**
+
+1. **Source Code** (most reliable):
+   - Repository: https://github.com/ankitects/anki
+   - Key files:
+     - `ts/lib/tslib/runtime-require.ts` - Shows all available packages
+     - Search for `registerPackage(` to find what each package exports
+     - `ts/editor/NoteEditor.svelte` - See global functions exposed
+
+2. **Runtime discovery** (in browser console):
+
+   ```javascript
+   ankiListPackages(); // List all available packages
+   ankiRequire("anki/NoteEditor"); // Inspect a package
+   ```
+
+3. **Documentation**:
+   - Official: https://addon-docs.ankiweb.net/
+   - Forums: https://forums.ankiweb.net/c/development/8
+
+### Available Packages
+
+#### `anki/packages`
+
+**Purpose:** Meta-package for discovering and loading other packages.
+
+| Function                | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| `require(name)`         | Load a package by name                        |
+| `listPackages()`        | Returns array of all registered package names |
+| `hasPackages(...names)` | Check if packages are available               |
+
+**Source:** `ts/lib/tslib/runtime-require.ts`
+
+---
+
+#### `svelte` / `svelte/store`
+
+**Purpose:** Svelte framework re-exported by Anki.
+
+**Store exports:**
+
+| Export                | Description                     |
+| --------------------- | ------------------------------- |
+| `writable(value)`     | Create a writable store         |
+| `readable(value)`     | Create a read-only store        |
+| `derived(stores, fn)` | Create a derived store          |
+| `get(store)`          | Get current value synchronously |
+
+**Store methods:**
+
+- `.set(value)` - Set value
+- `.subscribe(fn)` - Subscribe to changes, returns unsubscribe function
+- `.update(fn)` - Update with callback
+
+**Docs:** https://svelte.dev/docs/svelte/svelte-store
+
+---
+
+#### `anki/ui`
+
+**Purpose:** UI readiness signal - a promise that resolves when UI is loaded.
+
+| Export   | Description                            |
+| -------- | -------------------------------------- |
+| `loaded` | Promise that resolves when UI is ready |
+
+**Source:** `ts/lib/tslib/ui.ts`
+
+---
+
+#### `anki/bridgecommand`
+
+**Purpose:** Communication between webview and Python backend.
+
+| Function                        | Description                    |
+| ------------------------------- | ------------------------------ |
+| `bridgeCommand(cmd, callback?)` | Send command to Python backend |
+
+**Common commands:** `"attach"`, `"record"`, `"ans"`, `"focus:N"`, `"blur:N:noteId:content"`, `"saveTags:json"`, `"updateToolbar"`, etc.
+
+**Source:** `ts/lib/tslib/bridgecommand.ts`
+
+---
+
+#### `anki/shortcuts`
+
+**Purpose:** Keyboard shortcut registration.
+
+| Function                                              | Description                                                                       |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `registerShortcut(callback, keyCombination, params?)` | Register a keyboard shortcut. Returns unsubscribe function                        |
+| `getPlatformString(keyCombination)`                   | Convert key combo to platform-specific display string (e.g., "Ctrl" → "⌘" on Mac) |
+
+**Key combination format:** `"Control+Shift+T"`, `"F3"`, `"Control+Alt?+B"` (? = optional modifier)
+
+**Source:** `ts/lib/tslib/shortcuts.ts`
+
+---
+
+#### `anki/theme`
+
+**Purpose:** Theme/dark mode detection.
+
+| Export      | Description                                      |
+| ----------- | ------------------------------------------------ |
+| `pageTheme` | Svelte readable store with `{ isDark: boolean }` |
+
+**Usage:**
+
+```javascript
+const { pageTheme } = require("anki/theme");
+pageTheme.subscribe((theme) => console.log(theme.isDark));
+```
+
+**Source:** `ts/lib/sveltelib/theme.ts`
+
+---
+
+#### `anki/location`
+
+**Purpose:** Selection/caret position save and restore utilities.
+
+| Export                                 | Description                                   |
+| -------------------------------------- | --------------------------------------------- |
+| `Position`                             | Enum: `Before (-1)`, `Equal (0)`, `After (1)` |
+| `saveSelection(baseNode)`              | Save current selection state                  |
+| `restoreSelection(baseNode, location)` | Restore a saved selection                     |
+
+**Source:** `ts/lib/domlib/location/`
+
+---
+
+#### `anki/surround`
+
+**Purpose:** Text formatting (bold, italic, etc.) for rich text editor.
+
+| Export       | Description                        |
+| ------------ | ---------------------------------- |
+| `Surrounder` | Class for managing text formatting |
+
+**Surrounder methods:**
+
+- `.registerFormat(key, format)` - Register a format (e.g., "bold")
+- `.surround(formatName, exclusives?)` - Toggle format on selection
+- `.overwriteSurround(formatName, exclusives?)` - Apply format (overwrite existing)
+- `.isSurrounded(formatName)` - Check if selection has format
+- `.remove(formatNames, reformatNames?)` - Remove formats from selection
+- `.active` - Readable store indicating if surrounder is active
+
+**Source:** `ts/editor/surround.ts`
+
+---
+
+#### `anki/PlainTextInput`
+
+**Purpose:** Plain text (CodeMirror) editor component API.
+
+| Export      | Description                                                      |
+| ----------- | ---------------------------------------------------------------- |
+| `lifecycle` | `{ onMount(fn), onDestroy(fn) }` - Hook into component lifecycle |
+| `instances` | Array of active PlainTextInput instances                         |
+
+**Note:** `closeHTMLTags` store exists in the component but is NOT exported in the package. Use `window.setCloseHTMLTags(bool)` instead (exposed globally by NoteEditor).
+
+**Source:** `ts/editor/plain-text-input/PlainTextInput.svelte`
+
+---
+
+#### `anki/RichTextInput`
+
+**Purpose:** Rich text (contentEditable) editor component API.
+
+| Export       | Description                               |
+| ------------ | ----------------------------------------- |
+| `context`    | Svelte context for RichTextInput          |
+| `surrounder` | Shared Surrounder instance for formatting |
+| `lifecycle`  | `{ onMount(fn), onDestroy(fn) }`          |
+| `instances`  | Array of active RichTextInput instances   |
+
+**Source:** `ts/editor/rich-text-input/RichTextInput.svelte`
+
+---
+
+#### `anki/EditorField`
+
+**Purpose:** Field container component (wraps PlainText + RichText inputs).
+
+| Export      | Description                           |
+| ----------- | ------------------------------------- |
+| `context`   | Svelte context for EditorField        |
+| `lifecycle` | `{ onMount(fn), onDestroy(fn) }`      |
+| `instances` | Array of active EditorField instances |
+
+**Source:** `ts/editor/EditorField.svelte`
+
+---
+
+#### `anki/NoteEditor`
+
+**Purpose:** Main note editor component API.
+
+| Export      | Description                          |
+| ----------- | ------------------------------------ |
+| `context`   | Svelte context for NoteEditor        |
+| `lifecycle` | `{ onMount(fn), onDestroy(fn) }`     |
+| `instances` | Array of active NoteEditor instances |
+
+**Global functions exposed by NoteEditor on `window`:**
+
+- `setCloseHTMLTags(bool)` - Enable/disable HTML tag auto-closing
+- `setShrinkImages(bool)` - Shrink images by default
+- `setFields(fields)` - Set field data
+- `focusField(index)` - Focus a specific field
+- `saveNow()` - Save immediately
+- `setTags(tags)` - Set note tags
+- `setCollapsed(collapsed)` - Set collapsed state
+- `setPlainTexts(defaults)` - Set plain text defaults
+- ... and many more (see NoteEditor.svelte `onMount` for complete list)
+
+**Source:** `ts/editor/NoteEditor.svelte`
+
+---
+
+#### `anki/TemplateButtons`
+
+**Purpose:** Media attachment buttons (paperclip, microphone, LaTeX).
+
+| Export                | Description                                  |
+| --------------------- | -------------------------------------------- |
+| `resolveMedia(media)` | Callback to resolve media attachment promise |
+
+**Source:** `ts/editor/editor-toolbar/TemplateButtons.svelte`
+
+---
+
+#### `anki/reviewer`
+
+**Purpose:** Card review/study screen API (for reviewing cards, not editing).
+
+| Export         | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `onUpdateHook` | Array of callbacks called before MathJax renders              |
+| `onShownHook`  | Array of callbacks called after images load + MathJax renders |
+
+**Usage:** Append functions to these arrays to run code when questions/answers are shown.
+
+**Source:** `ts/reviewer/index.ts`
+
+---
+
+### Quick Reference: Most Useful APIs
+
+| Package               | Key Use Case                                        |
+| --------------------- | --------------------------------------------------- |
+| `anki/packages`       | Discover available APIs                             |
+| `anki/shortcuts`      | Add keyboard shortcuts                              |
+| `anki/bridgecommand`  | Communicate with Python backend                     |
+| `anki/theme`          | Detect dark/light mode                              |
+| `anki/NoteEditor`     | Hook into editor lifecycle, access global functions |
+| `anki/PlainTextInput` | Hook into CodeMirror lifecycle                      |
+| `svelte/store`        | Work with reactive stores                           |
