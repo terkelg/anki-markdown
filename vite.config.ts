@@ -35,6 +35,7 @@ const editor = defineConfig({
     outDir: "anki_markdown",
     emptyOutDir: false,
     rollupOptions: {
+      external: ["anki/ui"],
       output: {
         assetFileNames: "web/editor[extname]",
       },
