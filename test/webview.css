@@ -83,7 +83,7 @@
   color-scheme: dark;
 }
 
-/*! props */
+/* props */
 :root {
   --font-size: 15px;
   --border-radius: 5px;
@@ -96,7 +96,7 @@
   --focus-color: #6366f1;
 }
 
-/*! base */
+/* base */
 * {
   box-sizing: content-box;
 }
@@ -104,11 +104,13 @@
 html {
   font-family: Helvetica, sans-serif;
   font-size: var(--font-size);
+  background-color: var(--canvas);
+  container-type: inline-size;
 }
 
 body {
   color: var(--fg);
-  background-color: #fff;
+  background-color: var(--canvas);
   margin: 20px;
   overflow-wrap: break-word;
   overscroll-behavior: none;
