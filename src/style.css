@@ -37,7 +37,7 @@
 
 html,
 body {
-  block-size: 100%;
+  block-size: 100% !important;
 }
 
 .card {
