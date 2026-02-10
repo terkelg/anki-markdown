@@ -35,7 +35,7 @@ bun run release  # Bump version, tag, and push (triggers GitHub release)
 # IMPORTANT: Never run `bun run release` without explicit user permission.
 ```
 
-Debug in Chrome at `chrome://inspect`.
+Debug in Chrome at `chrome://inspect`. To test locally, disable the installed version of the add-on in Anki's add-on manager first, otherwise it conflicts with the symlinked dev version.
 
 ## Architecture
 
