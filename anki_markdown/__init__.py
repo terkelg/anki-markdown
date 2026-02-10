@@ -94,9 +94,6 @@ def sync_media(removed: list[str] = None):
         mw.col.media.add_file(str(file))
 
 
-NOTETYPE_CSS = ".card { all: unset; }"
-
-
 def get_template(name: str) -> str:
     """Read template and inject current config."""
     template = read(f"templates/{name}")
@@ -107,6 +104,30 @@ def get_template(name: str) -> str:
     return config_script + "\n" + template
 
 
+DEFAULT_CSS = (
+    "/* Uncomment to customize:\n"
+    ".card {\n"
+    "  --font-size: 14px;\n"
+    "  --font-size-mobile: 12px;\n"
+    "  --line-height: 1.5;\n"
+    "  --content-max-width: 34rem;\n"
+    "  --note: #2563eb;\n"
+    "  --tip: #16a34a;\n"
+    "  --important: #7c3aed;\n"
+    "  --warning: #ca8a04;\n"
+    "  --caution: #dc2626;\n"
+    "}\n"
+    "\n"
+    ".card.night-mode {\n"
+    "  --note: #318aff;\n"
+    "  --tip: #19be56;\n"
+    "  --important: #965bfb;\n"
+    "  --warning: #dc9703;\n"
+    "}\n"
+    "*/"
+)
+
+
 def ensure_notetype():
     mm = mw.col.models
     m = mm.by_name(NOTETYPE)
@@ -114,14 +135,13 @@ def ensure_notetype():
     if m:
         m["tmpls"][0]["qfmt"] = get_template("front.html")
         m["tmpls"][0]["afmt"] = get_template("back.html")
-        m["css"] = NOTETYPE_CSS
         for f in m["flds"]:
             f["plainText"] = True
         mm.save(m)
         return
 
     m = mm.new(NOTETYPE)
-    m["css"] = NOTETYPE_CSS
+    m["css"] = DEFAULT_CSS
     front = mm.new_field("Front")
     front["plainText"] = True
     mm.add_field(m, front)
