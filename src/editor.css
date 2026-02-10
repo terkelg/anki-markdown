@@ -23,6 +23,10 @@
     padding: 0 !important;
   }
 
+  .plain-text-input {
+    display: block !important;
+  }
+
   .plain-text-badge {
     display: none !important;
   }
