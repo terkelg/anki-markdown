@@ -321,3 +321,17 @@ For safety, only these HTML tags are allowed in cards:
 - `<kbd>` — keyboard keys
 
 All other HTML is stripped during rendering.
+
+---
+
+## AnkiMobile: Swipe Conflicts
+
+On iOS, AnkiMobile uses horizontal swipe gestures to open the tools menu (swipe left) and deck browser (swipe right). These swipes are handled at the native app level and override horizontal scrolling inside code blocks.
+
+To scroll code blocks horizontally on AnkiMobile, disable swipe gestures:
+
+1. Open AnkiMobile **Preferences**
+2. Go to **Review** > **Swipes**
+3. Set left and right swipe actions to **Off**
+
+You can still access tools and decks via the toolbar buttons. This does not affect AnkiDroid or desktop Anki.
