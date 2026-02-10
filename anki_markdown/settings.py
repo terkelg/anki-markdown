@@ -65,6 +65,11 @@ class ShikiSettingsDialog(QDialog):
             self.lang_list.addItem(item)
         layout.addWidget(self.lang_list)
 
+        # Info label
+        self.info_label = QLabel("")
+        self.info_label.setWordWrap(True)
+        layout.addWidget(self.info_label)
+
         # Theme section
         layout.addWidget(QLabel("<b>Themes</b>"))
 
@@ -86,11 +91,6 @@ class ShikiSettingsDialog(QDialog):
         self.cardless = QCheckBox("Cardless")
         self.cardless.setToolTip("Remove card border, shadow, and background on wide screens")
         layout.addWidget(self.cardless)
-
-        # Info label
-        self.info_label = QLabel("")
-        self.info_label.setWordWrap(True)
-        layout.addWidget(self.info_label)
 
         # Buttons
         buttons = QHBoxLayout()
