@@ -241,6 +241,20 @@ md.renderer.rules.code_inline = (tokens, idx) => {
   return `<code>${md.utils.escapeHtml(content)}</code>`;
 };
 
+// Prevent touch events on scrollable code blocks from reaching Anki's
+// tap handler, which would open the iOS menu drawer instead of scrolling.
+document.addEventListener(
+  "touchstart",
+  (e) => {
+    const target = e.target as HTMLElement;
+    const code = target.closest(".code-block pre code") as HTMLElement;
+    if (code && code.scrollWidth > code.clientWidth) {
+      e.stopPropagation();
+    }
+  },
+  true,
+);
+
 // Event delegation for toolbar
 const card = document.querySelector(".card");
 if (navigator.clipboard) card?.classList.add("clipboard");
