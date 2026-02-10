@@ -88,6 +88,7 @@ def get_config() -> dict:
         config = {
             "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown", "glsl", "wgsl", "rust", "swift", "go"],
             "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
+            "cardless": False,
         }
     return config
 
@@ -220,4 +221,5 @@ def generate_config_json() -> str:
     return json.dumps({
         "languages": config.get("languages", []),
         "themes": config.get("themes", {}),
+        "cardless": config.get("cardless", False),
     }, separators=(",", ":"))

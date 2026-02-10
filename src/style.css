@@ -40,7 +40,6 @@ html {
 }
 
 .card {
-  all: unset;
   display: block;
   container-type: inline-size;
 }
@@ -79,9 +78,12 @@ html {
   @container (inline-size >= 700px) {
     &:not(.mobile *) {
       font-size: var(--font-size, 14px);
-      background: var(--_bg);
       max-inline-size: var(--content-max-width, 34rem);
       margin-inline: auto;
+    }
+
+    &:not(.mobile *, .cardless) {
+      background: var(--_bg);
       border: 1px solid var(--_border);
       border-radius: 12px;
       box-shadow: var(--_shadow);

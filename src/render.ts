@@ -22,6 +22,7 @@ import {
 interface Config {
   languages: string[];
   themes: { light: string; dark: string };
+  cardless: boolean;
 }
 
 function getConfig(): Config {
@@ -30,6 +31,7 @@ function getConfig(): Config {
     return {
       languages: ["text"],
       themes: { light: "vitesse-light", dark: "vitesse-dark" },
+      cardless: false,
     };
   }
   return JSON.parse(el.textContent);
@@ -289,5 +291,6 @@ export async function render(front: string, back: string) {
   const backEl = document.querySelector(".back");
   if (frontEl) frontEl.innerHTML = renderMarkdown(decode(front));
   if (backEl) backEl.innerHTML = renderMarkdown(decode(back));
+  if (config.cardless) wrapper?.classList.add("cardless");
   wrapper?.classList.add("ready");
 }

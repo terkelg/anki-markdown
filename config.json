@@ -17,5 +17,6 @@
   "themes": {
     "light": "vitesse-light",
     "dark": "vitesse-dark"
-  }
+  },
+  "cardless": false
 }
