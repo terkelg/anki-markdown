@@ -43,7 +43,7 @@ class ShikiSettingsDialog(QDialog):
 
         # Language section
         layout.addWidget(QLabel("<b>Languages</b>"))
-        layout.addWidget(QLabel("Select languages for syntax highlighting:"))
+        layout.addWidget(QLabel("Select languages for syntax highlighting.\nNew languages require an internet connection to download."))
 
         filter_row = QHBoxLayout()
         self.lang_filter = QLineEdit()
@@ -82,6 +82,11 @@ class ShikiSettingsDialog(QDialog):
         theme_row2.addWidget(self.dark_theme)
         layout.addLayout(theme_row2)
 
+        # Cardless option
+        self.cardless = QCheckBox("Cardless")
+        self.cardless.setToolTip("Remove card border, shadow, and background on wide screens")
+        layout.addWidget(self.cardless)
+
         # Info label
         self.info_label = QLabel("")
         self.info_label.setWordWrap(True)
@@ -90,7 +95,7 @@ class ShikiSettingsDialog(QDialog):
         # Buttons
         buttons = QHBoxLayout()
 
-        self.apply_btn = QPushButton("Apply && Download")
+        self.apply_btn = QPushButton("Save")
         self.apply_btn.clicked.connect(self.apply_config)
         buttons.addWidget(self.apply_btn)
 
@@ -141,6 +146,8 @@ class ShikiSettingsDialog(QDialog):
         if idx >= 0:
             self.dark_theme.setCurrentIndex(idx)
 
+        self.cardless.setChecked(config.get("cardless", False))
+
         self.update_info()
 
     def get_selected_languages(self) -> list[str]:
@@ -175,13 +182,14 @@ class ShikiSettingsDialog(QDialog):
             "light": self.light_theme.currentText(),
             "dark": self.dark_theme.currentText(),
         }
+        config["cardless"] = self.cardless.isChecked()
 
         # Save config
         addon_name = __name__.split(".")[0]
         mw.addonManager.writeConfig(addon_name, config)
 
         # Show loading state
-        self.apply_btn.setText("Loading...")
+        self.apply_btn.setText("Saving...")
         self.apply_btn.setEnabled(False)
         QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         QApplication.processEvents()
@@ -221,7 +229,7 @@ class ShikiSettingsDialog(QDialog):
 
         except Exception as e:
             QApplication.restoreOverrideCursor()
-            self.apply_btn.setText("Apply && Download")
+            self.apply_btn.setText("Save")
             self.apply_btn.setEnabled(True)
             QMessageBox.critical(self, "Error", f"Failed to sync: {e}")
 

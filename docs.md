@@ -247,7 +247,7 @@ All [Shiki languages](https://shiki.style/languages) (300+) are available includ
 
 ### Themes
 
-Choose separate themes for light and dark mode. Changes apply immediately after clicking **Apply & Download**.
+Choose separate themes for light and dark mode. Changes apply immediately after clicking **Save**.
 
 **Default themes:** Vitesse Light / Vitesse Dark
 
