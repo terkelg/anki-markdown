@@ -11,27 +11,34 @@ const { loaded } = require("anki/ui") as { loaded: Promise<void> };
 const { instances } = require("anki/NoteEditor");
 const active = () => document.body.classList.contains("anki-md-active");
 
+/** Editor settings to force-disable for markdown notes. */
+const settings = ["setCloseHTMLTags", "setShrinkImages", "setMathjaxEnabled"];
+
 /** Get boolean array matching field count. */
-const texts = async (val: boolean) =>
+const fields = async (val: boolean) =>
   (await instances[0]?.fields)?.map(() => val);
 
 globalThis.ankiMdActivate = async () => {
   await loaded;
   document.body.classList.add("anki-md-active");
-  globalThis.setCloseHTMLTags(false);
-  globalThis.setPlainTexts(await texts(true));
+  for (const fn of settings) globalThis[fn](false);
+  globalThis.setPlainTexts(await fields(true));
 };
 
 globalThis.ankiMdDeactivate = async () => {
   await loaded;
   document.body.classList.remove("anki-md-active");
-  globalThis.setCloseHTMLTags(true);
-  globalThis.setPlainTexts(await texts(false));
+  for (const fn of settings) globalThis[fn](true);
+  globalThis.setPlainTexts(await fields(false));
 };
 
-/** Wrap setPlainTexts to force plain-text mode when active. */
+/** Wrap editor globals to force correct values when active. */
 loaded.then(() => {
+  for (const fn of settings) {
+    const orig = globalThis[fn];
+    globalThis[fn] = (val: boolean) => orig(active() ? false : val);
+  }
   const orig = globalThis.setPlainTexts;
-  globalThis.setPlainTexts = (texts: boolean[]) =>
-    orig(active() ? texts.map(() => true) : texts);
+  globalThis.setPlainTexts = (vals: boolean[]) =>
+    orig(active() ? vals.map(() => true) : vals);
 });
