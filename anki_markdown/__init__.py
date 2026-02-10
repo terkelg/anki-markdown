@@ -37,6 +37,21 @@ def html_to_markdown(content: str) -> str:
     text = re.sub(
         r"<(i|em)>(.*?)</\1>", r"*\2*", text, flags=re.DOTALL | re.IGNORECASE
     )
+
+    def link_replace(m):
+        href = m.group(1)
+        inner = m.group(2)
+        return f"[{inner}]({href})"
+
+    text = re.sub(
+        r'<a\s+href="([^"]*)"[^>]*>(.*?)</a>',
+        link_replace,
+        text,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+    # Remove any remaining bare <a> tags (e.g. auto-closed by Anki)
+    text = re.sub(r"</?a\b[^>]*>", "", text, flags=re.IGNORECASE)
+
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
     return text
 

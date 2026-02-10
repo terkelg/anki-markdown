@@ -237,6 +237,22 @@ It creates an array with 3 empty slots.
 > [!TIP]
 > Add a map function: \`Array.from({length: 3}, (_, i) => i)\`{js} → \`[0, 1, 2]\``,
         },
+        // HTML tags inside code blocks (issue #10)
+        {
+          front: `**jQuery** — How do you create a new element?`,
+          back: `Use the \`$()\`{js} function with an HTML string:
+
+\`\`\`js
+$("<a>", {
+  html: "This is a <strong>new</strong> link",
+  "class": "new",
+  href: "foo.html"
+});
+\`\`\`
+
+> [!NOTE]
+> The \`<a>\` and \`<strong>\` strings should render as literal text inside the code block.`,
+        },
         // Python example
         {
           front: `In Python, what's the difference between \`is\`{py} and \`==\`{py}?`,

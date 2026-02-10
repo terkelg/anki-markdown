@@ -265,13 +265,29 @@ card?.addEventListener("click", (e) => {
   }
 });
 
-// Textarea trick: browser decodes all HTML entities when parsing innerHTML
-const decoder = document.createElement("textarea");
+const ENTITIES: Record<string, string> = {
+  lt: "<",
+  gt: ">",
+  amp: "&",
+  quot: '"',
+  apos: "'",
+  nbsp: "\u00A0",
+};
 
-/** Decode Anki field content: convert <br> to newlines, decode HTML entities */
+/** Decode Anki field content: convert <br> to newlines, decode HTML entities.
+ *  Uses regex-based decoding to avoid innerHTML which strips HTML tags
+ *  that may appear inside code blocks (see issue #10). */
 function decode(text: string): string {
-  decoder.innerHTML = text.replace(/<br\s*\/?>/gi, "\n");
-  return decoder.value;
+  return text
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(
+      /&(?:#(\d+)|#x([0-9a-fA-F]+)|(\w+));/g,
+      (match, dec, hex, named) => {
+        if (dec) return String.fromCodePoint(parseInt(dec, 10));
+        if (hex) return String.fromCodePoint(parseInt(hex, 16));
+        return ENTITIES[named] ?? match;
+      },
+    );
 }
 
 /** Render markdown string to HTML */
