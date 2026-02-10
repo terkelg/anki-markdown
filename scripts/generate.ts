@@ -81,7 +81,7 @@ await Bun.write(`${ADDON_DIR}/shiki.py`, updatedPy);
 
 await Bun.write(
   `${ADDON_DIR}/config.json`,
-  JSON.stringify({ languages: config.languages, themes: config.themes }, null, 2) + "\n",
+  JSON.stringify({ languages: config.languages, themes: config.themes, cardless: config.cardless ?? false }, null, 2) + "\n",
 );
 
 const files = readdirSync(ADDON_DIR);

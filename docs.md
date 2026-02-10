@@ -247,11 +247,15 @@ All [Shiki languages](https://shiki.style/languages) (300+) are available includ
 
 ### Themes
 
-Choose separate themes for light and dark mode. Changes apply immediately after clicking **Apply & Download**.
+Choose separate themes for light and dark mode. Changes apply immediately after clicking **Save**.
 
 **Default themes:** Vitesse Light / Vitesse Dark
 
 All [Shiki themes](https://shiki.style/themes) are available including GitHub, Dracula, Nord, One Dark Pro, Tokyo Night, and more.
+
+### Cardless
+
+Enable **Cardless** to remove card border, shadow, and background on all screen sizes. Content stays centered with a max-width on wide screens but without any visual card chrome.
 
 ### How It Works
 
@@ -271,11 +275,12 @@ Override default styles in your note type's Styling section (**Browse > Cards > 
 
 ### CSS Variables
 
-| Variable              | Default | Description                     |
-| --------------------- | ------- | ------------------------------- |
-| `--font-size`         | `14px`  | Base font size (12px on mobile) |
-| `--line-height`       | `1.5`   | Line height for text            |
-| `--content-max-width` | `34rem` | Maximum width of card content   |
+| Variable              | Default | Description                    |
+| --------------------- | ------- | ------------------------------ |
+| `--font-size`         | `14px`  | Font size on wide screens      |
+| `--font-size-mobile`  | `12px`  | Font size on small screens     |
+| `--line-height`       | `1.5`   | Line height for text           |
+| `--content-max-width` | `34rem` | Maximum width of card content  |
 
 Example:
 

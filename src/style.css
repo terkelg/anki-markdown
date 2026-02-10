@@ -39,36 +39,24 @@ html {
   padding: 12px;
 }
 
+.card {
+  display: block;
+  container-type: inline-size;
+}
+
 .anki-md-wrapper {
   font-family:
     system-ui,
     -apple-system,
     sans-serif;
-  font-size: var(--font-size, 14px);
+  font-size: var(--font-size-mobile, 12px);
   line-height: var(--line-height, 1.5);
   text-wrap: pretty;
-  background: var(--_bg);
-  max-inline-size: var(--content-max-width, 34rem);
-  margin-inline: auto;
-  border: 1px solid var(--_border);
-  border-radius: 12px;
-  box-shadow: var(--_shadow);
   text-align: left;
   opacity: 0;
-  transition: box-shadow var(--transition, 120ms);
 
   &.ready {
     opacity: 1;
-  }
-
-  @media (hover: hover) {
-    &:hover {
-      box-shadow: var(--_shadow-hover);
-    }
-  }
-
-  .mobile & {
-    font-size: var(--font-size, 12px);
   }
 
   > .front,
@@ -85,6 +73,28 @@ html {
 
   > .back {
     border-block-start: 1px solid var(--_border);
+  }
+
+  @container (inline-size >= 700px) {
+    &:not(.mobile *) {
+      font-size: var(--font-size, 14px);
+      max-inline-size: var(--content-max-width, 34rem);
+      margin-inline: auto;
+    }
+
+    &:not(.mobile *, .cardless) {
+      background: var(--_bg);
+      border: 1px solid var(--_border);
+      border-radius: 12px;
+      box-shadow: var(--_shadow);
+      transition: box-shadow var(--transition, 120ms);
+
+      @media (hover: hover) {
+        &:hover {
+          box-shadow: var(--_shadow-hover);
+        }
+      }
+    }
   }
 }
 
