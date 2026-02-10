@@ -1,7 +1,5 @@
-/**
- * Editor integration for Anki Markdown note types.
- * Hides rich-text input per field using Anki's own APIs.
- */
+// Editor integration for Anki Markdown note types.
+// Hides rich-text input per field using Anki's own APIs.
 import "./editor.css";
 
 declare function require(name: string): any;
@@ -11,10 +9,10 @@ const { loaded } = require("anki/ui") as { loaded: Promise<void> };
 const { instances } = require("anki/NoteEditor");
 const active = () => document.body.classList.contains("anki-md-active");
 
-/** Editor settings to force-disable for markdown notes. */
+// Editor settings to force-disable for markdown notes
 const settings = ["setCloseHTMLTags", "setShrinkImages", "setMathjaxEnabled"];
 
-/** Get boolean array matching field count. */
+// Get boolean array matching field count
 const fields = async (val: boolean) =>
   (await instances[0]?.fields)?.map(() => val);
 
@@ -32,7 +30,7 @@ globalThis.ankiMdDeactivate = async () => {
   globalThis.setPlainTexts(await fields(false));
 };
 
-/** Wrap editor globals to force correct values when active. */
+// Wrap editor globals to force correct values when active
 loaded.then(() => {
   for (const fn of settings) {
     const orig = globalThis[fn];

@@ -267,7 +267,7 @@ img {
 }
 
 table {
-  width: 100%;
+  inline-size: 100%;
   border-collapse: separate;
   border-spacing: 0;
   border: 1px solid var(--_border);
@@ -298,7 +298,7 @@ table {
 
 ul,
 ol {
-  padding-left: 1.5em;
+  padding-inline-start: 1.5em;
 }
 
 li {
@@ -317,7 +317,7 @@ li {
 blockquote {
   margin: 0;
   padding: 0 0.5em;
-  border-left: 3px solid var(--_border);
+  border-inline-start: 3px solid var(--_border);
   font-style: italic;
   color: var(--_fg-subtle);
 
@@ -351,7 +351,7 @@ kbd {
 .markdown-alert {
   padding: 0.35em 0.75em;
   font-size: 0.9em;
-  border-left: 3px solid var(--alert-color, var(--_border));
+  border-inline-start: 3px solid var(--alert-color, var(--_border));
   background: color-mix(
     in srgb,
     var(--alert-color, var(--_border)) 10%,

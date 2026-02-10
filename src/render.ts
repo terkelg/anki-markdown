@@ -40,7 +40,6 @@ function getConfig(): Config {
 const config = getConfig();
 const themes = config.themes;
 
-// Load languages dynamically (parallel)
 async function loadLanguages(): Promise<LanguageRegistration[]> {
   const results = await Promise.allSettled(
     config.languages.map(
@@ -54,7 +53,6 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
   });
 }
 
-// Load themes dynamically (parallel)
 async function loadThemes(): Promise<ThemeRegistration[]> {
   const names = [...new Set([config.themes.light, config.themes.dark])];
   const results = await Promise.allSettled(
@@ -74,7 +72,6 @@ const transformers = [
   transformerNotationFocus({ matchAlgorithm: "v3" }),
 ];
 
-// Initialize highlighter with dynamic languages/themes
 let highlighter: HighlighterCore;
 
 async function initHighlighter(): Promise<HighlighterCore> {
@@ -100,10 +97,8 @@ const codeBlock: ShikiTransformer = {
     const classes = [node.properties.class].flat().filter(Boolean) as string[];
     const style = node.properties.style;
 
-    // Clear shiki from pre
     node.properties = {};
 
-    // Create figure with shiki class/styles
     const figure: Element = {
       type: "element",
       tagName: "figure",
@@ -166,14 +161,11 @@ const codeInline: ShikiTransformer = {
 
 function highlight(code: string, lang: string, meta?: string) {
   if (!highlighter) return `<pre><code>${code}</code></pre>`;
-
-  // Check if language is loaded, fallback to text
-  const loadedLangs = highlighter.getLoadedLanguages();
-  const effectiveLang = loadedLangs.includes(lang) ? lang : "text";
+  if (!highlighter.getLoadedLanguages().includes(lang)) lang = "text";
 
   try {
     return highlighter.codeToHtml(code, {
-      lang: effectiveLang,
+      lang,
       themes,
       meta: { __raw: meta },
       defaultColor: false,
@@ -193,10 +185,10 @@ const md = MarkdownIt({ html: true }).use(mark).use(alerts);
 
 // Only allow safe HTML tags, strip everything else
 const ALLOWED = /^<\/?(img|a|b|i|em|strong|br|kbd)(\s[^>]*)?>$/i;
-const filterHtml = (html: string) => (ALLOWED.test(html.trim()) ? html : "");
+const sanitize = (html: string) => (ALLOWED.test(html.trim()) ? html : "");
 md.renderer.rules.html_inline = (tokens, idx) =>
-  filterHtml(tokens[idx].content);
-md.renderer.rules.html_block = (tokens, idx) => filterHtml(tokens[idx].content);
+  sanitize(tokens[idx].content);
+md.renderer.rules.html_block = (tokens, idx) => sanitize(tokens[idx].content);
 
 // Fence renderer: ```lang meta
 md.renderer.rules.fence = (tokens, idx) => {
@@ -226,8 +218,7 @@ md.core.ruler.after("inline", "inline-code-lang", (state) => {
 md.renderer.rules.code_inline = (tokens, idx) => {
   const { content, meta } = tokens[idx];
   if (meta?.lang && highlighter) {
-    const loadedLangs = highlighter.getLoadedLanguages();
-    if (loadedLangs.includes(meta.lang)) {
+    if (highlighter.getLoadedLanguages().includes(meta.lang)) {
       try {
         return highlighter.codeToHtml(content, {
           lang: meta.lang,
@@ -260,7 +251,7 @@ card?.addEventListener("click", (e) => {
   const copy = target.closest(".copy") as HTMLElement;
   if (copy) {
     navigator.clipboard.writeText(
-      block.querySelector("code")?.textContent ?? "",
+      block.querySelector("code")?.textContent || "",
     );
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1500);
@@ -270,27 +261,20 @@ card?.addEventListener("click", (e) => {
 // Textarea trick: browser decodes all HTML entities when parsing innerHTML
 const decoder = document.createElement("textarea");
 
-/** Decode Anki field content: convert <br> to newlines, decode HTML entities */
 function decode(text: string): string {
   decoder.innerHTML = text.replace(/<br\s*\/?>/gi, "\n");
   return decoder.value;
 }
 
-/** Render markdown string to HTML */
-function renderMarkdown(text: string): string {
-  return md.render(text);
-}
-
-/** Render front/back fields to card DOM */
+/** Render front/back fields to card DOM. */
 export async function render(front: string, back: string) {
-  // Wait for highlighter to be ready
   await highlighterPromise;
 
   const wrapper = document.querySelector(".anki-md-wrapper");
   const frontEl = document.querySelector(".front");
   const backEl = document.querySelector(".back");
-  if (frontEl) frontEl.innerHTML = renderMarkdown(decode(front));
-  if (backEl) backEl.innerHTML = renderMarkdown(decode(back));
+  if (frontEl) frontEl.innerHTML = md.render(decode(front));
+  if (backEl) backEl.innerHTML = md.render(decode(back));
   if (config.cardless) wrapper?.classList.add("cardless");
   wrapper?.classList.add("ready");
 }
