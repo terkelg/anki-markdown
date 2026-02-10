@@ -1,29 +1,10 @@
 /*
  * Anki Markdown Editor Styles
  *
- * Hides rich-text editor UI for markdown-only editing while preserving functionality.
- *
- * Why not display:none? Anki's editor webview has features (drag-drop media, paste handling)
- * driven by the .rich-text-input element. Using display:none breaks these features.
- * Instead, we visually hide it (opacity:0, height:0) to keep it functional but invisible.
- *
- * The .anki-md-active class is toggled via JS (ankiMdActivate/ankiMdDeactivate) and only
- * applied when editing "Anki Markdown" note types, leaving other note types unaffected.
+ * Rich-text inputs are hidden per field via JS using Anki's own .hidden/.expanded
+ * wrapper class convention (see editor.ts). Only the plain-text badge needs CSS
+ * to prevent users from toggling back to rich-text mode.
  */
-.anki-md-active {
-  .editing-area {
-    gap: 0 !important;
-  }
-
-  .rich-text-input {
-    opacity: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    contain: strict;
-    padding: 0 !important;
-  }
-
-  .plain-text-badge {
-    display: none !important;
-  }
+.anki-md-active .plain-text-badge {
+  display: none !important;
 }
