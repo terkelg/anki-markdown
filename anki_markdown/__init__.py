@@ -115,14 +115,18 @@ def ensure_notetype():
         m["tmpls"][0]["qfmt"] = get_template("front.html")
         m["tmpls"][0]["afmt"] = get_template("back.html")
         m["css"] = NOTETYPE_CSS
+        for f in m["flds"]:
+            f["plainText"] = True
         mm.save(m)
         return
 
     m = mm.new(NOTETYPE)
     m["css"] = NOTETYPE_CSS
     front = mm.new_field("Front")
+    front["plainText"] = True
     mm.add_field(m, front)
     back = mm.new_field("Back")
+    back["plainText"] = True
     mm.add_field(m, back)
 
     t = mm.new_template("Default")
