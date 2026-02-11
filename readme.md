@@ -11,7 +11,6 @@ Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks
 - **Settings panel** to pick languages and themes
 - **AI agent friendly**, works great with MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
 
-See the [documentation](docs.md) for all features.
 
 > [!NOTE]
 > In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install
@@ -32,7 +31,8 @@ After installing the add-on:
 3. **Write your answer** in the Back field using markdown
 4. The markdown will be automatically rendered with syntax highlighting when you review the card
 
-See the [documentation](docs.md) for all supported markdown features including code blocks, line highlighting, alerts, and more.
+> [!TIP]
+> See the [documentation](docs.md) for all supported markdown features including code blocks, line highlighting, alerts, and more.
 
 ## Development
 
