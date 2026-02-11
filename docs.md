@@ -9,6 +9,7 @@ A modern Anki add-on that transforms your flashcards with full markdown support 
 - **Beautiful Code Highlighting**: Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with 300+ languages and 60+ themes to choose from
 - **Advanced Code Features**: Line highlighting, word highlighting, focus mode, error/warning annotations, and a copy button
 - **Mobile Compatible**: Works seamlessly on AnkiMobile and AnkiDroid
+- **AI Agent Friendly**: Markdown is the native language of LLMs, making it easy to generate flashcards with AI agents and MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
 
 ---
 
