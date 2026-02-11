@@ -60,6 +60,11 @@ Key patterns:
 - Files prefixed with `_` are synced to `collection.media` (works on mobile/AnkiWeb)
 - Files in `web/` use add-on exports (desktop only)
 - `ensure_notetype()` creates/updates the custom note type on profile load
+- Dark mode is normalized in `render.ts` into a single `.night-mode` class on `:root`. CSS only targets `.night-mode`. Platform conventions:
+  - Desktop: `nightMode` + `night_mode` on `<body>` ([source](https://github.com/ankitects/anki/blob/main/qt/aqt/theme.py))
+  - AnkiDroid: `night_mode` on `<body>` ([source](https://github.com/ankidroid/Anki-Android/wiki/Advanced-formatting))
+  - AnkiMobile: `nightMode` on card element ([source](https://docs.ankimobile.net/night-mode.html))
+  - Fallback: `prefers-color-scheme: dark` media query
 
 ## ESM in Anki Templates
 
@@ -116,7 +121,7 @@ The `.anki-md-active` class is only applied when editing "Anki Markdown" note ty
 
 ## Anki CSS Variables
 
-Anki provides CSS variables for theming. Use these instead of hardcoded colors for light/dark mode support. Night mode uses `:root.night-mode` selector (note: different from our `.nightMode` class on cards).
+Anki provides CSS variables for theming. Use these instead of hardcoded colors for light/dark mode support. Night mode uses `:root.night-mode` selector (note: different from our `.night-mode` class on cards).
 
 ### Colors
 

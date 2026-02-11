@@ -13,7 +13,8 @@ Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks
 
 
 > [!NOTE]
-> In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install
+> In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install.
+> See the [documentation](docs.md) for all supported features.
 
 <p align="center">
   <picture>
@@ -31,7 +32,7 @@ After installing the add-on:
 3. **Write your answer** in the Back field using markdown
 4. The markdown will be automatically rendered with syntax highlighting when you review the card
 
-> [!TIP]
+> [!NOTE]
 > See the [documentation](docs.md) for all supported markdown features including code blocks, line highlighting, alerts, and more.
 
 ## Development
