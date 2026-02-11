@@ -271,6 +271,20 @@ export async function render(front: string, back: string) {
   await highlighterPromise;
 
   const wrapper = document.querySelector(".anki-md-wrapper");
+
+  // Normalize dark mode classes into .night-mode on :root
+  // - Desktop: nightMode + night_mode on <body> (qt/aqt/theme.py body_classes_for_card_ord)
+  //   https://github.com/ankitects/anki/blob/main/qt/aqt/theme.py
+  // - AnkiDroid: night_mode on <body>
+  //   https://github.com/ankidroid/Anki-Android/wiki/Advanced-formatting
+  // - AnkiMobile: nightMode on card element
+  //   https://docs.ankimobile.net/night-mode.html
+  const dark =
+    document.body.classList.contains("nightMode") ||
+    document.body.classList.contains("night_mode") ||
+    matchMedia("(prefers-color-scheme: dark)").matches;
+  if (dark) document.documentElement.classList.add("night-mode");
+
   const frontEl = document.querySelector(".front");
   const backEl = document.querySelector(".back");
   if (frontEl) frontEl.innerHTML = md.render(decode(front));
