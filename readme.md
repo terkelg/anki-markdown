@@ -4,13 +4,13 @@
 
 Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks). Supports light and dark mode across desktop and mobile.
 
-- [Code blocks](docs.md#code-blocks) with 300+ languages via [Shiki](https://shiki.style)
-- [Inline code highlighting](docs.md#inline-code-highlighting)
-- [Line highlighting](docs.md#line-highlighting) and [word highlighting](docs.md#word-highlighting)
-- [Focus mode](docs.md#focus-mode), [error/warning annotations](docs.md#error--warning-annotations)
-- [GitHub-style alerts and callouts](docs.md#alerts--callouts)
-- [Settings panel](docs.md#settings) to pick languages and themes
-- [AI agent friendly](docs.md#why-use-this-add-on), works great with MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
+- **Code blocks** with 300+ languages via Shiki
+- **Inline code highlighting**
+- **Line and word highlighting**
+- **Focus mode**, error/warning annotations
+- **GitHub-style alerts and callouts**
+- **Settings panel** to pick languages and themes
+- **AI agent friendly**, works great with MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
 
 See the [documentation](docs.md) for all features.
 
