@@ -4,11 +4,7 @@ import mark from "markdown-it-mark";
 import alerts from "markdown-it-github-alerts";
 import { createHighlighterCore } from "@shikijs/core";
 import { createJavaScriptRegexEngine } from "@shikijs/engine-javascript";
-import type {
-  HighlighterCore,
-  LanguageRegistration,
-  ThemeRegistration,
-} from "@shikijs/core";
+import type { HighlighterCore } from "@shikijs/core";
 import type { ShikiTransformer } from "shiki";
 import type { Element } from "hast";
 import {
@@ -40,7 +36,7 @@ function getConfig(): Config {
 const config = getConfig();
 const themes = config.themes;
 
-async function loadLanguages(): Promise<LanguageRegistration[]> {
+async function loadLanguages() {
   const results = await Promise.allSettled(
     config.languages.map(
       (name) => import(/* @vite-ignore */ `./_lang-${name}.js`),
@@ -53,7 +49,7 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
   });
 }
 
-async function loadThemes(): Promise<ThemeRegistration[]> {
+async function loadThemes() {
   const names = [...new Set([config.themes.light, config.themes.dark])];
   const results = await Promise.allSettled(
     names.map((name) => import(/* @vite-ignore */ `./_theme-${name}.js`)),
@@ -83,10 +79,7 @@ async function initHighlighter(): Promise<HighlighterCore> {
   });
 }
 
-const highlighterPromise = initHighlighter();
-highlighterPromise.then((h) => {
-  highlighter = h;
-});
+const ready = initHighlighter().then((h) => (highlighter = h));
 
 const codeBlock: ShikiTransformer = {
   name: "code-block",
@@ -338,7 +331,7 @@ export async function render(front: string, back: string) {
   // If we rendered before the highlighter was ready, wait for it
   // then upgrade code blocks in-place with syntax highlighting.
   if (!highlighter) {
-    await highlighterPromise;
+    await ready;
     if (frontEl) upgradeCodeBlocks(frontEl);
     if (backEl) upgradeCodeBlocks(backEl);
   }
