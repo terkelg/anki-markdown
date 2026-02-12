@@ -166,7 +166,10 @@ function highlight(code: string, lang: string, meta?: string) {
       `<figure class="code-block" data-pending${attr}>` +
       `<pre><code>${escaped}</code></pre>` +
       `<figcaption class="toolbar"><span class="lang">${lang}</span>` +
-      `<span class="actions"></span></figcaption></figure>`
+      `<span class="actions">` +
+      `<button type="button" class="toggle">Reveal</button>` +
+      `<button type="button" class="copy">Copy</button>` +
+      `</span></figcaption></figure>`
     );
   }
   if (!highlighter.getLoadedLanguages().includes(lang)) lang = "text";
@@ -276,8 +279,8 @@ function decode(text: string): string {
 
 /**
  * Re-highlight code blocks that were rendered before Shiki was ready.
- * Targets blocks marked with [data-pending] and replaces them with
- * Shiki-highlighted versions (same outer structure, no layout shift).
+ * Updates in-place: swaps code innerHTML and copies Shiki attributes
+ * onto the existing figure so the outer layout never changes.
  */
 function upgradeCodeBlocks(container: HTMLElement) {
   const pending = container.querySelectorAll<HTMLElement>(
@@ -290,10 +293,18 @@ function upgradeCodeBlocks(container: HTMLElement) {
     const lang = figure.querySelector(".lang")?.textContent || "text";
     const meta = figure.dataset.meta;
     const highlighted = highlight(text.replace(/\n$/, ""), lang, meta);
-    const tmp = document.createElement("div");
-    tmp.innerHTML = highlighted;
-    const replacement = tmp.firstElementChild;
-    if (replacement) figure.replaceWith(replacement);
+    const tpl = document.createElement("template");
+    tpl.innerHTML = highlighted;
+    const fresh = tpl.content.firstElementChild as HTMLElement;
+    if (!fresh) continue;
+
+    // Swap code content and copy figure attributes in-place
+    const inner = fresh.querySelector("code");
+    if (inner) code.innerHTML = inner.innerHTML;
+    figure.className = fresh.className;
+    if (fresh.style.cssText) figure.style.cssText = fresh.style.cssText;
+    figure.removeAttribute("data-pending");
+    figure.removeAttribute("data-meta");
   }
 }
 

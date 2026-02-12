@@ -1,4 +1,7 @@
 :root {
+  --_mono:
+    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
+    monospace;
   --_radius: var(--border-radius, 5px);
   --_fg: var(--fg, #020202);
   --_fg-subtle: var(--fg-subtle, #737373);
@@ -107,36 +110,82 @@ body {
   }
 }
 
-/* Shared shiki styles */
-.shiki {
-  font-family:
-    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
-    monospace;
+.code-block {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--_border-code, var(--_border));
+  border-radius: 8px;
+  background-clip: padding-box;
+  box-shadow: var(--_shadow-code);
+  font-family: var(--_mono);
   font-size: 0.875rem;
-  background: var(--shiki-light-bg);
 
-  span {
-    color: var(--shiki-light);
-    font-style: var(--shiki-light-font-style);
-    font-weight: var(--shiki-light-font-weight);
-    text-decoration: var(--shiki-light-text-decoration);
+  pre {
+    margin: 0;
+    padding: 8px;
   }
 
-  .night-mode & {
-    background: var(--shiki-dark-bg);
+  code {
+    display: block;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  /* Shiki theme colors */
+  &.shiki {
+    background: var(--shiki-light-bg);
 
     span {
-      color: var(--shiki-dark);
-      font-style: var(--shiki-dark-font-style);
-      font-weight: var(--shiki-dark-font-weight);
-      text-decoration: var(--shiki-dark-text-decoration);
+      color: var(--shiki-light);
+      font-style: var(--shiki-light-font-style);
+      font-weight: var(--shiki-light-font-weight);
+      text-decoration: var(--shiki-light-text-decoration);
     }
-  }
 
-  .highlighted-word {
-    background: rgb(255 255 0 / 0.2);
-    padding: 2px;
-    border-radius: 4px;
+    .night-mode & {
+      background: var(--shiki-dark-bg);
+
+      span {
+        color: var(--shiki-dark);
+        font-style: var(--shiki-dark-font-style);
+        font-weight: var(--shiki-dark-font-weight);
+        text-decoration: var(--shiki-dark-text-decoration);
+      }
+    }
+
+    .highlighted-word {
+      background: rgb(255 255 0 / 0.2);
+      padding: 2px;
+      border-radius: 4px;
+    }
+
+    .line.highlighted {
+      background: rgb(255 255 0 / 0.2);
+      border-radius: 4px;
+
+      &.error {
+        background: rgb(255 0 0 / 0.2);
+      }
+
+      &.warning {
+        background: rgb(255 165 0 / 0.2);
+      }
+    }
+
+    pre > code {
+      --fade-size: 1.5rem;
+
+      mask-image: linear-gradient(
+        to right,
+        var(--fade-left),
+        #000 var(--fade-size),
+        #000 calc(100% - var(--fade-size)),
+        var(--fade-right)
+      );
+      animation: scroll-fade linear;
+      animation-timeline: scroll(self x);
+    }
   }
 
   &.has-focused .line:not(.focused) {
@@ -146,56 +195,18 @@ body {
       filter 0.35s,
       opacity 0.35s;
 
-    :is(.code-block.revealed, .shiki:hover) & {
+    :is(.code-block.revealed, .code-block:hover) & {
       opacity: 1;
       filter: blur(0);
     }
   }
 
-  .line.highlighted {
-    background: rgb(255 255 0 / 0.2);
-    border-radius: 4px;
-
-    &.error {
-      background: rgb(255 0 0 / 0.2);
-    }
-
-    &.warning {
-      background: rgb(255 165 0 / 0.2);
-    }
+  &.has-focused .toggle {
+    display: inline;
   }
 
-  pre > code {
-    --fade-size: 1.5rem;
-
-    display: block;
-    overflow-x: auto;
-    scrollbar-width: none;
-
-    mask-image: linear-gradient(
-      to right,
-      var(--fade-left),
-      #000 var(--fade-size),
-      #000 calc(100% - var(--fade-size)),
-      var(--fade-right)
-    );
-    animation: scroll-fade linear;
-    animation-timeline: scroll(self x);
-  }
-}
-
-.code-block {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--_border-code, var(--_border));
-  border-radius: 8px;
-  background-clip: padding-box;
-  box-shadow: var(--_shadow-code);
-
-  pre {
-    margin: 0;
-    padding: 8px;
+  .clipboard & .copy {
+    display: inline;
   }
 
   .toolbar {
@@ -235,20 +246,10 @@ body {
       display: none;
     }
   }
-
-  &.has-focused .toggle {
-    display: inline;
-  }
-
-  .clipboard & .copy {
-    display: inline;
-  }
 }
 
 code:not(.shiki code, pre code) {
-  font-family:
-    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
-    monospace;
+  font-family: var(--_mono);
   font-size: 0.875em;
   background: var(--_bg-inset);
   border: 1px solid var(--_border);
