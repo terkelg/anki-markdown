@@ -76,7 +76,6 @@ let highlighter: HighlighterCore;
 
 async function initHighlighter(): Promise<HighlighterCore> {
   const [langs, themeList] = await Promise.all([loadLanguages(), loadThemes()]);
-
   return createHighlighterCore({
     langs,
     themes: themeList,
@@ -160,7 +159,16 @@ const codeInline: ShikiTransformer = {
 };
 
 function highlight(code: string, lang: string, meta?: string) {
-  if (!highlighter) return `<pre><code>${code}</code></pre>`;
+  if (!highlighter) {
+    const escaped = md.utils.escapeHtml(code);
+    const attr = meta ? ` data-meta="${md.utils.escapeHtml(meta)}"` : "";
+    return (
+      `<figure class="code-block" data-pending${attr}>` +
+      `<pre><code>${escaped}</code></pre>` +
+      `<figcaption class="toolbar"><span class="lang">${lang}</span>` +
+      `<span class="actions"></span></figcaption></figure>`
+    );
+  }
   if (!highlighter.getLoadedLanguages().includes(lang)) lang = "text";
 
   try {
@@ -266,10 +274,31 @@ function decode(text: string): string {
   return decoder.value;
 }
 
+/**
+ * Re-highlight code blocks that were rendered before Shiki was ready.
+ * Targets blocks marked with [data-pending] and replaces them with
+ * Shiki-highlighted versions (same outer structure, no layout shift).
+ */
+function upgradeCodeBlocks(container: HTMLElement) {
+  const pending = container.querySelectorAll<HTMLElement>(
+    ".code-block[data-pending]",
+  );
+  for (const figure of pending) {
+    const code = figure.querySelector("code");
+    if (!code) continue;
+    const text = code.textContent || "";
+    const lang = figure.querySelector(".lang")?.textContent || "text";
+    const meta = figure.dataset.meta;
+    const highlighted = highlight(text.replace(/\n$/, ""), lang, meta);
+    const tmp = document.createElement("div");
+    tmp.innerHTML = highlighted;
+    const replacement = tmp.firstElementChild;
+    if (replacement) figure.replaceWith(replacement);
+  }
+}
+
 /** Render front/back fields to card DOM. */
 export async function render(front: string, back: string) {
-  await highlighterPromise;
-
   const wrapper = document.querySelector(".anki-md-wrapper");
 
   // Normalize dark mode classes into .night-mode on :root
@@ -285,10 +314,21 @@ export async function render(front: string, back: string) {
     matchMedia("(prefers-color-scheme: dark)").matches;
   if (dark) document.documentElement.classList.add("night-mode");
 
-  const frontEl = document.querySelector(".front");
-  const backEl = document.querySelector(".back");
+  const frontEl = document.querySelector<HTMLElement>(".front");
+  const backEl = document.querySelector<HTMLElement>(".back");
+
+  // Render immediately — if the highlighter isn't ready yet, code blocks
+  // will use the plain <pre><code> fallback from highlight().
   if (frontEl) frontEl.innerHTML = md.render(decode(front));
   if (backEl) backEl.innerHTML = md.render(decode(back));
   if (config.cardless) wrapper?.classList.add("cardless");
   wrapper?.classList.add("ready");
+
+  // If we rendered before the highlighter was ready, wait for it
+  // then upgrade code blocks in-place with syntax highlighting.
+  if (!highlighter) {
+    await highlighterPromise;
+    if (frontEl) upgradeCodeBlocks(frontEl);
+    if (backEl) upgradeCodeBlocks(backEl);
+  }
 }

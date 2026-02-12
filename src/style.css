@@ -245,7 +245,7 @@ body {
   }
 }
 
-code:not(.shiki code) {
+code:not(.shiki code, pre code) {
   font-family:
     "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
     monospace;
@@ -387,7 +387,7 @@ kbd {
     margin: 0;
   }
 
-  code:not(.shiki code) {
+  code:not(.shiki code, pre code) {
     background: rgb(0 0 0 / 0.06);
     border-color: rgb(0 0 0 / 0.1);
 
