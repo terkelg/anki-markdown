@@ -51,8 +51,6 @@ await Bun.write(
   `${ADDON_DIR}/shiki-data.json`,
   JSON.stringify(
     { version: shikiVersion, languages: languageNames, themes: themeNames },
-    null,
-    2,
   ) + "\n",
 );
 
