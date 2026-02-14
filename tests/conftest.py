@@ -32,8 +32,8 @@ def shiki(monkeypatch):
         match = re.search(r"/(langs|themes)@[^/]+/es2022/(.+)\.mjs$", url)
         if not match:
             raise ValueError(f"unexpected URL: {url}")
-        dir = LANGS_DIR if match.group(1) == "langs" else THEMES_DIR
-        return (dir / f"{match.group(2)}.mjs").read_bytes()
+        root = LANGS_DIR if match.group(1) == "langs" else THEMES_DIR
+        return (root / f"{match.group(2)}.mjs").read_bytes()
 
     monkeypatch.setattr(mod, "fetch_module", local_fetch)
     return mod
