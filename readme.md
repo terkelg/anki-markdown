@@ -80,6 +80,22 @@ The build runs `bun run generate` which:
 - Sets `SHIKI_VERSION` from `package.json` dependencies
 - Cleans stray `_lang-*.js` / `_theme-*.js` files
 
+## Tests
+
+Python tests for `shiki.py` (language/theme download and management). Requires a one-time venv setup:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install pytest
+```
+
+```bash
+bun run test           # offline (reads from node_modules)
+bun run test:online    # online only (hits esm.sh)
+bun run test:all       # all tests
+```
+
+Most tests read language/theme files from `node_modules/@shikijs/` instead of making network requests. Tests marked `@online` hit esm.sh to verify the CDN serves the same format.
+
 ## Testing in Anki
 
 Requires Anki 2.1.55+. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.

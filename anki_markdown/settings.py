@@ -22,8 +22,7 @@ from .shiki import (
     AVAILABLE_LANGS,
     AVAILABLE_THEMES,
     get_config,
-    sync_shiki_files,
-    cleanup_unused,
+    store,
 )
 
 
@@ -196,10 +195,10 @@ class ShikiSettingsDialog(QDialog):
 
         try:
             # Download missing files
-            downloaded, errors = sync_shiki_files()
+            downloaded, errors = store.sync(config)
 
             # Cleanup unused files
-            removed = cleanup_unused(config)
+            removed = store.cleanup(config)
 
             # Sync to collection.media (pass removed files to trash from media)
             from . import sync_media

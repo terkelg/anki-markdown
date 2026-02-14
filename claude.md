@@ -28,6 +28,8 @@ Key distinction: Users create **notes**, Anki generates **cards** from them. One
 ```bash
 bun run dev      # Start dev server at localhost:5173
 bun run build    # Compile TypeScript and bundle for add-on
+bun run test     # Run Python tests offline (pytest)
+bun run test:all # Run all Python tests including online
 bun run debug    # Symlink add-on and launch Anki with remote debugging (port 9222)
 bun run package  # Build and create .ankiaddon file
 bun run release  # Bump version, tag, and push (triggers GitHub release)
@@ -48,12 +50,30 @@ src/                     # TypeScript source (compiled by Vite)
 
 anki_markdown/           # Anki add-on (symlinked to Anki addons folder)
 ├── __init__.py          # Python entry point - hooks into Anki, syncs media, manages note type
+├── shiki.py             # Language/theme download and management (ShikiStore)
+├── settings.py          # Settings dialog (Qt)
 ├── manifest.json        # Add-on metadata
 ├── templates/           # Card templates
 ├── _review.js           # Card renderer (built, syncs to mobile)
 ├── _review.css          # Card styles (built, syncs to mobile)
 └── web/                 # Editor files (built, desktop only)
+
+tests/                   # Python tests (pytest, no Anki dependency)
+├── conftest.py          # Loads shiki.py via importlib to bypass aqt
+└── test_shiki.py        # Pure function + ShikiStore tests
 ```
+
+### shiki.py structure
+
+`shiki.py` is split into layers so it can be tested without Anki:
+
+- **Pure functions** (`esm_url`, `is_alias_module`, `lang_deps`, `rewrite_lang_imports`) — no I/O, no state
+- **I/O** (`fetch_module`) — network only, no filesystem
+- **`ShikiStore` class** — all filesystem ops, directory passed via constructor. Non-bundled `.mjs` modules from esm.sh have relative imports to sibling language files (e.g. html imports javascript + css). `download_lang` rewrites these to local `_lang-*.js` paths and recursively downloads deps. `cleanup` preserves dependency files even if not explicitly configured.
+- **Default instance** (`store = ShikiStore(ADDON_DIR)`) — used by `__init__.py` and `settings.py`
+- **Anki glue** (`get_config`, `generate_config_json`) — lazy-import `aqt` so the rest of the module stays importable outside Anki
+
+Tests use `ShikiStore(tmp_path)` with real network calls, loaded via `importlib` to bypass `__init__.py`.
 
 Key patterns:
 
@@ -68,18 +88,29 @@ Key patterns:
 
 ## ESM in Anki Templates
 
-ESM works in Anki templates with placeholder elements:
+ESM works in Anki templates. Field data is passed via hidden `<script type="text/plain">` elements to avoid HTML parsing issues:
 
 ```html
+<link rel="stylesheet" href="./_review.css" />
 <div class="anki-md-wrapper">
   <div class="front"></div>
   <div class="back"></div>
 </div>
+<script id="data-front" type="text/plain">
+  {{Front}}
+</script>
+<script id="data-back" type="text/plain">
+  {{Back}}
+</script>
 <script type="module">
   import { render } from "./_review.js";
+  const front = document.getElementById("data-front").textContent;
+  const back = document.getElementById("data-back").textContent;
   render(front, back);
 </script>
 ```
+
+Python injects a `<script type="application/json" id="anki-md-config">` tag before the template at runtime with the current config (languages, themes, cardless).
 
 **Critical**: Don't replace parent `innerHTML` — mutate children instead. Anki's reviewer.js caches element references after initial parse. Using `parent.innerHTML = ...` destroys elements and invalidates those references, causing null errors. Instead, populate existing elements: `frontEl.innerHTML = content`.
 
@@ -92,32 +123,20 @@ ESM works in Anki templates with placeholder elements:
 
 ## Editor Integration
 
-The editor webview (`src/editor.ts` + `src/editor.css`) hides rich-text UI for markdown-only editing.
+The editor webview (`src/editor.ts` + `src/editor.css`) forces plain-text mode for markdown-only editing.
 
-### Why visually hide instead of display:none?
+### How it works
 
-Anki's editor webview has many built-in features: drag-drop media upload, paste handling, undo/redo, etc. These are driven by the `.rich-text-input` element. Using `display:none` completely breaks these features because the element is removed from the render tree.
+When an "Anki Markdown" note is loaded, Python calls `ankiMdActivate()` which:
 
-After trying several approaches (custom editor, fully replacing the view), the most elegant solution is to **visually hide** the rich-text editor while keeping it functional:
+1. Adds `.anki-md-active` class to `<body>`
+2. Calls Anki's built-in `setPlainTexts([true, true, ...])` to force all fields to plain-text mode
+3. Disables `setCloseHTMLTags`, `setShrinkImages`, `setMathjaxEnabled`
+4. CSS hides the plain-text badge (so users can't toggle back) and the settings button
 
-```css
-.rich-text-input {
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  contain: strict;
-}
-```
+When switching to a different note type, `ankiMdDeactivate()` reverses everything.
 
-This keeps the element in the DOM and functional (receiving events, handling drops) while being invisible. Users edit in the plain-text/source view which shows raw markdown.
-
-### Selective activation
-
-The `.anki-md-active` class is only applied when editing "Anki Markdown" note types:
-
-- Python detects note type changes and calls `ankiMdActivate()` / `ankiMdDeactivate()`
-- Other note types remain completely unaffected
-- The JS/CSS is injected into the editor webview on add-on load
+The JS also wraps Anki's global setter functions so they can't re-enable rich-text while a markdown note is active. This prevents Anki's own lifecycle from overriding the forced settings.
 
 ## Anki CSS Variables
 
