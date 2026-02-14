@@ -1,5 +1,5 @@
 /**
- * Generates Python constants and addon config from config.json.
+ * Generates shiki-data.json and addon config from config.json.
  * Shiki version is read from package.json dependencies.
  * Run: bun run generate
  */
@@ -47,41 +47,26 @@ for (const theme of [config.themes.light, config.themes.dark]) {
   }
 }
 
-function formatPyList(items: string[], indent = 4): string {
-  const lines: string[] = [];
-  let line = "";
-  for (const item of items) {
-    const quoted = `"${item}"`;
-    if (line.length + quoted.length + 2 > 80 - indent) {
-      lines.push(line.slice(0, -1));
-      line = "";
-    }
-    line += quoted + ", ";
-  }
-  if (line) lines.push(line.slice(0, -2));
-  return lines.map((l) => " ".repeat(indent) + l).join("\n");
-}
-
-const shikiPy = await Bun.file(`${ADDON_DIR}/shiki.py`).text();
-
-const langsMarker = /^AVAILABLE_LANGS = \[[\s\S]*?\]$/m;
-const themesMarker = /^AVAILABLE_THEMES = \[[\s\S]*?\]$/m;
-const versionMarker = /^SHIKI_VERSION = ".*"$/m;
-
-const newLangs = `AVAILABLE_LANGS = [\n${formatPyList(languageNames)},\n]`;
-const newThemes = `AVAILABLE_THEMES = [\n${formatPyList(themeNames)},\n]`;
-const newVersion = `SHIKI_VERSION = "${shikiVersion}"`;
-
-const updatedPy = shikiPy
-  .replace(langsMarker, newLangs)
-  .replace(themesMarker, newThemes)
-  .replace(versionMarker, newVersion);
-
-await Bun.write(`${ADDON_DIR}/shiki.py`, updatedPy);
+await Bun.write(
+  `${ADDON_DIR}/shiki-data.json`,
+  JSON.stringify(
+    { version: shikiVersion, languages: languageNames, themes: themeNames },
+    null,
+    2,
+  ) + "\n",
+);
 
 await Bun.write(
   `${ADDON_DIR}/config.json`,
-  JSON.stringify({ languages: config.languages, themes: config.themes, cardless: config.cardless ?? false }, null, 2) + "\n",
+  JSON.stringify(
+    {
+      languages: config.languages,
+      themes: config.themes,
+      cardless: config.cardless ?? false,
+    },
+    null,
+    2,
+  ) + "\n",
 );
 
 const files = readdirSync(ADDON_DIR);
@@ -93,8 +78,9 @@ for (const file of files) {
   }
 }
 
-console.log(`✓ Generated AVAILABLE_LANGS (${languageNames.length} languages)`);
-console.log(`✓ Generated AVAILABLE_THEMES (${themeNames.length} themes)`);
+console.log(
+  `✓ Generated shiki-data.json (${languageNames.length} languages, ${themeNames.length} themes)`,
+);
 console.log(`✓ Updated ${ADDON_DIR}/config.json`);
 console.log(`✓ SHIKI_VERSION = "${shikiVersion}"`);
 if (cleaned > 0) {
