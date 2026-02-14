@@ -21,9 +21,9 @@ from aqt import mw
 from .shiki import (
     AVAILABLE_LANGS,
     AVAILABLE_THEMES,
+    SHIKI_VERSION,
     get_config,
-    sync_shiki_files,
-    cleanup_unused,
+    store,
 )
 
 
@@ -91,6 +91,11 @@ class ShikiSettingsDialog(QDialog):
         self.cardless = QCheckBox("Cardless")
         self.cardless.setToolTip("Remove card border, shadow, and background on wide screens")
         layout.addWidget(self.cardless)
+
+        # Version
+        version = QLabel(f"Shiki {SHIKI_VERSION}")
+        version.setStyleSheet("color: gray; font-size: 11px;")
+        layout.addWidget(version)
 
         # Buttons
         buttons = QHBoxLayout()
@@ -196,10 +201,10 @@ class ShikiSettingsDialog(QDialog):
 
         try:
             # Download missing files
-            downloaded, errors = sync_shiki_files()
+            downloaded, errors = store.sync(config)
 
             # Cleanup unused files
-            removed = cleanup_unused(config)
+            removed = store.cleanup(config)
 
             # Sync to collection.media (pass removed files to trash from media)
             from . import sync_media

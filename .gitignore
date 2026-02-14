@@ -15,4 +15,6 @@ anki_markdown/meta.json
 *.ankiaddon
 node_modules
 __pycache__/
+.venv/
+.pytest_cache/
 .DS_Store
