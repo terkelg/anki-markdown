@@ -1,9 +1,5 @@
 /*
  * Anki Markdown Editor Styles
- *
- * Rich-text inputs are hidden per field via JS using Anki's own .hidden/.expanded
- * wrapper class convention (see editor.ts). Only the plain-text badge needs CSS
- * to prevent users from toggling back to rich-text mode.
  */
 .anki-md-active {
   .plain-text-badge {
@@ -12,5 +8,129 @@
 
   #settings {
     display: none;
+  }
+
+  .anki-md-preview {
+    margin-top: 0;
+    background: var(--canvas);
+    border-radius: var(--border-radius, 5px);
+    overflow: hidden;
+  }
+
+  .anki-md-preview .label-container {
+    padding: 0;
+  }
+
+  .anki-md-preview .collapse-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    line-height: 1.2;
+    user-select: none;
+  }
+
+  .anki-md-preview .collapse-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-end: 0.1rem;
+    opacity: 0.4;
+    transition:
+      opacity var(--transition, 150ms) ease-in-out,
+      transform var(--transition, 150ms) ease-in;
+  }
+
+  .anki-md-preview .collapse-label:hover .collapse-badge {
+    opacity: 1;
+  }
+
+  .anki-md-preview .collapse-badge.collapsed {
+    transform: rotate(-90deg);
+  }
+
+  .anki-md-preview .badge {
+    border: none;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .anki-md-preview-icon-wrap {
+    inline-size: 0.95em;
+    block-size: 0.95em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .anki-md-preview-icon svg {
+    inline-size: 1em;
+    block-size: 1em;
+    fill: currentColor;
+  }
+
+  .anki-md-preview .label-name {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1.2;
+  }
+
+  .anki-md-preview .field-state {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .anki-md-preview .field-state > * {
+    margin: 0 3px;
+  }
+
+  .anki-md-preview .field-state > *:first-child {
+    margin-left: 0;
+  }
+
+  .anki-md-preview .field-state > *:last-child {
+    margin-right: 0;
+  }
+
+  .anki-md-preview .justify-content-end {
+    justify-content: flex-end;
+  }
+
+  .anki-md-preview-meta {
+    color: var(--fg-subtle);
+  }
+
+  .anki-md-preview .editor-field {
+    overflow: hidden;
+    margin: 1px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border);
+    outline-offset: -1px;
+  }
+
+  .anki-md-preview-body {
+    max-height: 260px;
+    overflow: auto;
+  }
+
+  .anki-md-preview-content {
+    padding: 8px;
+
+    > .front {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6em;
+
+      > * {
+        margin: 0;
+      }
+    }
   }
 }

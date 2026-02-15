@@ -1,0 +1,385 @@
+.anki-md-rendered {
+  --_radius: var(--border-radius, 5px);
+  --_fg: var(--fg, #020202);
+  --_fg-subtle: var(--fg-subtle, #737373);
+  --_border: rgb(0 0 0 / 0.1);
+  --_bg: var(--canvas-elevated, #fff);
+  --_bg-inset: rgb(0 0 0 / 0.04);
+  --_shadow: 0 1px 2px 0 rgb(20 20 20 / 0.06), 0 1px 3px 0 rgb(20 20 20 / 0.04);
+  --_shadow-hover:
+    0 2px 4px 0 rgb(20 20 20 / 0.1), 0 1px 3px 0 rgb(20 20 20 / 0.06);
+  --_shadow-code:
+    0 1px 3px 0 rgb(0 0 0 / 0.025), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  --_color-note: var(--note, #2563eb);
+  --_color-tip: var(--tip, #16a34a);
+  --_color-important: var(--important, #7c3aed);
+  --_color-warning: var(--warning, #ca8a04);
+  --_color-caution: var(--caution, #dc2626);
+
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: var(--line-height, 1.5);
+  text-wrap: pretty;
+  text-align: left;
+}
+
+:root.night-mode .anki-md-rendered {
+  --_fg: var(--fg, #fcfcfc);
+  --_fg-subtle: var(--fg-subtle, #858585);
+  --_border: rgb(255 255 255 / 0.12);
+  --_border-code: rgb(255 255 255 / 0.22);
+  --_bg: var(--canvas-elevated, #363636);
+  --_bg-inset: rgb(255 255 255 / 0.05);
+  --_shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 2px 6px 0 rgb(0 0 0 / 0.2);
+  --_shadow-hover:
+    0 2px 6px 0 rgb(0 0 0 / 0.4), 0 4px 12px 0 rgb(0 0 0 / 0.3);
+  --_shadow-code:
+    0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+  --_color-note: var(--note, #318aff);
+  --_color-tip: var(--tip, #19be56);
+  --_color-important: var(--important, #965bfb);
+  --_color-warning: var(--warning, #dc9703);
+}
+
+.anki-md-rendered .shiki {
+  font-family:
+    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
+    monospace;
+  font-size: 0.875rem;
+  background: var(--shiki-light-bg);
+}
+
+.anki-md-rendered .shiki span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+
+:root.night-mode .anki-md-rendered .shiki {
+  background: var(--shiki-dark-bg);
+}
+
+:root.night-mode .anki-md-rendered .shiki span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+
+.anki-md-rendered .shiki .highlighted-word {
+  background: rgb(255 255 0 / 0.2);
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.anki-md-rendered .shiki.has-focused .line:not(.focused) {
+  opacity: 0.7;
+  filter: blur(0.095rem);
+  transition:
+    filter 0.35s,
+    opacity 0.35s;
+}
+
+.anki-md-rendered .code-block.revealed .shiki.has-focused .line:not(.focused),
+.anki-md-rendered .shiki:hover.has-focused .line:not(.focused) {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.anki-md-rendered .shiki .line.highlighted {
+  background: rgb(255 255 0 / 0.2);
+  border-radius: 4px;
+}
+
+.anki-md-rendered .shiki .line.highlighted.error {
+  background: rgb(255 0 0 / 0.2);
+}
+
+.anki-md-rendered .shiki .line.highlighted.warning {
+  background: rgb(255 165 0 / 0.2);
+}
+
+.anki-md-rendered .shiki pre > code {
+  --fade-size: 1.5rem;
+
+  display: block;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  mask-image: linear-gradient(
+    to right,
+    var(--fade-left),
+    #000 var(--fade-size),
+    #000 calc(100% - var(--fade-size)),
+    var(--fade-right)
+  );
+  animation: scroll-fade linear;
+  animation-timeline: scroll(self x);
+}
+
+.anki-md-rendered .code-block {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--_border-code, var(--_border));
+  border-radius: 8px;
+  background-clip: padding-box;
+  box-shadow: var(--_shadow-code);
+}
+
+.anki-md-rendered .code-block pre {
+  margin: 0;
+  padding: 8px;
+}
+
+.anki-md-rendered .code-block .toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4px 8px;
+  font-size: 0.625rem;
+  color: var(--_fg-subtle);
+  background: var(--_bg-inset);
+  border-block-start: 1px solid var(--_border);
+  user-select: none;
+}
+
+.anki-md-rendered .code-block .toolbar .actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-inline-start: auto;
+}
+
+.anki-md-rendered .code-block .toolbar .actions button:last-child {
+  margin-inline-end: -4px;
+}
+
+.anki-md-rendered .code-block .toolbar button {
+  all: unset;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 0.25rem;
+}
+
+.anki-md-rendered .code-block .toolbar button:hover {
+  background: var(--_border-subtle);
+}
+
+.anki-md-rendered .code-block .toolbar .toggle,
+.anki-md-rendered .code-block .toolbar .copy {
+  display: none;
+}
+
+.anki-md-rendered .code-block.has-focused .toggle {
+  display: inline;
+}
+
+.clipboard .anki-md-rendered .code-block .copy {
+  display: inline;
+}
+
+.anki-md-rendered code:not(.shiki code) {
+  font-family:
+    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
+    monospace;
+  font-size: 0.875em;
+  background: var(--_bg-inset);
+  border: 1px solid var(--_border);
+  border-radius: var(--_radius);
+  padding: 1px 2px;
+}
+
+.anki-md-rendered .code-inline {
+  font-size: 0.875rem;
+}
+
+.anki-md-rendered mark {
+  color: var(--_fg);
+  background: rgb(255 255 0 / 0.3);
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+:root.night-mode .anki-md-rendered mark {
+  background: rgb(255 255 0 / 0.4);
+}
+
+.anki-md-rendered img {
+  border-radius: 4px;
+}
+
+.anki-md-rendered table {
+  inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--_border);
+  border-radius: 8px;
+  font-size: 0.875em;
+  overflow: hidden;
+}
+
+.anki-md-rendered table th,
+.anki-md-rendered table td {
+  padding: 0.5em 0.75em;
+  border-bottom: 1px solid var(--_border);
+  text-align: left;
+}
+
+.anki-md-rendered table th {
+  font-weight: 600;
+  background: var(--_bg-inset);
+}
+
+.anki-md-rendered table tr:last-child td {
+  border-bottom: none;
+}
+
+.anki-md-rendered table tr:hover td {
+  background: var(--_bg-inset);
+}
+
+.anki-md-rendered ul,
+.anki-md-rendered ol {
+  padding-inline-start: 1.5em;
+}
+
+.anki-md-rendered li {
+  margin: 0;
+}
+
+.anki-md-rendered li p {
+  margin: 0;
+}
+
+.anki-md-rendered li ul,
+.anki-md-rendered li ol {
+  margin: 0;
+}
+
+.anki-md-rendered blockquote {
+  margin: 0;
+  padding: 0 0.5em;
+  border-inline-start: 3px solid var(--_border);
+  font-style: italic;
+  color: var(--_fg-subtle);
+}
+
+.anki-md-rendered blockquote > * {
+  margin-block: 0.25em;
+}
+
+.anki-md-rendered blockquote > :first-child {
+  margin-block-start: 0;
+}
+
+.anki-md-rendered blockquote > :last-child {
+  margin-block-end: 0;
+}
+
+.anki-md-rendered kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 0.75em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--_fg);
+  background: var(--_bg);
+  border: 1px solid var(--_border);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--_border);
+}
+
+.anki-md-rendered .markdown-alert {
+  padding: 0.35em 0.75em;
+  font-size: 0.9em;
+  border-inline-start: 3px solid var(--alert-color, var(--_border));
+  background: color-mix(
+    in srgb,
+    var(--alert-color, var(--_border)) 10%,
+    transparent
+  );
+  border-radius: 4px;
+}
+
+.anki-md-rendered .markdown-alert .markdown-alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0;
+  font-weight: 600;
+  color: var(--alert-color);
+}
+
+.anki-md-rendered .markdown-alert .markdown-alert-title svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+.anki-md-rendered .markdown-alert p:last-child {
+  margin: 0;
+}
+
+.anki-md-rendered .markdown-alert code:not(.shiki code) {
+  background: rgb(0 0 0 / 0.06);
+  border-color: rgb(0 0 0 / 0.1);
+}
+
+:root.night-mode .anki-md-rendered .markdown-alert code:not(.shiki code) {
+  background: rgb(255 255 255 / 0.1);
+  border-color: rgb(255 255 255 / 0.15);
+}
+
+.anki-md-rendered .markdown-alert.markdown-alert-note {
+  --alert-color: var(--_color-note);
+}
+
+.anki-md-rendered .markdown-alert.markdown-alert-tip {
+  --alert-color: var(--_color-tip);
+}
+
+.anki-md-rendered .markdown-alert.markdown-alert-important {
+  --alert-color: var(--_color-important);
+}
+
+.anki-md-rendered .markdown-alert.markdown-alert-warning {
+  --alert-color: var(--_color-warning);
+}
+
+.anki-md-rendered .markdown-alert.markdown-alert-caution {
+  --alert-color: var(--_color-caution);
+}
+
+@property --fade-left {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #000;
+}
+
+@property --fade-right {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #000;
+}
+
+@keyframes scroll-fade {
+  0% {
+    --fade-left: #000;
+    --fade-right: transparent;
+  }
+
+  3%,
+  97% {
+    --fade-left: transparent;
+    --fade-right: transparent;
+  }
+
+  100% {
+    --fade-left: transparent;
+    --fade-right: #000;
+  }
+}
