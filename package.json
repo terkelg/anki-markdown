@@ -10,6 +10,9 @@
     "package": "bun run build && cd anki_markdown && zip -r ../anki-markdown.ankiaddon . -x '__pycache__/*' '.*'",
     "preview": "vite preview",
     "debug": "ln -sfn \"$(pwd)/anki_markdown\" ~/Library/Application\\ Support/Anki2/addons21/anki_markdown && QTWEBENGINE_REMOTE_DEBUGGING=9222 open -a Anki",
+    "test": ".venv/bin/pytest tests/ -v -m offline",
+    "test:online": ".venv/bin/pytest tests/ -v -m online",
+    "test:all": ".venv/bin/pytest tests/ -v",
     "format": "prettier --write .",
     "release": "bun scripts/release.ts"
   },

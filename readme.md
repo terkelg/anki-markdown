@@ -2,8 +2,9 @@
 
 > Anki add-on for Markdown notes with syntax highlighting powered by [Shiki](https://shiki.style)
 
-Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks). Supports light and dark mode across desktop and mobile.
+Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks). Pick from 300+ languages and 60+ themes — only your selections are downloaded and synced. Supports light and dark mode across desktop and mobile.
 
+- **Only what you need** — pick from 300+ languages and 60+ themes, only your selections are downloaded and synced
 - **Code blocks** with 300+ languages via Shiki
 - **Inline code** syntax highlighting support
 - **Line and word highlighting**
@@ -75,14 +76,29 @@ Default languages and themes are configured in `config.json`:
 ```
 
 The build runs `bun run generate` which:
-- Generates `AVAILABLE_LANGS` and `AVAILABLE_THEMES` lists in `shiki.py` (including all aliases)
+- Generates `anki_markdown/shiki-data.json` (version, languages, themes)
 - Updates `anki_markdown/config.json` with defaults
-- Sets `SHIKI_VERSION` from `package.json` dependencies
 - Cleans stray `_lang-*.js` / `_theme-*.js` files
+
+## Tests
+
+Python tests for `shiki.py` (language/theme download and management). Requires a one-time venv setup:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install pytest
+```
+
+```bash
+bun run test           # offline (reads from node_modules)
+bun run test:online    # online only (hits esm.sh)
+bun run test:all       # all tests
+```
+
+Most tests read language/theme files from `node_modules/@shikijs/` instead of making network requests. Tests marked `@online` hit esm.sh to verify the CDN serves the same format.
 
 ## Testing in Anki
 
-Requires Anki 2.1.55+. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
+Requires Anki 25.x. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
 
 ```bash
 bun run debug

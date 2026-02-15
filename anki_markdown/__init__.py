@@ -5,7 +5,7 @@ from aqt.qt import QMessageBox
 from aqt.editor import Editor
 from aqt.webview import WebContent
 
-from .shiki import sync_shiki_files, generate_config_json
+from .shiki import store, get_config, generate_config_json
 from .settings import show_settings
 
 ADDON_DIR = Path(__file__).parent
@@ -53,7 +53,7 @@ def on_munge_html(txt: str, editor: Editor) -> str:
 
 def on_profile_loaded():
     # Download any missing language/theme files
-    _, errors = sync_shiki_files()
+    _, errors = store.sync(get_config())
     if errors:
         details = "\n".join(f"- {err}" for err in errors)
         QMessageBox.warning(

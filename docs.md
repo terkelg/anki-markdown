@@ -1,6 +1,9 @@
 # Anki Markdown
 
-A modern Anki add-on that transforms your flashcards with full markdown support and beautiful syntax highlighting.
+A modern Anki add-on that transforms your flashcards with full markdown support and beautiful syntax highlighting, designed for fast syncing.
+
+> [!TIP]
+> Pick from 300+ languages and 60+ themes. Only your selections are downloaded and synced to your devices — nothing extra.
 
 ## Why Use This Add-on?
 
