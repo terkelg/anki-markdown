@@ -7,6 +7,7 @@
     "dev": "vite test",
     "generate": "bun scripts/generate.ts",
     "build": "bun run generate && tsc && vite build && BUILD_TARGET=editor vite build",
+    "watch": "tsc --watch --preserveWatchOutput & vite build --watch & BUILD_TARGET=editor vite build --watch",
     "package": "bun run build && cd anki_markdown && zip -r ../anki-markdown.ankiaddon . -x '__pycache__/*' '.*'",
     "preview": "vite preview",
     "debug": "bun scripts/debug.ts",
