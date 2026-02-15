@@ -104,13 +104,7 @@ Requires Anki 25.x. Note that Anki caches the add-on, so you must restart Anki f
 bun run debug
 ```
 
-This creates the symlink and launches Anki with remote debugging enabled. Then open Chrome and navigate to `chrome://inspect` to access the webview console.
-
-To do a manual symlink, run the following command:
-
-```bash
-ln -s "$(pwd)/anki_markdown" ~/Library/Application\ Support/Anki2/addons21/anki_markdown
-```
+This symlinks the add-on, launches Anki with remote debugging, waits for the main webview to load, and auto-opens Chrome DevTools for it. Requires macOS and Google Chrome.
 
 > [!TIP]
 > Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
