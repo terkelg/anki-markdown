@@ -4,25 +4,24 @@
 
 Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks). Pick from 300+ languages and 60+ themes — only your selections are downloaded and synced. Supports light and dark mode across desktop and mobile.
 
-- **Only what you need** — pick from 300+ languages and 60+ themes, only your selections are downloaded and synced
-- **Code blocks** with 300+ languages via Shiki
-- **Inline code** syntax highlighting support
-- **Line and word highlighting**
-- **Alerts and callouts** in GitHub-style syntax
-- **Settings panel** to pick languages and themes
-- **AI agent friendly**, works great with MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
-
-
-> [!NOTE]
-> In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install.
-> See the [documentation](docs.md) for all supported features.
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="media/back-dark.png">
     <img src="media/back.png" alt="Anki Markdown card example" width="800">
   </picture>
 </p>
+
+> [!NOTE]
+> In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install.
+> See the [documentation](docs.md) for all supported features.
+
+- **Syntax highlighting** with 300+ languages and 60+ themes, only your selections are downloaded and synced
+- **Advanced code annotations** including line highlighting, word highlighting, focus mode, and error/warning markers
+- **Full Markdown** with bold, italic, lists, blockquotes, tables, images, alerts, and more
+- **Clean card design** with polished light/dark styling that matches Anki's native UI
+- **Settings panel** to dynamically pick languages and themes
+- **Mobile** works on AnkiDroid and AnkiMobile
+- **AI agent friendly** works great with MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
 
 ## Usage
 
