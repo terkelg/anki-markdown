@@ -98,7 +98,7 @@ Most tests read language/theme files from `node_modules/@shikijs/` instead of ma
 
 ## Testing in Anki
 
-Requires Anki 2.1.55+. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
+Requires Anki 25.x. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
 
 ```bash
 bun run debug

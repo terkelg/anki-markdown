@@ -101,12 +101,27 @@ class ShikiStore:
         (self.dir / f"_theme-{name}.js").write_bytes(raw)
 
     def needs_redownload(self, name: str) -> bool:
-        """Check if a language file is missing or has unrewritten imports."""
-        path = self.dir / f"_lang-{name}.js"
-        if not path.exists():
-            return True
-        text = path.read_text(encoding="utf-8")
-        return bool(_IMPORT_RE.search(text))
+        """Check if a language file is missing, broken, or has missing deps at any depth."""
+        stack = [name]
+        seen = set()
+
+        while stack:
+            lang = stack.pop()
+            if lang in seen:
+                continue
+            seen.add(lang)
+
+            path = self.dir / f"_lang-{lang}.js"
+            if not path.exists():
+                return True
+
+            text = path.read_text(encoding="utf-8")
+            if _IMPORT_RE.search(text):
+                return True
+
+            stack.extend(_LOCAL_RE.findall(text))
+
+        return False
 
     def local_langs(self) -> set[str]:
         """Get set of language names that exist locally."""

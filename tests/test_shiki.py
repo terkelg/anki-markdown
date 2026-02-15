@@ -57,8 +57,22 @@ class TestNeedsRedownload:
 
     def test_fixed(self, shiki, tmp_path):
         (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
+        (tmp_path / "_lang-javascript.js").write_text("var x;")
         s = shiki.ShikiStore(tmp_path)
         assert s.needs_redownload("html") is False
+
+    def test_missing_dep(self, shiki, tmp_path):
+        """Rewritten imports but dep file missing → needs redownload."""
+        (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
+        s = shiki.ShikiStore(tmp_path)
+        assert s.needs_redownload("html") is True
+
+    def test_missing_transitive_dep(self, shiki, tmp_path):
+        """Direct dep exists, but transitive dep missing → needs redownload."""
+        (tmp_path / "_lang-nginx.js").write_text('import t from"./_lang-lua.js";')
+        (tmp_path / "_lang-lua.js").write_text('import t from"./_lang-c.js";')
+        s = shiki.ShikiStore(tmp_path)
+        assert s.needs_redownload("nginx") is True
 
 
 # Store tests — download (offline, reads from node_modules)
@@ -117,6 +131,65 @@ class TestSync:
         (tmp_path / "_lang-python.js").write_text('from"./broken.mjs";')
         downloaded3, _ = s.sync(config)
         assert "_lang-python.js" in downloaded3
+
+    def test_dep_failure_recovery(self, shiki, monkeypatch, tmp_path):
+        """Dep fails mid-download → next sync retries and recovers."""
+        s = shiki.ShikiStore(tmp_path)
+        config = {
+            "languages": ["html"],
+            "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
+        }
+
+        # Fail on javascript dep
+        orig = shiki.fetch_module
+        def fail_js(url):
+            if "javascript.mjs" in url:
+                raise ConnectionError("simulated")
+            return orig(url)
+        monkeypatch.setattr(shiki, "fetch_module", fail_js)
+
+        _, errors = s.sync(config)
+        assert errors
+        assert (tmp_path / "_lang-html.js").exists()
+        assert not (tmp_path / "_lang-javascript.js").exists()
+
+        # Restore fetch, retry → recovers
+        monkeypatch.setattr(shiki, "fetch_module", orig)
+        downloaded, errors = s.sync(config)
+        assert not errors
+        assert "_lang-html.js" in downloaded
+        assert (tmp_path / "_lang-javascript.js").exists()
+
+    def test_transitive_dep_failure_recovery(self, shiki, monkeypatch, tmp_path):
+        """Transitive dep fails mid-download → next sync retries and recovers."""
+        s = shiki.ShikiStore(tmp_path)
+        config = {
+            "languages": ["nginx"],
+            "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
+        }
+
+        # nginx -> lua -> c, fail on transitive dep c
+        orig = shiki.fetch_module
+
+        def fail_c(url):
+            if "/c.mjs" in url:
+                raise ConnectionError("simulated")
+            return orig(url)
+
+        monkeypatch.setattr(shiki, "fetch_module", fail_c)
+
+        _, errors = s.sync(config)
+        assert errors
+        assert (tmp_path / "_lang-nginx.js").exists()
+        assert (tmp_path / "_lang-lua.js").exists()
+        assert not (tmp_path / "_lang-c.js").exists()
+
+        # Restore fetch, retry -> recovers transitive dep too
+        monkeypatch.setattr(shiki, "fetch_module", orig)
+        downloaded, errors = s.sync(config)
+        assert not errors
+        assert "_lang-nginx.js" in downloaded
+        assert (tmp_path / "_lang-c.js").exists()
 
 
 # Cleanup tests (synthetic files, offline)
