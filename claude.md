@@ -352,16 +352,20 @@ pageTheme.subscribe((theme) => console.log(theme.isDark));
 
 #### `anki/PlainTextInput`
 
-**Purpose:** Plain text (CodeMirror) editor component API.
+**Purpose:** Plain text (CodeMirror 5) editor component API.
 
 | Export      | Description                                                      |
 | ----------- | ---------------------------------------------------------------- |
 | `lifecycle` | `{ onMount(fn), onDestroy(fn) }` - Hook into component lifecycle |
-| `instances` | Array of active PlainTextInput instances                         |
+| `instances` | Array of active `PlainTextInputAPI` instances                    |
+
+Each instance exposes `codeMirror: { editor: Promise<Editor>, setOption(key, value): Promise<void> }`.
+
+The default CodeMirror mode is `"htmlanki"` — a custom mode extending `htmlmixed` with `<anki-mathjax>` tag support (defined in `ts/editor/code-mirror.ts`). Set mode to `"null"` to disable syntax highlighting.
 
 **Note:** `closeHTMLTags` store exists in the component but is NOT exported in the package. Use `window.setCloseHTMLTags(bool)` instead (exposed globally by NoteEditor).
 
-**Source:** `ts/editor/plain-text-input/PlainTextInput.svelte`
+**Source:** `ts/editor/plain-text-input/PlainTextInput.svelte`, `ts/editor/code-mirror.ts`
 
 ---
 
