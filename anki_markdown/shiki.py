@@ -13,7 +13,7 @@ import re
 ADDON_DIR = Path(__file__).parent
 ESM_BASE = "https://esm.sh/@shikijs"
 
-_DATA = json.loads((ADDON_DIR / "shiki-data.json").read_text())
+_DATA = json.loads((ADDON_DIR / "shiki-data.json").read_text(encoding="utf-8"))
 SHIKI_VERSION = _DATA["version"]
 AVAILABLE_LANGS = _DATA["languages"]
 AVAILABLE_THEMES = _DATA["themes"]
