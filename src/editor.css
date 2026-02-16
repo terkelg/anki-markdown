@@ -1,7 +1,9 @@
 /*
  * Anki Markdown Editor Styles
  */
-.anki-md-hidden,
+
+/* Visually hide rich-text wrapper with sr-only pattern instead of display:none
+   so drag-and-drop events still fire */
 .anki-md-active :has(> .rich-text-input) {
   position: absolute !important;
   overflow: hidden !important;
