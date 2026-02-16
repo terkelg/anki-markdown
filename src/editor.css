@@ -10,7 +10,9 @@
     display: none !important;
   }
 
-  #settings {
+  /* settings gear, image float/resize toolbar */
+  #settings,
+  .floating {
     display: none;
   }
 }
