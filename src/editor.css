@@ -1,10 +1,18 @@
 /*
  * Anki Markdown Editor Styles
- *
- * Rich-text inputs are hidden per field via JS using Anki's own .hidden/.expanded
- * wrapper class convention (see editor.ts). Only the plain-text badge needs CSS
- * to prevent users from toggling back to rich-text mode.
  */
+.anki-md-hidden,
+.anki-md-active :has(> .rich-text-input) {
+  position: absolute !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  block-size: 1px !important;
+  inline-size: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
 .anki-md-active {
   .plain-text-badge {
     display: none !important;
