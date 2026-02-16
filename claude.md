@@ -44,7 +44,7 @@ Debug in Chrome at `chrome://inspect`. To test locally, disable the installed ve
 ```
 src/                     # TypeScript source (compiled by Vite)
 ├── render.ts            # Card renderer → _review.js
-├── style.css            # Card styles → _review.css
+├── reviewer.css         # Reviewer card layout styles → _review.css
 ├── editor.ts            # Editor integration → web/editor.js
 └── editor.css           # Editor styles → web/editor.css
 

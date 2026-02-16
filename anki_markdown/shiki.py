@@ -19,6 +19,38 @@ AVAILABLE_LANGS = _DATA["languages"]
 AVAILABLE_THEMES = _DATA["themes"]
 
 
+def _load_default_config() -> dict:
+    """Load addon defaults from config.json, with safe fallbacks."""
+    try:
+        raw = json.loads((ADDON_DIR / "config.json").read_text(encoding="utf-8"))
+    except Exception:
+        raw = {}
+
+    langs = [
+        lang
+        for lang in raw.get("languages", [])
+        if isinstance(lang, str) and lang in AVAILABLE_LANGS
+    ]
+
+    raw_themes = raw.get("themes", {}) if isinstance(raw.get("themes"), dict) else {}
+    light = raw_themes.get("light")
+    dark = raw_themes.get("dark")
+
+    if light not in AVAILABLE_THEMES:
+        light = AVAILABLE_THEMES[0]
+    if dark not in AVAILABLE_THEMES:
+        dark = light
+
+    return {
+        "languages": langs,
+        "themes": {"light": light, "dark": dark},
+        "cardless": bool(raw.get("cardless", False)),
+    }
+
+
+DEFAULT_CONFIG = _load_default_config()
+
+
 # Pure functions
 
 _IMPORT_RE = re.compile(r"""from\s*["']\./([^"'.]+)\.mjs["']""")
@@ -192,24 +224,66 @@ store = ShikiStore(ADDON_DIR)
 
 # Anki glue (lazy-import aqt)
 
+def _normalize_config(config: dict | None) -> dict:
+    """Return a sanitized config with defaults filled in."""
+    if not isinstance(config, dict):
+        config = {}
+
+    raw_langs = config.get("languages", [])
+    langs: list[str] = []
+    seen = set()
+    if isinstance(raw_langs, list):
+        for lang in raw_langs:
+            if not isinstance(lang, str):
+                continue
+            name = lang.strip()
+            if not name or name not in AVAILABLE_LANGS or name in seen:
+                continue
+            seen.add(name)
+            langs.append(name)
+    if not langs:
+        langs = list(DEFAULT_CONFIG["languages"])
+
+    raw_themes = config.get("themes", {})
+    light = DEFAULT_CONFIG["themes"]["light"]
+    dark = DEFAULT_CONFIG["themes"]["dark"]
+    if isinstance(raw_themes, dict):
+        raw_light = raw_themes.get("light")
+        raw_dark = raw_themes.get("dark")
+        if isinstance(raw_light, str) and raw_light in AVAILABLE_THEMES:
+            light = raw_light
+        if isinstance(raw_dark, str) and raw_dark in AVAILABLE_THEMES:
+            dark = raw_dark
+
+    return {
+        "languages": langs,
+        "themes": {"light": light, "dark": dark},
+        "cardless": bool(config.get("cardless", False)),
+    }
+
+
 def get_config() -> dict:
     """Get add-on config, falling back to defaults."""
     from aqt import mw
-    config = mw.addonManager.getConfig(__name__.split(".")[0])
-    if config is None:
-        config = {
-            "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown", "glsl", "wgsl", "rust", "swift", "go"],
-            "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
-            "cardless": False,
-        }
-    return config
+
+    addon = __name__.split(".")[0]
+    raw = mw.addonManager.getConfig(addon)
+    normalized = _normalize_config(raw)
+
+    # Persist defaults/sanitized values so future runs are deterministic.
+    if raw != normalized:
+        mw.addonManager.writeConfig(addon, normalized)
+
+    return normalized
 
 
 def generate_config_json() -> str:
     """Generate JSON config string for embedding in templates."""
     config = get_config()
+    available = sorted(store.local_langs())
     return json.dumps({
         "languages": config.get("languages", []),
+        "availableLanguages": available,
         "themes": config.get("themes", {}),
         "cardless": config.get("cardless", False),
     }, separators=(",", ":"))

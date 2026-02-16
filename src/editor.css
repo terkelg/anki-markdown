@@ -1,9 +1,5 @@
 /*
  * Anki Markdown Editor Styles
- *
- * Rich-text inputs are hidden per field via JS using Anki's own .hidden/.expanded
- * wrapper class convention (see editor.ts). Only the plain-text badge needs CSS
- * to prevent users from toggling back to rich-text mode.
  */
 .anki-md-active {
   .plain-text-badge {
@@ -12,5 +8,99 @@
 
   #settings {
     display: none;
+  }
+
+  .anki-md-preview {
+    margin-top: 0;
+    background: var(--canvas);
+    border-radius: var(--border-radius, 5px);
+    overflow: hidden;
+  }
+
+  .anki-md-preview .label-container {
+    padding: 0;
+  }
+
+  .anki-md-preview .anki-md-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .anki-md-preview .collapse-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    line-height: 1.2;
+    user-select: none;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding-inline-start: 3px;
+  }
+
+  .anki-md-preview .label-name {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1.2;
+  }
+
+  .anki-md-preview .field-state {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 0 0 auto;
+    min-width: fit-content;
+  }
+
+  .anki-md-preview .field-state > * {
+    margin: 0 3px;
+  }
+
+  .anki-md-preview .field-state > *:first-child {
+    margin-left: 0;
+  }
+
+  .anki-md-preview .field-state > *:last-child {
+    margin-right: 0;
+  }
+
+  .anki-md-preview .justify-content-end {
+    justify-content: flex-end;
+  }
+
+  .anki-md-preview-meta {
+    color: var(--fg-subtle);
+    white-space: nowrap;
+  }
+
+  .anki-md-preview .editor-field {
+    overflow: hidden;
+    margin: 1px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border);
+    outline-offset: -1px;
+  }
+
+  .anki-md-preview-body {
+    max-height: 260px;
+    overflow: auto;
+  }
+
+  .anki-md-preview-content {
+    padding: 8px;
+
+    > .front {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6em;
+
+      > * {
+        margin: 0;
+      }
+    }
   }
 }

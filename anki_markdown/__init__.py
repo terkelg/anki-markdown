@@ -161,6 +161,14 @@ def on_webview_set_content(content: WebContent, context):
     """Inject editor JS/CSS."""
     if isinstance(context, Editor):
         addon = mw.addonManager.addonFromModule(__name__)
+        config_json = generate_config_json()
+        # Share renderer config with editor preview.
+        content.head += (
+            f'<script type="application/json" id="anki-md-config">'
+            f"{config_json}"
+            f"</script>"
+            f"<script>window.ankiMdConfig={config_json};</script>"
+        )
         content.js.append(f"/_addons/{addon}/web/editor.js")
         content.css.append(f"/_addons/{addon}/web/editor.css")
 

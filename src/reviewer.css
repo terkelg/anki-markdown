@@ -1,0 +1,64 @@
+html {
+  block-size: 100% !important;
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0 !important;
+  min-block-size: 100% !important;
+  overflow-y: auto !important;
+}
+
+.card {
+  display: block;
+  container-type: inline-size;
+  padding-block: 12px;
+  box-sizing: border-box;
+}
+
+.anki-md-wrapper {
+  font-size: var(--font-size-mobile, 12px);
+  opacity: 0;
+
+  &.ready {
+    opacity: 1;
+  }
+
+  > .front,
+  > .back {
+    display: flex;
+    flex-flow: column;
+    gap: 1em;
+    padding: 1rem;
+
+    > * {
+      margin: 0;
+    }
+  }
+
+  > .back {
+    border-block-start: 1px solid var(--_border);
+  }
+
+  @container (inline-size >= 700px) {
+    &:not(.mobile *) {
+      font-size: var(--font-size, 14px);
+      max-inline-size: var(--content-max-width, 34rem);
+      margin-inline: auto;
+    }
+
+    &:not(.mobile *, .cardless) {
+      background: var(--_bg);
+      border: 1px solid var(--_border);
+      border-radius: 12px;
+      box-shadow: var(--_shadow);
+      transition: box-shadow var(--transition, 120ms);
+
+      @media (hover: hover) {
+        &:hover {
+          box-shadow: var(--_shadow-hover);
+        }
+      }
+    }
+  }
+}
