@@ -19,6 +19,9 @@ AVAILABLE_LANGS = _DATA["languages"]
 AVAILABLE_THEMES = _DATA["themes"]
 
 
+DEFAULT_CONFIG = json.loads((ADDON_DIR / "config.json").read_text(encoding="utf-8"))
+
+
 # Pure functions
 
 _IMPORT_RE = re.compile(r"""from\s*["']\./([^"'.]+)\.mjs["']""")
@@ -195,21 +198,9 @@ store = ShikiStore(ADDON_DIR)
 def get_config() -> dict:
     """Get add-on config, falling back to defaults."""
     from aqt import mw
-    config = mw.addonManager.getConfig(__name__.split(".")[0])
-    if config is None:
-        config = {
-            "languages": ["javascript", "typescript", "python", "html", "css", "json", "bash", "markdown", "glsl", "wgsl", "rust", "swift", "go"],
-            "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
-            "cardless": False,
-        }
-    return config
+    return mw.addonManager.getConfig(__name__.split(".")[0]) or DEFAULT_CONFIG
 
 
 def generate_config_json() -> str:
     """Generate JSON config string for embedding in templates."""
-    config = get_config()
-    return json.dumps({
-        "languages": config.get("languages", []),
-        "themes": config.get("themes", {}),
-        "cardless": config.get("cardless", False),
-    }, separators=(",", ":"))
+    return json.dumps(get_config(), separators=(",", ":"))
