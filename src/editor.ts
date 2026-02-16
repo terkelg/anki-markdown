@@ -67,9 +67,9 @@ class LivePreview {
     this.panel.innerHTML = `
       <div class="anki-md-preview-header label-container">
         <span class="anki-md-preview-collapse collapse-label" tabindex="-1" role="button" aria-expanded="true" title="Collapse preview">
-          <div class="anki-md-preview-badge collapse-badge" aria-hidden="true">
-            <button type="button" class="anki-md-preview-icon badge" tabindex="-1">
-              <span class="anki-md-preview-icon-wrap">
+          <div class="anki-md-preview-badge collapse-badge svelte-1u1j1u5" aria-hidden="true">
+            <button type="button" class="anki-md-preview-icon badge svelte-tvhc1n" tabindex="-1">
+              <span class="anki-md-preview-icon-wrap svelte-111fj0e" style="--width-multiplier: 1; --icon-size: 80%;">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path>
                 </svg>
@@ -244,10 +244,10 @@ class LivePreview {
 
   private syncCollapsedState(): void {
     this.panel.classList.toggle("collapsed", this.collapsed);
-    this.frame.hidden = this.collapsed;
     this.badge.classList.toggle("collapsed", this.collapsed);
     this.toggle.setAttribute("aria-expanded", String(!this.collapsed));
     this.toggle.title = this.collapsed ? "Expand preview" : "Collapse preview";
+    this.frame.hidden = this.collapsed;
 
     try {
       localStorage.setItem(COLLAPSED_KEY, this.collapsed ? "1" : "0");

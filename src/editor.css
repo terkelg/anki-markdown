@@ -21,6 +21,15 @@
     padding: 0;
   }
 
+  .anki-md-preview .anki-md-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
   .anki-md-preview .collapse-label {
     cursor: pointer;
     display: inline-flex;
@@ -28,50 +37,9 @@
     gap: 0;
     line-height: 1.2;
     user-select: none;
-  }
-
-  .anki-md-preview .collapse-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-inline-end: 0.1rem;
-    opacity: 0.4;
-    transition:
-      opacity var(--transition, 150ms) ease-in-out,
-      transform var(--transition, 150ms) ease-in;
-  }
-
-  .anki-md-preview .collapse-label:hover .collapse-badge {
-    opacity: 1;
-  }
-
-  .anki-md-preview .collapse-badge.collapsed {
-    transform: rotate(-90deg);
-  }
-
-  .anki-md-preview .badge {
-    border: none;
-    background: transparent;
-    padding: 0;
-    box-shadow: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-  }
-
-  .anki-md-preview-icon-wrap {
-    inline-size: 0.95em;
-    block-size: 0.95em;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .anki-md-preview-icon svg {
-    inline-size: 1em;
-    block-size: 1em;
-    fill: currentColor;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding-inline-start: 3px;
   }
 
   .anki-md-preview .label-name {
@@ -84,7 +52,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    flex-grow: 1;
+    flex: 0 0 auto;
+    min-width: fit-content;
   }
 
   .anki-md-preview .field-state > * {
@@ -105,6 +74,7 @@
 
   .anki-md-preview-meta {
     color: var(--fg-subtle);
+    white-space: nowrap;
   }
 
   .anki-md-preview .editor-field {
