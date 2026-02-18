@@ -44,7 +44,7 @@ async function loadLanguages() {
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default].flat();
-    console.log(`[anki-md] Failed to load language: ${config.languages[i]}`);
+    console.error(`[anki-md] Failed to load language: ${config.languages[i]}`);
     return [];
   });
 }
@@ -56,7 +56,7 @@ async function loadThemes() {
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default];
-    console.log(`[anki-md] Failed to load theme: ${names[i]}`);
+    console.error(`[anki-md] Failed to load theme: ${names[i]}`);
     return [];
   });
 }
@@ -137,6 +137,8 @@ const codeBlock: ShikiTransformer = {
   },
 };
 
+const blockTransformers = [...transformers, codeBlock];
+
 const codeInline: ShikiTransformer = {
   name: "code-inline",
   pre(node) {
@@ -151,19 +153,32 @@ const codeInline: ShikiTransformer = {
   },
 };
 
+/** Parse an HTML string and return its root element. */
+function parse(html: string): HTMLElement | null {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html;
+  return tpl.content.firstElementChild as HTMLElement;
+}
+
+// Fallback skeleton for code blocks rendered before Shiki is ready.
+// Cloned per block — textContent/dataset fills are inherently XSS-safe.
+const skeleton = parse(
+  `<figure class="code-block" data-pending>` +
+    `<pre><code></code></pre>` +
+    `<figcaption class="toolbar"><span class="lang"></span>` +
+    `<span class="actions">` +
+    `<button type="button" class="toggle">Reveal</button>` +
+    `<button type="button" class="copy">Copy</button>` +
+    `</span></figcaption></figure>`,
+)!;
+
 function highlight(code: string, lang: string, meta?: string) {
   if (!highlighter) {
-    const escaped = md.utils.escapeHtml(code);
-    const attr = meta ? ` data-meta="${md.utils.escapeHtml(meta)}"` : "";
-    return (
-      `<figure class="code-block" data-pending${attr}>` +
-      `<pre><code>${escaped}</code></pre>` +
-      `<figcaption class="toolbar"><span class="lang">${lang}</span>` +
-      `<span class="actions">` +
-      `<button type="button" class="toggle">Reveal</button>` +
-      `<button type="button" class="copy">Copy</button>` +
-      `</span></figcaption></figure>`
-    );
+    const el = skeleton.cloneNode(true) as HTMLElement;
+    el.querySelector("code")!.textContent = code;
+    el.querySelector(".lang")!.textContent = lang;
+    if (meta) el.dataset.meta = meta;
+    return el.outerHTML;
   }
   if (!highlighter.getLoadedLanguages().includes(lang)) lang = "text";
 
@@ -173,7 +188,7 @@ function highlight(code: string, lang: string, meta?: string) {
       themes,
       meta: { __raw: meta },
       defaultColor: false,
-      transformers: [...transformers, codeBlock],
+      transformers: blockTransformers,
     });
   } catch {
     return highlighter.codeToHtml(code, {
@@ -221,21 +236,22 @@ md.core.ruler.after("inline", "inline-code-lang", (state) => {
 
 md.renderer.rules.code_inline = (tokens, idx) => {
   const { content, meta } = tokens[idx];
-  if (meta?.lang && highlighter) {
-    if (highlighter.getLoadedLanguages().includes(meta.lang)) {
-      try {
-        return highlighter.codeToHtml(content, {
-          lang: meta.lang,
-          themes,
-          defaultColor: false,
-          transformers: [codeInline],
-        });
-      } catch {
-        /* fall through */
-      }
+  const escaped = md.utils.escapeHtml(content);
+  if (!meta?.lang) return `<code>${escaped}</code>`;
+  if (!highlighter) return `<code data-pending data-lang="${md.utils.escapeHtml(meta.lang)}">${escaped}</code>`;
+  if (highlighter.getLoadedLanguages().includes(meta.lang)) {
+    try {
+      return highlighter.codeToHtml(content, {
+        lang: meta.lang,
+        themes,
+        defaultColor: false,
+        transformers: [codeInline],
+      });
+    } catch {
+      /* fall through */
     }
   }
-  return `<code>${md.utils.escapeHtml(content)}</code>`;
+  return `<code>${escaped}</code>`;
 };
 
 // Event delegation for toolbar
@@ -271,33 +287,53 @@ function decode(text: string): string {
 }
 
 /**
- * Re-highlight code blocks that were rendered before Shiki was ready.
- * Updates in-place: swaps code innerHTML and copies Shiki attributes
- * onto the existing figure so the outer layout never changes.
+ * Re-highlight code rendered before Shiki was ready.
+ * Swaps content and copies attributes in-place so layout never shifts.
  */
-function upgradeCodeBlocks(container: HTMLElement) {
-  const pending = container.querySelectorAll<HTMLElement>(
+function upgrade(container: HTMLElement) {
+  // Code blocks
+  for (const fig of container.querySelectorAll<HTMLElement>(
     ".code-block[data-pending]",
-  );
-  for (const figure of pending) {
-    const code = figure.querySelector("code");
+  )) {
+    const code = fig.querySelector("code");
     if (!code) continue;
-    const text = code.textContent || "";
-    const lang = figure.querySelector(".lang")?.textContent || "text";
-    const meta = figure.dataset.meta;
-    const highlighted = highlight(text.replace(/\n$/, ""), lang, meta);
-    const tpl = document.createElement("template");
-    tpl.innerHTML = highlighted;
-    const fresh = tpl.content.firstElementChild as HTMLElement;
+    const lang = fig.querySelector(".lang")?.textContent || "text";
+    const fresh = parse(
+      highlight(code.textContent.replace(/\n$/, "") || "", lang, fig.dataset.meta),
+    );
     if (!fresh) continue;
-
-    // Swap code content and copy figure attributes in-place
     const inner = fresh.querySelector("code");
     if (inner) code.innerHTML = inner.innerHTML;
-    figure.className = fresh.className;
-    if (fresh.style.cssText) figure.style.cssText = fresh.style.cssText;
-    figure.removeAttribute("data-pending");
-    figure.removeAttribute("data-meta");
+    fig.className = fresh.className;
+    if (fresh.style.cssText) fig.style.cssText = fresh.style.cssText;
+    fig.removeAttribute("data-pending");
+    fig.removeAttribute("data-meta");
+  }
+
+  // Inline code
+  for (const el of container.querySelectorAll<HTMLElement>(
+    "code[data-pending]",
+  )) {
+    const lang = el.dataset.lang || "text";
+    el.removeAttribute("data-pending");
+    el.removeAttribute("data-lang");
+    if (!highlighter.getLoadedLanguages().includes(lang)) continue;
+    try {
+      const fresh = parse(
+        highlighter.codeToHtml(el.textContent || "", {
+          lang,
+          themes,
+          defaultColor: false,
+          transformers: [codeInline],
+        }),
+      );
+      if (!fresh) continue;
+      el.innerHTML = fresh.innerHTML;
+      el.className = fresh.className;
+      if (fresh.style.cssText) el.style.cssText = fresh.style.cssText;
+    } catch {
+      console.error(`[anki-md] Failed to highlight inline code for language: ${lang}`);
+    }
   }
 }
 
@@ -329,10 +365,13 @@ export async function render(front: string, back: string) {
   wrapper?.classList.add("ready");
 
   // If we rendered before the highlighter was ready, wait for it
-  // then upgrade code blocks in-place with syntax highlighting.
+  // then upgrade code blocks and inline code in-place.
   if (!highlighter) {
-    await ready;
-    if (frontEl) upgradeCodeBlocks(frontEl);
-    if (backEl) upgradeCodeBlocks(backEl);
+    try {
+      await ready;
+      for (const el of [frontEl, backEl]) if (el) upgrade(el);
+    } catch (e) {
+      console.error("[anki-md] Failed to load highlighter:", e);
+    }
   }
 }
