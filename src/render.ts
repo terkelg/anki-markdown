@@ -81,11 +81,12 @@ async function initHighlighter(): Promise<HighlighterCore> {
 
 const ready = initHighlighter().then((h) => (highlighter = h));
 
+let label = "text";
+
 const codeBlock: ShikiTransformer = {
   name: "code-block",
   pre(node) {
     // Move shiki class/styles from <pre> to <figure> wrapper
-    const lang = this.options.lang;
     const classes = [node.properties.class].flat().filter(Boolean) as string[];
     const style = node.properties.style;
 
@@ -106,7 +107,7 @@ const codeBlock: ShikiTransformer = {
               type: "element",
               tagName: "span",
               properties: { class: "lang" },
-              children: [{ type: "text", value: lang }],
+              children: [{ type: "text", value: label }],
             },
             {
               type: "element",
@@ -180,11 +181,12 @@ function highlight(code: string, lang: string, meta?: string) {
     if (meta) el.dataset.meta = meta;
     return el.outerHTML;
   }
-  if (!highlighter.getLoadedLanguages().includes(lang)) lang = "text";
+  label = lang;
+  const resolved = highlighter.getLoadedLanguages().includes(lang) ? lang : "text";
 
   try {
     return highlighter.codeToHtml(code, {
-      lang,
+      lang: resolved,
       themes,
       meta: { __raw: meta },
       defaultColor: false,

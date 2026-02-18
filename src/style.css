@@ -110,49 +110,17 @@ body {
   }
 }
 
-.code-block {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--_border-code, var(--_border));
-  border-radius: 8px;
-  background-clip: padding-box;
-  box-shadow: var(--_shadow-code);
-  font-family: var(--_mono);
-  font-size: 0.875rem;
-
-  pre {
-    margin: 0;
-    padding: 8px;
+/* Shiki theme colors */
+.shiki {
+  span {
+    color: var(--shiki-light);
+    font-style: var(--shiki-light-font-style);
+    font-weight: var(--shiki-light-font-weight);
+    text-decoration: var(--shiki-light-text-decoration);
   }
 
-  code {
-    display: block;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  /* Shiki theme colors */
-  &.shiki {
+  &.code-block {
     background: var(--shiki-light-bg);
-
-    span {
-      color: var(--shiki-light);
-      font-style: var(--shiki-light-font-style);
-      font-weight: var(--shiki-light-font-weight);
-      text-decoration: var(--shiki-light-text-decoration);
-    }
-
-    .night-mode & {
-      background: var(--shiki-dark-bg);
-
-      span {
-        color: var(--shiki-dark);
-        font-style: var(--shiki-dark-font-style);
-        font-weight: var(--shiki-dark-font-weight);
-        text-decoration: var(--shiki-dark-text-decoration);
-      }
-    }
 
     .highlighted-word {
       background: rgb(255 255 0 / 0.2);
@@ -188,6 +156,42 @@ body {
     }
   }
 
+  .night-mode & {
+    span {
+      color: var(--shiki-dark);
+      font-style: var(--shiki-dark-font-style);
+      font-weight: var(--shiki-dark-font-weight);
+      text-decoration: var(--shiki-dark-text-decoration);
+    }
+
+    &.code-block {
+      background: var(--shiki-dark-bg);
+    }
+  }
+}
+
+.code-block {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--_border-code, var(--_border));
+  border-radius: 8px;
+  background-clip: padding-box;
+  box-shadow: var(--_shadow-code);
+  font-family: var(--_mono);
+  font-size: 0.875rem;
+
+  pre {
+    margin: 0;
+    padding: 8px;
+  }
+
+  code {
+    display: block;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
   &.has-focused .line:not(.focused) {
     opacity: 0.7;
     filter: blur(0.095rem);
@@ -199,14 +203,6 @@ body {
       opacity: 1;
       filter: blur(0);
     }
-  }
-
-  &.has-focused .toggle {
-    display: inline;
-  }
-
-  .clipboard & .copy {
-    display: inline;
   }
 
   .toolbar {
@@ -237,7 +233,7 @@ body {
       border-radius: 0.25rem;
 
       &:hover {
-        background: var(--_border-subtle);
+        background: var(--_bg-inset);
       }
     }
 
@@ -245,6 +241,14 @@ body {
     .copy {
       display: none;
     }
+  }
+
+  &.has-focused .toggle {
+    display: inline;
+  }
+
+  .clipboard & .copy {
+    display: inline;
   }
 }
 
