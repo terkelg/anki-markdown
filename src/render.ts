@@ -4,11 +4,7 @@ import mark from "markdown-it-mark";
 import alerts from "markdown-it-github-alerts";
 import { createHighlighterCore } from "@shikijs/core";
 import { createJavaScriptRegexEngine } from "@shikijs/engine-javascript";
-import type {
-  HighlighterCore,
-  LanguageRegistration,
-  ThemeRegistration,
-} from "@shikijs/core";
+import type { HighlighterCore } from "@shikijs/core";
 import type { ShikiTransformer } from "shiki";
 import type { Element } from "hast";
 import {
@@ -40,7 +36,7 @@ function getConfig(): Config {
 const config = getConfig();
 const themes = config.themes;
 
-async function loadLanguages(): Promise<LanguageRegistration[]> {
+async function loadLanguages() {
   const results = await Promise.allSettled(
     config.languages.map(
       (name) => import(/* @vite-ignore */ `./_lang-${name}.js`),
@@ -48,19 +44,19 @@ async function loadLanguages(): Promise<LanguageRegistration[]> {
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default].flat();
-    console.log(`[anki-md] Failed to load language: ${config.languages[i]}`);
+    console.error(`[anki-md] Failed to load language: ${config.languages[i]}`);
     return [];
   });
 }
 
-async function loadThemes(): Promise<ThemeRegistration[]> {
+async function loadThemes() {
   const names = [...new Set([config.themes.light, config.themes.dark])];
   const results = await Promise.allSettled(
     names.map((name) => import(/* @vite-ignore */ `./_theme-${name}.js`)),
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default];
-    console.log(`[anki-md] Failed to load theme: ${names[i]}`);
+    console.error(`[anki-md] Failed to load theme: ${names[i]}`);
     return [];
   });
 }
@@ -76,7 +72,6 @@ let highlighter: HighlighterCore;
 
 async function initHighlighter(): Promise<HighlighterCore> {
   const [langs, themeList] = await Promise.all([loadLanguages(), loadThemes()]);
-
   return createHighlighterCore({
     langs,
     themes: themeList,
@@ -84,16 +79,14 @@ async function initHighlighter(): Promise<HighlighterCore> {
   });
 }
 
-const highlighterPromise = initHighlighter();
-highlighterPromise.then((h) => {
-  highlighter = h;
-});
+const ready = initHighlighter().then((h) => (highlighter = h));
+
+let label = "text";
 
 const codeBlock: ShikiTransformer = {
   name: "code-block",
   pre(node) {
     // Move shiki class/styles from <pre> to <figure> wrapper
-    const lang = this.options.lang;
     const classes = [node.properties.class].flat().filter(Boolean) as string[];
     const style = node.properties.style;
 
@@ -114,7 +107,7 @@ const codeBlock: ShikiTransformer = {
               type: "element",
               tagName: "span",
               properties: { class: "lang" },
-              children: [{ type: "text", value: lang }],
+              children: [{ type: "text", value: label }],
             },
             {
               type: "element",
@@ -145,6 +138,8 @@ const codeBlock: ShikiTransformer = {
   },
 };
 
+const blockTransformers = [...transformers, codeBlock];
+
 const codeInline: ShikiTransformer = {
   name: "code-inline",
   pre(node) {
@@ -159,17 +154,43 @@ const codeInline: ShikiTransformer = {
   },
 };
 
+/** Parse an HTML string and return its root element. */
+function parse(html: string): HTMLElement | null {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html;
+  return tpl.content.firstElementChild as HTMLElement;
+}
+
+// Fallback skeleton for code blocks rendered before Shiki is ready.
+// Cloned per block — textContent/dataset fills are inherently XSS-safe.
+const skeleton = parse(
+  `<figure class="code-block" data-pending>` +
+    `<pre><code></code></pre>` +
+    `<figcaption class="toolbar"><span class="lang"></span>` +
+    `<span class="actions">` +
+    `<button type="button" class="toggle">Reveal</button>` +
+    `<button type="button" class="copy">Copy</button>` +
+    `</span></figcaption></figure>`,
+)!;
+
 function highlight(code: string, lang: string, meta?: string) {
-  if (!highlighter) return `<pre><code>${code}</code></pre>`;
-  if (!highlighter.getLoadedLanguages().includes(lang)) lang = "text";
+  if (!highlighter) {
+    const el = skeleton.cloneNode(true) as HTMLElement;
+    el.querySelector("code")!.textContent = code;
+    el.querySelector(".lang")!.textContent = lang;
+    if (meta) el.dataset.meta = meta;
+    return el.outerHTML;
+  }
+  label = lang;
+  const resolved = highlighter.getLoadedLanguages().includes(lang) ? lang : "text";
 
   try {
     return highlighter.codeToHtml(code, {
-      lang,
+      lang: resolved,
       themes,
       meta: { __raw: meta },
       defaultColor: false,
-      transformers: [...transformers, codeBlock],
+      transformers: blockTransformers,
     });
   } catch {
     return highlighter.codeToHtml(code, {
@@ -217,21 +238,22 @@ md.core.ruler.after("inline", "inline-code-lang", (state) => {
 
 md.renderer.rules.code_inline = (tokens, idx) => {
   const { content, meta } = tokens[idx];
-  if (meta?.lang && highlighter) {
-    if (highlighter.getLoadedLanguages().includes(meta.lang)) {
-      try {
-        return highlighter.codeToHtml(content, {
-          lang: meta.lang,
-          themes,
-          defaultColor: false,
-          transformers: [codeInline],
-        });
-      } catch {
-        /* fall through */
-      }
+  const escaped = md.utils.escapeHtml(content);
+  if (!meta?.lang) return `<code>${escaped}</code>`;
+  if (!highlighter) return `<code data-pending data-lang="${md.utils.escapeHtml(meta.lang)}">${escaped}</code>`;
+  if (highlighter.getLoadedLanguages().includes(meta.lang)) {
+    try {
+      return highlighter.codeToHtml(content, {
+        lang: meta.lang,
+        themes,
+        defaultColor: false,
+        transformers: [codeInline],
+      });
+    } catch {
+      /* fall through */
     }
   }
-  return `<code>${md.utils.escapeHtml(content)}</code>`;
+  return `<code>${escaped}</code>`;
 };
 
 // Event delegation for toolbar
@@ -266,10 +288,59 @@ function decode(text: string): string {
   return decoder.value;
 }
 
+/**
+ * Re-highlight code rendered before Shiki was ready.
+ * Swaps content and copies attributes in-place so layout never shifts.
+ */
+function upgrade(container: HTMLElement) {
+  // Code blocks
+  for (const fig of container.querySelectorAll<HTMLElement>(
+    ".code-block[data-pending]",
+  )) {
+    const code = fig.querySelector("code");
+    if (!code) continue;
+    const lang = fig.querySelector(".lang")?.textContent || "text";
+    const fresh = parse(
+      highlight(code.textContent.replace(/\n$/, "") || "", lang, fig.dataset.meta),
+    );
+    if (!fresh) continue;
+    const inner = fresh.querySelector("code");
+    if (inner) code.innerHTML = inner.innerHTML;
+    fig.className = fresh.className;
+    if (fresh.style.cssText) fig.style.cssText = fresh.style.cssText;
+    fig.removeAttribute("data-pending");
+    fig.removeAttribute("data-meta");
+  }
+
+  // Inline code
+  for (const el of container.querySelectorAll<HTMLElement>(
+    "code[data-pending]",
+  )) {
+    const lang = el.dataset.lang || "text";
+    el.removeAttribute("data-pending");
+    el.removeAttribute("data-lang");
+    if (!highlighter.getLoadedLanguages().includes(lang)) continue;
+    try {
+      const fresh = parse(
+        highlighter.codeToHtml(el.textContent || "", {
+          lang,
+          themes,
+          defaultColor: false,
+          transformers: [codeInline],
+        }),
+      );
+      if (!fresh) continue;
+      el.innerHTML = fresh.innerHTML;
+      el.className = fresh.className;
+      if (fresh.style.cssText) el.style.cssText = fresh.style.cssText;
+    } catch {
+      console.error(`[anki-md] Failed to highlight inline code for language: ${lang}`);
+    }
+  }
+}
+
 /** Render front/back fields to card DOM. */
 export async function render(front: string, back: string) {
-  await highlighterPromise;
-
   const wrapper = document.querySelector(".anki-md-wrapper");
 
   // Normalize dark mode classes into .night-mode on :root
@@ -285,10 +356,24 @@ export async function render(front: string, back: string) {
     matchMedia("(prefers-color-scheme: dark)").matches;
   if (dark) document.documentElement.classList.add("night-mode");
 
-  const frontEl = document.querySelector(".front");
-  const backEl = document.querySelector(".back");
+  const frontEl = document.querySelector<HTMLElement>(".front");
+  const backEl = document.querySelector<HTMLElement>(".back");
+
+  // Render immediately — if the highlighter isn't ready yet, code blocks
+  // will use the plain <pre><code> fallback from highlight().
   if (frontEl) frontEl.innerHTML = md.render(decode(front));
   if (backEl) backEl.innerHTML = md.render(decode(back));
   if (config.cardless) wrapper?.classList.add("cardless");
   wrapper?.classList.add("ready");
+
+  // If we rendered before the highlighter was ready, wait for it
+  // then upgrade code blocks and inline code in-place.
+  if (!highlighter) {
+    try {
+      await ready;
+      for (const el of [frontEl, backEl]) if (el) upgrade(el);
+    } catch (e) {
+      console.error("[anki-md] Failed to load highlighter:", e);
+    }
+  }
 }

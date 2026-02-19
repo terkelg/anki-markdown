@@ -1,4 +1,7 @@
 :root {
+  --_mono:
+    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
+    monospace;
   --_radius: var(--border-radius, 5px);
   --_fg: var(--fg, #020202);
   --_fg-subtle: var(--fg-subtle, #737373);
@@ -107,14 +110,8 @@ body {
   }
 }
 
-/* Shared shiki styles */
+/* Shiki theme colors */
 .shiki {
-  font-family:
-    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
-    monospace;
-  font-size: 0.875rem;
-  background: var(--shiki-light-bg);
-
   span {
     color: var(--shiki-light);
     font-style: var(--shiki-light-font-style);
@@ -122,65 +119,54 @@ body {
     text-decoration: var(--shiki-light-text-decoration);
   }
 
-  .night-mode & {
-    background: var(--shiki-dark-bg);
+  &.code-block {
+    background: var(--shiki-light-bg);
 
+    .highlighted-word {
+      background: rgb(255 255 0 / 0.2);
+      padding: 2px;
+      border-radius: 4px;
+    }
+
+    .line.highlighted {
+      background: rgb(255 255 0 / 0.2);
+      border-radius: 4px;
+
+      &.error {
+        background: rgb(255 0 0 / 0.2);
+      }
+
+      &.warning {
+        background: rgb(255 165 0 / 0.2);
+      }
+    }
+
+    pre > code {
+      --fade-size: 1.5rem;
+
+      mask-image: linear-gradient(
+        to right,
+        var(--fade-left),
+        #000 var(--fade-size),
+        #000 calc(100% - var(--fade-size)),
+        var(--fade-right)
+      );
+      animation: scroll-fade linear;
+      animation-timeline: scroll(self x);
+    }
+  }
+
+  .night-mode & {
     span {
       color: var(--shiki-dark);
       font-style: var(--shiki-dark-font-style);
       font-weight: var(--shiki-dark-font-weight);
       text-decoration: var(--shiki-dark-text-decoration);
     }
-  }
 
-  .highlighted-word {
-    background: rgb(255 255 0 / 0.2);
-    padding: 2px;
-    border-radius: 4px;
-  }
-
-  &.has-focused .line:not(.focused) {
-    opacity: 0.7;
-    filter: blur(0.095rem);
-    transition:
-      filter 0.35s,
-      opacity 0.35s;
-
-    :is(.code-block.revealed, .shiki:hover) & {
-      opacity: 1;
-      filter: blur(0);
+    &.code-block {
+      background: var(--shiki-dark-bg);
     }
-  }
-
-  .line.highlighted {
-    background: rgb(255 255 0 / 0.2);
-    border-radius: 4px;
-
-    &.error {
-      background: rgb(255 0 0 / 0.2);
-    }
-
-    &.warning {
-      background: rgb(255 165 0 / 0.2);
-    }
-  }
-
-  pre > code {
-    --fade-size: 1.5rem;
-
-    display: block;
-    overflow-x: auto;
-    scrollbar-width: none;
-
-    mask-image: linear-gradient(
-      to right,
-      var(--fade-left),
-      #000 var(--fade-size),
-      #000 calc(100% - var(--fade-size)),
-      var(--fade-right)
-    );
-    animation: scroll-fade linear;
-    animation-timeline: scroll(self x);
   }
 }
 
@@ -192,10 +178,31 @@ body {
   border-radius: 8px;
   background-clip: padding-box;
   box-shadow: var(--_shadow-code);
+  font-family: var(--_mono);
+  font-size: 0.875rem;
 
   pre {
     margin: 0;
     padding: 8px;
+  }
+
+  code {
+    display: block;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  &.has-focused .line:not(.focused) {
+    opacity: 0.7;
+    filter: blur(0.095rem);
+    transition:
+      filter 0.35s,
+      opacity 0.35s;
+
+    :is(.code-block.revealed, .code-block:hover) & {
+      opacity: 1;
+      filter: blur(0);
+    }
   }
 
   .toolbar {
@@ -226,7 +233,7 @@ body {
       border-radius: 0.25rem;
 
       &:hover {
-        background: var(--_border-subtle);
+        background: var(--_bg-inset);
       }
     }
 
@@ -245,10 +252,8 @@ body {
   }
 }
 
-code:not(.shiki code) {
-  font-family:
-    "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code",
-    monospace;
+code:not(.shiki code, pre code) {
+  font-family: var(--_mono);
   font-size: 0.875em;
   background: var(--_bg-inset);
   border: 1px solid var(--_border);
@@ -387,7 +392,7 @@ kbd {
     margin: 0;
   }
 
-  code:not(.shiki code) {
+  code:not(.shiki code, pre code) {
     background: rgb(0 0 0 / 0.06);
     border-color: rgb(0 0 0 / 0.1);
 
