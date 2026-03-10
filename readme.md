@@ -21,7 +21,7 @@ Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks
 - **Clean card design** with polished light/dark styling that matches Anki's native UI
 - **Settings panel** to dynamically pick languages and themes
 - **Mobile** works on AnkiDroid and AnkiMobile
-- **AI agent friendly** works great with MCP servers like [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server)
+- **[AI agent skill](#ai-agent-skill)** built-in skill that lets AI agents create markdown flashcards via [AnkiConnect](https://foosoft.net/projects/anki-connect/)
 
 ## Usage
 
@@ -34,6 +34,18 @@ After installing the add-on:
 
 > [!NOTE]
 > See the [documentation](docs.md) for all supported markdown features including code blocks, line highlighting, alerts, and more.
+
+## AI Agent Skill
+
+Markdown is a perfect format for AI-generated content, and this add-on leans into that. It ships with a companion skill that lets AI coding agents (Claude Code, Codex, etc.) create and manage markdown flashcards directly from your editor via [AnkiConnect](https://foosoft.net/projects/anki-connect/). The add-on renders the markdown, the skill creates it.
+
+**Prerequisites:** Anki desktop running with [AnkiConnect](https://foosoft.net/projects/anki-connect/) installed.
+
+Install:
+
+```bash
+npx skills add terkelg/anki-markdown -s anki
+```
 
 ## Development
 
@@ -121,5 +133,6 @@ This bumps the version in `package.json` and `manifest.json`, commits, tags, and
 ## Resources
 
 - [Anki Add-on Documentation](https://addon-docs.ankiweb.net/intro.html)
+- [AnkiConnect](https://foosoft.net/projects/anki-connect/) - HTTP API for programmatic access to Anki
 - [Card Templates](https://docs.ankiweb.net/templates/intro.html)
 - [Card Styling](https://docs.ankiweb.net/templates/styling.html) - Anki CSS classes (`.nightMode`, `.mac`, `.win`, `.mobile`, etc.)
