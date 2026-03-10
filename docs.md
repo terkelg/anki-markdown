@@ -1,18 +1,8 @@
 # Anki Markdown
 
-A modern Anki add-on that transforms your flashcards with full markdown support and beautiful syntax highlighting, designed for fast syncing.
+Reference for writing cards with Anki Markdown.
 
-> [!TIP]
-> Pick from 300+ languages and 60+ themes. Only your selections are downloaded and synced to your devices — nothing extra.
-
-## Why Use This Add-on?
-
-- **Clean, Modern Styling**: Cards feature a polished design with light/dark mode support that matches Anki's native UI
-- **Full Markdown Support**: Write cards using familiar markdown syntax including bold, italic, lists, blockquotes, tables, and more
-- **Beautiful Code Highlighting**: Powered by [Shiki](https://shiki.style), the same syntax highlighter used by VS Code, with 300+ languages and 60+ themes to choose from
-- **Advanced Code Features**: Line highlighting, word highlighting, focus mode, error/warning annotations, and a copy button
-- **Mobile Compatible**: Works seamlessly on AnkiMobile and AnkiDroid
-- **AI Agent Friendly**: Markdown is the native language of LLMs. The built-in [agent skill](readme.md#ai-agent-skill) lets AI agents create and manage flashcards via [AnkiConnect](https://foosoft.net/projects/anki-connect/)
+This document covers supported markdown syntax, code highlighting, and card formatting features. For installation and development workflow, see `readme.md`.
 
 ---
 
@@ -270,6 +260,29 @@ When you apply settings:
 3. Unused files are automatically removed
 
 Files are only downloaded once and cached locally.
+
+---
+
+## AI Agents
+
+Anki Markdown works well with AI tools because the note fields are plain markdown. When using an agent, write markdown in the `Front` and `Back` fields and use fenced code blocks with language tags when needed.
+
+This works well with MCP-based Anki tools such as [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server).
+
+Install the companion skill with the CLI:
+
+```bash
+npx skills add terkelg/anki-markdown -s anki
+```
+
+Example prompt:
+
+```text
+Use the anki skill to create a card about JavaScript event bubbling.
+Front: "What happens when you click a button inside a parent div that also has a click handler?"
+Back: explain that the button handler runs first, then the event bubbles to the parent unless propagation is stopped.
+Include a short fenced `js` example with both handlers.
+```
 
 ---
 
