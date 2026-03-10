@@ -26,11 +26,10 @@ Key distinction: Users create **notes**, Anki generates **cards** from them. One
 ## Commands
 
 ```bash
-bun run dev      # Start dev server at localhost:5173
 bun run build    # Compile TypeScript and bundle for add-on
 bun run test     # Run Python tests offline (pytest)
 bun run test:all # Run all Python tests including online
-bun run debug    # Symlink add-on and launch Anki with remote debugging (port 9222)
+bun run dev      # Symlink add-on and launch Anki with remote debugging (port 9222)
 bun run package  # Build and create .ankiaddon file
 bun run release  # Bump version, tag, and push (triggers GitHub release)
 
@@ -122,7 +121,7 @@ Python injects a `<script type="application/json" id="anki-md-config">` tag befo
 
 **Critical**: Don't replace parent `innerHTML` — mutate children instead. Anki's reviewer.js caches element references after initial parse. Using `parent.innerHTML = ...` destroys elements and invalidates those references, causing null errors. Instead, populate existing elements: `frontEl.innerHTML = content`.
 
-**Important**: Always keep `front.html` and `back.html` templates in sync. They should have the same DOM structure — the only difference is `back.html` includes the `.back` div while `front.html` only has `.front`. Same applies to dev templates in `test/` — keep them structurally consistent with production templates.
+**Important**: Always keep `front.html` and `back.html` templates in sync. They should have the same DOM structure — the only difference is `back.html` includes the `.back` div while `front.html` only has `.front`.
 
 ## Shiki Notes
 

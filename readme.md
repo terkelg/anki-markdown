@@ -37,21 +37,13 @@ After installing the add-on:
 
 ## Development
 
-### Preview
-
-For rapid iteration without restarting Anki:
+For local iteration against the real reviewer:
 
 ```bash
 bun run dev
 ```
 
-Then open:
-
-- `http://localhost:5173/front.html` - preview front card
-- `http://localhost:5173/back.html` - preview back card
-- Add `?night` to test night mode (e.g., `/front.html?night`)
-
-Edit files in `src/` and the browser will hot-reload.
+This symlinks the add-on into Anki, launches Anki with remote debugging enabled, waits for the main webview to load, and opens Chrome DevTools for it.
 
 ## Build
 
@@ -97,13 +89,9 @@ Most tests read language/theme files from `node_modules/@shikijs/` instead of ma
 
 ## Testing in Anki
 
-Requires Anki 25.x. Note that Anki caches the add-on, so you must restart Anki for changes to take effect.
+Requires Anki 25.x. Note that Anki caches the add-on, so you must restart Anki for changes to take effect. `bun run dev` requires macOS and Google Chrome.
 
-```bash
-bun run debug
-```
-
-This symlinks the add-on, launches Anki with remote debugging, waits for the main webview to load, and auto-opens Chrome DevTools for it. Requires macOS and Google Chrome.
+For a quick renderer smoke test, import [fixtures/kitchen-sink-deck.apkg](/Users/terkel/Developer/personal/anki-markdown/fixtures/kitchen-sink-deck.apkg).
 
 > [!TIP]
 > Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
