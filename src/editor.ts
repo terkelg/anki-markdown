@@ -28,6 +28,11 @@ const settings = ["setCloseHTMLTags", "setShrinkImages", "setMathjaxEnabled"];
 const fields = async (val: boolean) =>
   (await instances[0]?.fields)?.map(() => val);
 
+async function setPlainText(val: boolean): Promise<void> {
+  const list = await fields(val);
+  if (list) globalThis.setPlainTexts(list);
+}
+
 // Set a CodeMirror option on all plain-text inputs
 async function setOption(key: string, value: unknown): Promise<void> {
   await Promise.all(plainTexts.map((pt) => pt.codeMirror.setOption(key, value)));
@@ -37,15 +42,15 @@ globalThis.ankiMdActivate = async () => {
   await loaded;
   document.body.classList.add("anki-md-active");
   for (const fn of settings) globalThis[fn](false);
-  globalThis.setPlainTexts(await fields(true));
-  setOption("mode", "null");
+  await setPlainText(true);
+  await setOption("mode", "null");
 };
 
 globalThis.ankiMdDeactivate = async () => {
   await loaded;
   document.body.classList.remove("anki-md-active");
   for (const fn of settings) globalThis[fn](true);
-  globalThis.setPlainTexts(await fields(false));
+  await setPlainText(false);
 };
 
 // Wrap editor globals to force correct values when active

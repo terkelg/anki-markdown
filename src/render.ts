@@ -61,7 +61,7 @@ async function loadThemes() {
   });
 }
 
-const transformers = [
+const baseTransformers = [
   transformerMetaHighlight(),
   transformerMetaWordHighlight(),
   transformerNotationErrorLevel({ matchAlgorithm: "v3" }),
@@ -81,64 +81,62 @@ async function initHighlighter(): Promise<HighlighterCore> {
 
 const ready = initHighlighter().then((h) => (highlighter = h));
 
-let label = "text";
+function codeBlock(lang: string): ShikiTransformer {
+  return {
+    name: "code-block",
+    pre(node) {
+      // Move shiki class/styles from <pre> to <figure> wrapper
+      const classes = [node.properties.class].flat().filter(Boolean) as string[];
+      const style = node.properties.style;
 
-const codeBlock: ShikiTransformer = {
-  name: "code-block",
-  pre(node) {
-    // Move shiki class/styles from <pre> to <figure> wrapper
-    const classes = [node.properties.class].flat().filter(Boolean) as string[];
-    const style = node.properties.style;
+      node.properties = {};
 
-    node.properties = {};
+      const figure: Element = {
+        type: "element",
+        tagName: "figure",
+        properties: { class: ["code-block", ...classes], style },
+        children: [
+          { ...node } as Element,
+          {
+            type: "element",
+            tagName: "figcaption",
+            properties: { class: "toolbar" },
+            children: [
+              {
+                type: "element",
+                tagName: "span",
+                properties: { class: "lang" },
+                children: [{ type: "text", value: lang }],
+              },
+              {
+                type: "element",
+                tagName: "span",
+                properties: { class: "actions" },
+                children: [
+                  {
+                    type: "element",
+                    tagName: "button",
+                    properties: { type: "button", class: "toggle" },
+                    children: [{ type: "text", value: "Reveal" }],
+                  },
+                  {
+                    type: "element",
+                    tagName: "button",
+                    properties: { type: "button", class: "copy" },
+                    children: [{ type: "text", value: "Copy" }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
 
-    const figure: Element = {
-      type: "element",
-      tagName: "figure",
-      properties: { class: ["code-block", ...classes], style },
-      children: [
-        { ...node } as Element,
-        {
-          type: "element",
-          tagName: "figcaption",
-          properties: { class: "toolbar" },
-          children: [
-            {
-              type: "element",
-              tagName: "span",
-              properties: { class: "lang" },
-              children: [{ type: "text", value: label }],
-            },
-            {
-              type: "element",
-              tagName: "span",
-              properties: { class: "actions" },
-              children: [
-                {
-                  type: "element",
-                  tagName: "button",
-                  properties: { type: "button", class: "toggle" },
-                  children: [{ type: "text", value: "Reveal" }],
-                },
-                {
-                  type: "element",
-                  tagName: "button",
-                  properties: { type: "button", class: "copy" },
-                  children: [{ type: "text", value: "Copy" }],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    };
-
-    // Replace node properties to become the figure
-    Object.assign(node, figure);
-  },
-};
-
-const blockTransformers = [...transformers, codeBlock];
+      // Replace node properties to become the figure
+      Object.assign(node, figure);
+    },
+  };
+}
 
 const codeInline: ShikiTransformer = {
   name: "code-inline",
@@ -181,7 +179,6 @@ function highlight(code: string, lang: string, meta?: string) {
     if (meta) el.dataset.meta = meta;
     return el.outerHTML;
   }
-  label = lang;
   const resolved = highlighter.getLoadedLanguages().includes(lang) ? lang : "text";
 
   try {
@@ -190,14 +187,14 @@ function highlight(code: string, lang: string, meta?: string) {
       themes,
       meta: { __raw: meta },
       defaultColor: false,
-      transformers: blockTransformers,
+      transformers: [...baseTransformers, codeBlock(lang)],
     });
   } catch {
     return highlighter.codeToHtml(code, {
       lang: "text",
       themes,
       defaultColor: false,
-      transformers: [codeBlock],
+      transformers: [codeBlock(lang)],
     });
   }
 }
