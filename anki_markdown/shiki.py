@@ -5,6 +5,7 @@ in collection.media for mobile sync.
 """
 
 from pathlib import Path
+from typing import Optional
 import urllib.request
 import ssl
 import json
@@ -33,7 +34,7 @@ def esm_url(kind: str, name: str, version: str) -> str:
     return f"{ESM_BASE}/{pkg}@{version}/es2022/{name}.mjs"
 
 
-def is_alias_module(content: bytes) -> str | None:
+def is_alias_module(content: bytes) -> Optional[str]:
     """Check if module is an alias (re-export from another module).
     Returns the canonical name if it's an alias, None otherwise.
     """
@@ -75,7 +76,7 @@ class ShikiStore:
         self.dir = dir
         self.version = version
 
-    def download_lang(self, name: str, _seen: set[str] | None = None):
+    def download_lang(self, name: str, _seen: Optional[set[str]] = None):
         """Download a language grammar, resolving aliases and deps."""
         if _seen is None:
             _seen = set()
