@@ -206,6 +206,17 @@ class TestCleanup:
         assert "_lang-javascript.js" not in removed
         assert (tmp_path / "_lang-javascript.js").exists()
 
+    def test_transitive_dep_protected(self, shiki, tmp_path):
+        """Configured root keeps deps through multiple levels."""
+        s = shiki.ShikiStore(tmp_path)
+        (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
+        (tmp_path / "_lang-javascript.js").write_text('import t from"./_lang-css.js";')
+        (tmp_path / "_lang-css.js").write_text("var x;")
+        config = {"languages": ["html"], "themes": {"light": "a", "dark": "b"}}
+
+        removed = s.cleanup(config)
+        assert not removed
+
     def test_unused_removed(self, shiki, tmp_path):
         """Not configured, not dep → deleted."""
         s = shiki.ShikiStore(tmp_path)
@@ -224,18 +235,38 @@ class TestCleanup:
         assert not removed
 
     def test_orphan(self, shiki, tmp_path):
-        """Parent removed → dep survives first cleanup, removed on second."""
+        """Orphaned deps are removed in the same cleanup pass."""
         s = shiki.ShikiStore(tmp_path)
         (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
         (tmp_path / "_lang-javascript.js").write_text("var x;")
         config = {"languages": [], "themes": {"light": "a", "dark": "b"}}
 
-        removed1 = s.cleanup(config)
-        assert "_lang-html.js" in removed1
-        assert "_lang-javascript.js" not in removed1
+        removed = s.cleanup(config)
+        assert "_lang-html.js" in removed
+        assert "_lang-javascript.js" in removed
 
-        removed2 = s.cleanup(config)
-        assert "_lang-javascript.js" in removed2
+    def test_transitive_orphan(self, shiki, tmp_path):
+        """Orphaned dep chains are removed in the same cleanup pass."""
+        s = shiki.ShikiStore(tmp_path)
+        (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
+        (tmp_path / "_lang-javascript.js").write_text('import t from"./_lang-css.js";')
+        (tmp_path / "_lang-css.js").write_text("var x;")
+        config = {"languages": [], "themes": {"light": "a", "dark": "b"}}
+
+        removed = s.cleanup(config)
+        assert "_lang-html.js" in removed
+        assert "_lang-javascript.js" in removed
+        assert "_lang-css.js" in removed
+
+    def test_cycle(self, shiki, tmp_path):
+        """Cycles do not loop and configured members stay reachable."""
+        s = shiki.ShikiStore(tmp_path)
+        (tmp_path / "_lang-a.js").write_text('import t from"./_lang-b.js";')
+        (tmp_path / "_lang-b.js").write_text('import t from"./_lang-a.js";')
+        config = {"languages": ["a"], "themes": {"light": "a", "dark": "b"}}
+
+        removed = s.cleanup(config)
+        assert not removed
 
     def test_theme_removed(self, shiki, tmp_path):
         """Non-configured theme → deleted."""

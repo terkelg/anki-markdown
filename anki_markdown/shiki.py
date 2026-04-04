@@ -134,18 +134,36 @@ class ShikiStore:
         """Get set of theme names that exist locally."""
         return {f.stem.removeprefix("_theme-") for f in self.dir.glob("_theme-*.js")}
 
-    def collect_deps(self) -> set[str]:
-        """Collect all dependency names referenced by local lang files."""
+    def collect_deps(self, roots: set[str]) -> set[str]:
+        """Collect transitive local language deps from the given roots."""
         deps = set()
-        for f in self.dir.glob("_lang-*.js"):
-            text = f.read_text(encoding="utf-8")
-            deps.update(_LOCAL_RE.findall(text))
+        seen = set()
+        stack = list(roots)
+
+        while stack:
+            name = stack.pop()
+            if name in seen:
+                continue
+            seen.add(name)
+
+            path = self.dir / f"_lang-{name}.js"
+            if not path.exists():
+                continue
+
+            text = path.read_text(encoding="utf-8")
+            for dep in _LOCAL_RE.findall(text):
+                if dep in deps:
+                    continue
+                deps.add(dep)
+                stack.append(dep)
+
         return deps
 
     def cleanup(self, config: dict) -> list[str]:
         """Remove unused language/theme files. Returns removed filenames."""
         removed = []
-        keep = set(config.get("languages", [])) | self.collect_deps()
+        roots = set(config.get("languages", []))
+        keep = roots | self.collect_deps(roots)
         themes = {config["themes"]["light"], config["themes"]["dark"]}
 
         for f in self.dir.glob("_lang-*.js"):
