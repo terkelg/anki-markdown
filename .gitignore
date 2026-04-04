@@ -12,9 +12,9 @@ anki_markdown/_theme-*.js
 # User config (managed by Anki)
 anki_markdown/meta.json
 
+.DS_Store
 *.ankiaddon
 node_modules
 __pycache__/
 .venv/
 .pytest_cache/
-.DS_Store
