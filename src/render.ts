@@ -1,7 +1,7 @@
 import "./style.css";
-import MarkdownIt from "markdown-it";
 import mark from "markdown-it-mark";
 import alerts from "markdown-it-github-alerts";
+import { createMarkdownExit } from "markdown-exit";
 import { createHighlighterCore } from "@shikijs/core";
 import { createJavaScriptRegexEngine } from "@shikijs/engine-javascript";
 import type { HighlighterCore } from "@shikijs/core";
@@ -79,71 +79,76 @@ async function initHighlighter(): Promise<HighlighterCore> {
   });
 }
 
-const ready = initHighlighter().then((h) => (highlighter = h));
-
-function codeBlock(lang: string): ShikiTransformer {
-  return {
-    name: "code-block",
-    pre(node) {
-      // Move shiki class/styles from <pre> to <figure> wrapper
-      const classes = [node.properties.class].flat().filter(Boolean) as string[];
-      const style = node.properties.style;
-
-      node.properties = {};
-
-      const figure: Element = {
-        type: "element",
-        tagName: "figure",
-        properties: { class: ["code-block", ...classes], style },
-        children: [
-          { ...node } as Element,
-          {
-            type: "element",
-            tagName: "figcaption",
-            properties: { class: "toolbar" },
-            children: [
-              {
-                type: "element",
-                tagName: "span",
-                properties: { class: "lang" },
-                children: [{ type: "text", value: lang }],
-              },
-              {
-                type: "element",
-                tagName: "span",
-                properties: { class: "actions" },
-                children: [
-                  {
-                    type: "element",
-                    tagName: "button",
-                    properties: { type: "button", class: "toggle" },
-                    children: [{ type: "text", value: "Reveal" }],
-                  },
-                  {
-                    type: "element",
-                    tagName: "button",
-                    properties: { type: "button", class: "copy" },
-                    children: [{ type: "text", value: "Copy" }],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      };
-
-      // Replace node properties to become the figure
-      Object.assign(node, figure);
-    },
-  };
+function classes(node: Element): string[] {
+  const value = node.properties.class;
+  if (Array.isArray(value)) return value.filter((value) => typeof value === "string");
+  if (typeof value === "string") return value.split(/\s+/).filter(Boolean);
+  return [];
 }
+
+function lang(node: Element): string {
+  const child = node.children[0];
+  if (child?.type !== "element") return "text";
+  const value = classes(child).find((value) => value.startsWith("language-"));
+  return value?.slice("language-".length) || "text";
+}
+
+const codeBlock: ShikiTransformer = {
+  name: "code-block",
+  pre(node) {
+    const style = node.properties.style;
+    const figure: Element = {
+      type: "element",
+      tagName: "figure",
+      properties: { class: ["code-block", ...classes(node)], style },
+      children: [
+        { ...node } as Element,
+        {
+          type: "element",
+          tagName: "figcaption",
+          properties: { class: "toolbar" },
+          children: [
+            {
+              type: "element",
+              tagName: "span",
+              properties: { class: "lang" },
+              children: [{ type: "text", value: lang(node) }],
+            },
+            {
+              type: "element",
+              tagName: "span",
+              properties: { class: "actions" },
+              children: [
+                {
+                  type: "element",
+                  tagName: "button",
+                  properties: { type: "button", class: "toggle" },
+                  children: [{ type: "text", value: "Reveal" }],
+                },
+                {
+                  type: "element",
+                  tagName: "button",
+                  properties: { type: "button", class: "copy" },
+                  children: [{ type: "text", value: "Copy" }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    node.properties = {};
+    Object.assign(node, figure);
+  },
+};
 
 const codeInline: ShikiTransformer = {
   name: "code-inline",
   pre(node) {
-    const classes = [node.properties.class].flat().filter(Boolean) as string[];
+    const value = classes(node);
     node.tagName = "code";
-    node.properties.class = ["code-inline", ...classes];
+    node.properties.class = ["code-inline", ...value];
     // Flatten: move inner <code> children up
     const inner = node.children[0] as Element;
     if (inner?.tagName === "code") {
@@ -171,35 +176,39 @@ const skeleton = parse(
     `</span></figcaption></figure>`,
 )!;
 
-function highlight(code: string, lang: string, meta?: string) {
+function highlight(code: string, name: string, meta?: string) {
   if (!highlighter) {
     const el = skeleton.cloneNode(true) as HTMLElement;
     el.querySelector("code")!.textContent = code;
-    el.querySelector(".lang")!.textContent = lang;
+    el.querySelector(".lang")!.textContent = name;
     if (meta) el.dataset.meta = meta;
     return el.outerHTML;
   }
-  const resolved = highlighter.getLoadedLanguages().includes(lang) ? lang : "text";
+
+  const lang = highlighter.getLoadedLanguages().includes(name) ? name : "text";
 
   try {
     return highlighter.codeToHtml(code, {
-      lang: resolved,
+      lang,
       themes,
       meta: { __raw: meta },
       defaultColor: false,
-      transformers: [...baseTransformers, codeBlock(lang)],
+      transformers: [...baseTransformers, codeBlock],
     });
   } catch {
     return highlighter.codeToHtml(code, {
       lang: "text",
       themes,
       defaultColor: false,
-      transformers: [codeBlock(lang)],
+      transformers: [codeBlock],
     });
   }
 }
 
-const md = MarkdownIt({ html: true }).use(mark).use(alerts);
+const md = createMarkdownExit({ html: true });
+md.use(mark as never);
+md.use(alerts as never);
+const ready = initHighlighter().then((value) => (highlighter = value));
 
 // Only allow safe HTML tags, strip everything else
 const ALLOWED = /^<\/?(img|a|b|i|em|strong|br|kbd)(\s[^>]*)?>$/i;
@@ -207,8 +216,6 @@ const sanitize = (html: string) => (ALLOWED.test(html.trim()) ? html : "");
 md.renderer.rules.html_inline = (tokens, idx) =>
   sanitize(tokens[idx].content);
 md.renderer.rules.html_block = (tokens, idx) => sanitize(tokens[idx].content);
-
-// Fence renderer: ```lang meta
 md.renderer.rules.fence = (tokens, idx) => {
   const { content, info } = tokens[idx];
   const [lang, ...rest] = info.split(/\s+/);
@@ -238,19 +245,17 @@ md.renderer.rules.code_inline = (tokens, idx) => {
   const escaped = md.utils.escapeHtml(content);
   if (!meta?.lang) return `<code>${escaped}</code>`;
   if (!highlighter) return `<code data-pending data-lang="${md.utils.escapeHtml(meta.lang)}">${escaped}</code>`;
-  if (highlighter.getLoadedLanguages().includes(meta.lang)) {
-    try {
-      return highlighter.codeToHtml(content, {
-        lang: meta.lang,
-        themes,
-        defaultColor: false,
-        transformers: [codeInline],
-      });
-    } catch {
-      /* fall through */
-    }
+  const lang = highlighter.getLoadedLanguages().includes(meta.lang) ? meta.lang : "text";
+  try {
+    return highlighter.codeToHtml(content, {
+      lang,
+      themes,
+      defaultColor: false,
+      transformers: [codeInline],
+    });
+  } catch {
+    return `<code>${escaped}</code>`;
   }
-  return `<code>${escaped}</code>`;
 };
 
 // Event delegation for toolbar
@@ -290,7 +295,6 @@ function decode(text: string): string {
  * Swaps content and copies attributes in-place so layout never shifts.
  */
 function upgrade(container: HTMLElement) {
-  // Code blocks
   for (const fig of container.querySelectorAll<HTMLElement>(
     ".code-block[data-pending]",
   )) {
@@ -298,7 +302,7 @@ function upgrade(container: HTMLElement) {
     if (!code) continue;
     const lang = fig.querySelector(".lang")?.textContent || "text";
     const fresh = parse(
-      highlight(code.textContent.replace(/\n$/, "") || "", lang, fig.dataset.meta),
+      highlight(code.textContent?.replace(/\n$/, "") || "", lang, fig.dataset.meta),
     );
     if (!fresh) continue;
     const inner = fresh.querySelector("code");
@@ -309,7 +313,6 @@ function upgrade(container: HTMLElement) {
     fig.removeAttribute("data-meta");
   }
 
-  // Inline code
   for (const el of container.querySelectorAll<HTMLElement>(
     "code[data-pending]",
   )) {
@@ -355,22 +358,25 @@ export async function render(front: string, back: string) {
 
   const frontEl = document.querySelector<HTMLElement>(".front");
   const backEl = document.querySelector<HTMLElement>(".back");
+  const frontText = decode(front);
+  const backText = decode(back);
 
-  // Render immediately — if the highlighter isn't ready yet, code blocks
-  // will use the plain <pre><code> fallback from highlight().
-  if (frontEl) frontEl.innerHTML = md.render(decode(front));
-  if (backEl) backEl.innerHTML = md.render(decode(back));
+  wrapper?.setAttribute("data-state", "loading");
   if (config.cardless) wrapper?.classList.add("cardless");
+
+  if (frontEl) frontEl.innerHTML = md.render(frontText);
+  if (backEl) backEl.innerHTML = md.render(backText);
   wrapper?.classList.add("ready");
 
-  // If we rendered before the highlighter was ready, wait for it
-  // then upgrade code blocks and inline code in-place.
   if (!highlighter) {
     try {
       await ready;
       for (const el of [frontEl, backEl]) if (el) upgrade(el);
-    } catch (e) {
-      console.error("[anki-md] Failed to load highlighter:", e);
+    } catch (error) {
+      console.error("[anki-md] Failed to load highlighter:", error);
     }
   }
+
+  wrapper?.setAttribute("data-state", "ready");
+  wrapper?.classList.add("ready");
 }

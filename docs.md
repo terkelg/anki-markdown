@@ -8,7 +8,7 @@ This document covers supported markdown syntax, code highlighting, and card form
 
 ## Basic Markdown
 
-Standard markdown syntax via [markdown-it](https://github.com/markdown-it/markdown-it):
+Standard markdown syntax via [markdown-exit](https://markdown-exit.pages.dev):
 
 | Syntax                   | Result            |
 | ------------------------ | ----------------- |

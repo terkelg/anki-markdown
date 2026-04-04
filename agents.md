@@ -87,9 +87,9 @@ If a change affects rendering, editor behavior, or Shiki metadata, run `bun run 
 `src/render.ts` powers reviewed cards:
 
 - reads config from the injected `#anki-md-config` JSON script
-- renders markdown with `markdown-it`, `markdown-it-mark`, and GitHub alerts
+- renders markdown with `markdown-exit` plus the compatibility plugins `markdown-it-mark` and `markdown-it-github-alerts`
 - loads configured Shiki languages and themes dynamically
-- renders immediately, then upgrades pending code blocks in place once Shiki is ready
+- renders immediately with a styled fallback code shell, then upgrades code blocks and inline code in place once Shiki is ready
 - normalizes dark mode to `html.night-mode`
 
 Field values are passed through hidden `<script type="text/plain">` nodes with ids `data-front` and `data-back`. Keep those ids stable.
@@ -174,6 +174,7 @@ For a quick smoke test in Anki, import `fixtures/kitchen-sink-deck.apkg`.
 - `web/` assets are desktop-only add-on web exports.
 - `front.html` and `back.html` must keep the same script ids and wrapper structure. `back.html` is the only one with a `.back` container.
 - Update existing rendered nodes in place. Do not replace the parent wrapper with `innerHTML`, because Anki caches reviewer DOM references.
+- Preserve the progressive code-rendering path in `src/render.ts`: fallback code blocks should keep the styled toolbar shell and upgrade in place after Shiki loads.
 - The safe inline/block HTML allow-list in `src/render.ts` is intentionally narrow: `img`, `a`, `b`, `i`, `em`, `strong`, `br`, `kbd`.
 
 ## When Editing
