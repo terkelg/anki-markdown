@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 from aqt import mw, gui_hooks
-from aqt.qt import QMessageBox
+from aqt.qt import QAction, QMessageBox
 from aqt.editor import Editor
 from aqt.webview import WebContent
 
@@ -10,6 +10,7 @@ from .settings import show_settings
 
 ADDON_DIR = Path(__file__).parent
 NOTETYPE = "Anki Markdown"
+MENU = "Anki Markdown"
 
 
 def read(name: str) -> str:
@@ -70,6 +71,7 @@ def on_profile_loaded():
     # Register web exports and settings action
     mw.addonManager.setWebExports(__name__, r"(web/.*|_.*)")
     mw.addonManager.setConfigAction(__name__, show_settings)
+    add_menu()
 
 
 def sync_media(removed: list[str] = None):
@@ -92,6 +94,19 @@ def sync_media(removed: list[str] = None):
     mw.col.media.trash_files([f.name for f in files])
     for file in files:
         mw.col.media.add_file(str(file))
+
+
+def add_menu():
+    """Add the settings dialog to the Tools menu once per session."""
+    if getattr(mw, "_anki_md_menu", None):
+        return
+    menu = getattr(getattr(mw, "form", None), "menuTools", None)
+    if not menu:
+        return
+    act = QAction(MENU, mw)
+    act.triggered.connect(lambda _=False: show_settings())
+    menu.addAction(act)
+    mw._anki_md_menu = act
 
 
 def get_template(name: str) -> str:

@@ -41,6 +41,32 @@ class FakeAddonManager:
         return mod
 
 
+class FakeSignal:
+    def __init__(self):
+        self.slots = []
+
+    def connect(self, fn):
+        self.slots.append(fn)
+
+
+class FakeAction:
+    def __init__(self, text, parent=None):
+        self.parent = parent
+        self._text = text
+        self.triggered = FakeSignal()
+
+    def text(self):
+        return self._text
+
+
+class FakeMenu:
+    def __init__(self):
+        self.added = []
+
+    def addAction(self, act):
+        self.added.append(act)
+
+
 class FakeMedia:
     def __init__(self, path: Path):
         self.path = path
@@ -135,9 +161,11 @@ def addon(monkeypatch, tmp_path):
     media.path.mkdir()
     models = FakeModels()
     addon_manager = FakeAddonManager()
+    menu = FakeMenu()
     mw = types.SimpleNamespace(
         col=types.SimpleNamespace(media=media, models=models),
         addonManager=addon_manager,
+        form=types.SimpleNamespace(menuTools=menu),
     )
     box = FakeMessageBox()
     hooks = FakeHooks()
@@ -147,6 +175,7 @@ def addon(monkeypatch, tmp_path):
     aqt.gui_hooks = hooks
 
     qt = types.ModuleType("aqt.qt")
+    qt.QAction = FakeAction
     qt.QMessageBox = box
 
     editor = types.ModuleType("aqt.editor")
@@ -201,6 +230,7 @@ def addon(monkeypatch, tmp_path):
         media=media,
         hooks=hooks,
         addon_manager=addon_manager,
+        menu=menu,
     )
 
 
@@ -267,3 +297,11 @@ class TestSyncMedia:
             "_review.js",
             "_review.css",
         }
+
+
+class TestProfileLoaded:
+    def test_adds_tools_menu_once(self, addon):
+        addon.mod.on_profile_loaded()
+        addon.mod.on_profile_loaded()
+
+        assert [act.text() for act in addon.menu.added] == ["Anki Markdown"]

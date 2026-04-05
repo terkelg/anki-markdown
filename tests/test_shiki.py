@@ -277,6 +277,51 @@ class TestCleanup:
         assert "_theme-monokai.js" in removed
 
 
+class TestDebug:
+    def test_local_deps(self, shiki, tmp_path):
+        s = shiki.ShikiStore(tmp_path)
+        (tmp_path / "_lang-html.js").write_text(
+            'import t from"./_lang-javascript.js";import e from"./_lang-css.js";'
+        )
+        assert s.local_deps("html") == ["css", "javascript"]
+
+    def test_debug_data(self, shiki, tmp_path):
+        s = shiki.ShikiStore(tmp_path)
+        (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
+        (tmp_path / "_lang-javascript.js").write_text("var x;")
+        (tmp_path / "_theme-vitesse-dark.js").write_text("var x;")
+        config = {
+            "languages": ["html", "python"],
+            "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
+        }
+
+        data = s.debug_data(config)
+        assert data["roots"] == ["html", "python"]
+        assert data["graph"] == {"html": ["javascript"], "javascript": []}
+        assert data["miss"] == ["python"]
+        assert data["deps"] == ["javascript"]
+        assert data["rev"] == {"javascript": ["html"]}
+        assert data["themes"] == ["vitesse-dark"]
+
+    def test_debug_text(self, shiki, tmp_path):
+        s = shiki.ShikiStore(tmp_path)
+        (tmp_path / "_lang-html.js").write_text('import t from"./_lang-javascript.js";')
+        (tmp_path / "_lang-javascript.js").write_text("var x;")
+        (tmp_path / "_theme-vitesse-dark.js").write_text("var x;")
+        config = {
+            "languages": ["html", "python"],
+            "themes": {"light": "vitesse-light", "dark": "vitesse-dark"},
+        }
+
+        text = s.debug_text(config)
+        assert "shiki:" in text
+        assert "selected languages: html, python" in text
+        assert "missing selected: python" in text
+        assert "installed themes: vitesse-dark" in text
+        assert "html: deps=javascript; used_by=-" in text
+        assert "javascript: deps=-; used_by=html" in text
+
+
 # Online tests — real esm.sh downloads
 
 

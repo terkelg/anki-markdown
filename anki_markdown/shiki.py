@@ -135,6 +135,21 @@ class ShikiStore:
         """Get set of theme names that exist locally."""
         return {f.stem.removeprefix("_theme-") for f in self.dir.glob("_theme-*.js")}
 
+    def local_deps(self, name: str) -> list[str]:
+        """Get direct local deps for a downloaded language."""
+        path = self.dir / f"_lang-{name}.js"
+        if not path.exists():
+            return []
+        text = path.read_text(encoding="utf-8")
+        return sorted(set(_LOCAL_RE.findall(text)))
+
+    def local_graph(self) -> dict[str, list[str]]:
+        """Get local language graph keyed by installed language."""
+        return {
+            name: self.local_deps(name)
+            for name in sorted(self.local_langs())
+        }
+
     def collect_deps(self, roots: set[str]) -> set[str]:
         """Collect transitive local language deps from the given roots."""
         deps = set()
@@ -180,6 +195,51 @@ class ShikiStore:
                 removed.append(f.name)
 
         return removed
+
+    def debug_data(self, config: dict) -> dict:
+        """Summarize local languages and their dependency graph."""
+        roots = sorted(set(config.get("languages", [])))
+        graph = self.local_graph()
+        have = sorted(graph)
+        miss = sorted(set(roots) - set(have))
+        deps = sorted(set(have) - set(roots))
+        rev: dict[str, list[str]] = {}
+
+        for name, vals in graph.items():
+            for dep in vals:
+                rev.setdefault(dep, []).append(name)
+        for vals in rev.values():
+            vals.sort()
+        return {
+            "roots": roots,
+            "graph": graph,
+            "have": have,
+            "miss": miss,
+            "deps": deps,
+            "rev": rev,
+            "themes": sorted(self.local_themes()),
+        }
+
+    def debug_text(self, config: dict) -> str:
+        """Format local Shiki state as plain text for issue reports."""
+        data = self.debug_data(config)
+        lines = [
+            f"shiki: {self.version}",
+            f"selected languages: {', '.join(data['roots']) or '-'}",
+            f"installed languages: {', '.join(data['have']) or '-'}",
+            f"missing selected: {', '.join(data['miss']) or '-'}",
+            f"dependency-only: {', '.join(data['deps']) or '-'}",
+            f"installed themes: {', '.join(data['themes']) or '-'}",
+            "dependency graph:",
+        ]
+        if data["graph"]:
+            for name in data["have"]:
+                deps = ", ".join(data["graph"][name]) or "-"
+                refs = ", ".join(data["rev"].get(name, [])) or "-"
+                lines.append(f"  - {name}: deps={deps}; used_by={refs}")
+        else:
+            lines.append("  -")
+        return "\n".join(lines)
 
     def sync(self, config: dict) -> tuple[list[str], list[str]]:
         """Download missing/broken languages and themes.

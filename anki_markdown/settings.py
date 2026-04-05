@@ -1,9 +1,16 @@
 """Settings dialog for Anki Markdown syntax highlighting configuration."""
 
+import json
+from pathlib import Path
+import platform
+import plistlib
+import sys
+
 from aqt.qt import (
     QDialog,
     QVBoxLayout,
     QHBoxLayout,
+    QFrame,
     QListWidget,
     QListWidgetItem,
     QComboBox,
@@ -26,6 +33,71 @@ from .shiki import (
     store,
 )
 
+ADDON_DIR = Path(__file__).parent
+ADDON_VERSION = json.loads((ADDON_DIR / "manifest.json").read_text(encoding="utf-8"))["version"]
+REPO_URL = "https://github.com/terkelg/anki-markdown"
+
+
+def ver(obj) -> str | None:
+    """Read one appVersion-style attribute from an object."""
+    val = getattr(obj, "appVersion", None)
+    if isinstance(val, str) and val:
+        return val
+    if callable(val):
+        try:
+            out = val()
+        except TypeError:
+            out = None
+        if out:
+            return str(out)
+    return None
+
+
+def anki_ver() -> str:
+    """Best-effort Anki version for issue reports."""
+    if val := ver(mw):
+        return val
+
+    try:
+        import aqt
+
+        if val := ver(aqt):
+            return val
+    except Exception:
+        pass
+
+    if sys.platform == "darwin":
+        path = Path(sys.executable).resolve().parent.parent / "Info.plist"
+        if path.exists():
+            try:
+                data = plistlib.loads(path.read_bytes())
+                val = data.get("CFBundleShortVersionString")
+                if val:
+                    return str(val)
+            except Exception:
+                pass
+
+    return "unknown"
+
+
+def debug_report() -> str:
+    """Build a clipboard-ready debug report."""
+    config = get_config()
+    theme = config.get("themes", {})
+    lines = [
+        "Anki Markdown debug info",
+        f"anki_markdown: {ADDON_VERSION}",
+        f"anki: {anki_ver()}",
+        f"python: {platform.python_implementation()} {platform.python_version()}",
+        f"os: {platform.platform()}",
+        f"light theme: {theme.get('light', '-')}",
+        f"dark theme: {theme.get('dark', '-')}",
+        f"cardless: {config.get('cardless', False)}",
+        "",
+        store.debug_text(config),
+    ]
+    return "\n".join(lines)
+
 
 class ShikiSettingsDialog(QDialog):
     """Settings dialog for configuring Shiki languages and themes."""
@@ -35,15 +107,51 @@ class ShikiSettingsDialog(QDialog):
         self.setWindowTitle("Anki Markdown - Syntax Highlighting")
         self.setMinimumWidth(400)
         self.setMinimumHeight(500)
+        self.setStyleSheet(
+            """
+            QFrame[ankiMdSection="true"] {
+                border: 1px solid rgba(255, 255, 255, 0.10);
+                border-radius: 4px;
+                background-color: rgba(255, 255, 255, 0.03);
+            }
+            QLabel[ankiMdTitle="true"] {
+                font-weight: 600;
+            }
+            """
+        )
         self.setup_ui()
         self.load_config()
 
+    def section(self, title: str) -> tuple[QFrame, QVBoxLayout]:
+        """Create one boxed settings section with a real title label."""
+        box = QFrame()
+        box.setProperty("ankiMdSection", True)
+        layout = QVBoxLayout(box)
+        layout.setContentsMargins(14, 10, 14, 14)
+        layout.setSpacing(10)
+        label = QLabel(title)
+        label.setProperty("ankiMdTitle", True)
+        layout.addWidget(label)
+        return box, layout
+
+    def link(self, text: str, href: str, open: bool) -> QLabel:
+        """Create one footer link label."""
+        label = QLabel(
+            f'<a href="{href}" style="color: gray; text-decoration: none;">{text}</a>'
+        )
+        label.setStyleSheet("font-size: 11px;")
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
+        label.setOpenExternalLinks(open)
+        return label
+
     def setup_ui(self):
         layout = QVBoxLayout(self)
+        layout.setSpacing(12)
 
         # Language section
-        layout.addWidget(QLabel("<b>Languages</b>"))
-        layout.addWidget(QLabel("Select languages for syntax highlighting.\nNew languages require an internet connection to download."))
+        langs, lang_layout = self.section("Languages")
+        lang_layout.addWidget(QLabel("Select languages for syntax highlighting.\nNew languages require an internet connection to download."))
 
         filter_row = QHBoxLayout()
         self.lang_filter = QLineEdit()
@@ -54,7 +162,7 @@ class ShikiSettingsDialog(QDialog):
         self.show_selected = QCheckBox("Selected only")
         self.show_selected.toggled.connect(self.filter_languages)
         filter_row.addWidget(self.show_selected)
-        layout.addLayout(filter_row)
+        lang_layout.addLayout(filter_row)
 
         self.lang_list = QListWidget()
         self.lang_list.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
@@ -63,39 +171,59 @@ class ShikiSettingsDialog(QDialog):
             item = QListWidgetItem(lang)
             item.setData(Qt.ItemDataRole.UserRole, lang)
             self.lang_list.addItem(item)
-        layout.addWidget(self.lang_list)
+        lang_layout.addWidget(self.lang_list)
 
         # Info label
         self.info_label = QLabel("")
         self.info_label.setWordWrap(True)
-        layout.addWidget(self.info_label)
+        lang_layout.addWidget(self.info_label)
+        layout.addWidget(langs)
 
         # Theme section
-        layout.addWidget(QLabel("<b>Themes</b>"))
+        themes, theme_layout = self.section("Theme")
+        theme_layout.setSpacing(4)
 
         theme_row1 = QHBoxLayout()
+        theme_row1.setContentsMargins(0, 0, 0, 0)
         theme_row1.addWidget(QLabel("Light mode:"))
         self.light_theme = QComboBox()
         self.light_theme.addItems(sorted(AVAILABLE_THEMES))
         theme_row1.addWidget(self.light_theme)
-        layout.addLayout(theme_row1)
+        theme_layout.addLayout(theme_row1)
 
         theme_row2 = QHBoxLayout()
+        theme_row2.setContentsMargins(0, 0, 0, 0)
         theme_row2.addWidget(QLabel("Dark mode:"))
         self.dark_theme = QComboBox()
         self.dark_theme.addItems(sorted(AVAILABLE_THEMES))
         theme_row2.addWidget(self.dark_theme)
-        layout.addLayout(theme_row2)
+        theme_layout.addLayout(theme_row2)
+        layout.addWidget(themes)
 
-        # Cardless option
+        # UI section
+        ui, ui_layout = self.section("UI")
         self.cardless = QCheckBox("Cardless")
         self.cardless.setToolTip("Remove card border, shadow, and background on wide screens")
-        layout.addWidget(self.cardless)
+        ui_layout.addWidget(self.cardless)
+        layout.addWidget(ui)
 
-        # Version
-        version = QLabel(f"Shiki {SHIKI_VERSION}")
+        meta = QHBoxLayout()
+        version = QLabel(f"Anki Markdown {ADDON_VERSION} · Shiki {SHIKI_VERSION}")
         version.setStyleSheet("color: gray; font-size: 11px;")
-        layout.addWidget(version)
+        meta.addWidget(version)
+        meta.addStretch()
+
+        repo = self.link("Repo", REPO_URL, True)
+        meta.addWidget(repo)
+
+        sep = QLabel("·")
+        sep.setStyleSheet("color: gray; font-size: 11px;")
+        meta.addWidget(sep)
+
+        self.debug = self.link("Debug info", "debug", False)
+        self.debug.linkActivated.connect(self.export_debug)
+        meta.addWidget(self.debug)
+        layout.addLayout(meta)
 
         # Buttons
         buttons = QHBoxLayout()
@@ -167,6 +295,11 @@ class ShikiSettingsDialog(QDialog):
         """Update info label with selection count."""
         count = len(self.get_selected_languages())
         self.info_label.setText(f"Selected: {count} language(s)")
+
+    def export_debug(self):
+        """Copy issue-report debug info to the clipboard."""
+        QApplication.clipboard().setText(debug_report())
+        QMessageBox.information(self, "Anki Markdown", "Debug info copied to clipboard.")
 
     def apply_config(self):
         """Save config and download missing files."""
