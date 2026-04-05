@@ -91,6 +91,7 @@ If a change affects rendering, editor behavior, or Shiki metadata, run `bun run 
 - loads configured Shiki languages and themes dynamically
 - renders immediately with a styled fallback code shell, then upgrades code blocks and inline code in place once Shiki is ready
 - normalizes dark mode to `html.night-mode`
+- do not call `console.error()` or `console.warn()` in reviewer code; some Anki mobile webviews expose a partial `console`, and calling missing methods can crash card rendering. If you need reviewer logs, use plain `console.log()` and fail soft instead.
 
 Field values are passed through hidden `<script type="text/plain">` nodes with ids `data-front` and `data-back`. Keep those ids stable.
 

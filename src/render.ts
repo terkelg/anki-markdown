@@ -44,7 +44,7 @@ async function loadLanguages() {
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default].flat();
-    console.error(`[anki-md] Failed to load language: ${config.languages[i]}`);
+    console.log(`[anki-md] Failed to load language: ${config.languages[i]}`);
     return [];
   });
 }
@@ -56,7 +56,7 @@ async function loadThemes() {
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default];
-    console.error(`[anki-md] Failed to load theme: ${names[i]}`);
+    console.log(`[anki-md] Failed to load theme: ${names[i]}`);
     return [];
   });
 }
@@ -69,6 +69,7 @@ const baseTransformers = [
 ];
 
 let highlighter: HighlighterCore;
+const warned = new Set<string>();
 
 async function initHighlighter(): Promise<HighlighterCore> {
   const [langs, themeList] = await Promise.all([loadLanguages(), loadThemes()]);
@@ -96,6 +97,8 @@ function lang(node: Element): string {
 const codeBlock: ShikiTransformer = {
   name: "code-block",
   pre(node) {
+    const name =
+      typeof this.options.lang === "string" ? this.options.lang : lang(node);
     const style = node.properties.style;
     const figure: Element = {
       type: "element",
@@ -112,7 +115,7 @@ const codeBlock: ShikiTransformer = {
               type: "element",
               tagName: "span",
               properties: { class: "lang" },
-              children: [{ type: "text", value: lang(node) }],
+              children: [{ type: "text", value: name }],
             },
             {
               type: "element",
@@ -176,32 +179,44 @@ const skeleton = parse(
     `</span></figcaption></figure>`,
 )!;
 
+function warn(name: string) {
+  if (!name || name === "text" || warned.has(name)) return;
+  warned.add(name);
+  console.log(
+    `[anki-md] Language not loaded: ${name}. Falling back to plain text. Open Anki Markdown settings to enable and download it.`,
+  );
+}
+
+function plain(code: string, name: string, meta?: string, pending = false) {
+  const el = skeleton.cloneNode(true) as HTMLElement;
+  el.querySelector("code")!.textContent = code;
+  el.querySelector(".lang")!.textContent = name;
+  if (meta) el.dataset.meta = meta;
+  if (!pending) el.removeAttribute("data-pending");
+  return el.outerHTML;
+}
+
 function highlight(code: string, name: string, meta?: string) {
   if (!highlighter) {
-    const el = skeleton.cloneNode(true) as HTMLElement;
-    el.querySelector("code")!.textContent = code;
-    el.querySelector(".lang")!.textContent = name;
-    if (meta) el.dataset.meta = meta;
-    return el.outerHTML;
+    return plain(code, name, meta, true);
   }
 
-  const lang = highlighter.getLoadedLanguages().includes(name) ? name : "text";
+  if (!highlighter.getLoadedLanguages().includes(name)) {
+    warn(name);
+    return plain(code, name, meta);
+  }
 
   try {
     return highlighter.codeToHtml(code, {
-      lang,
+      lang: name,
       themes,
       meta: { __raw: meta },
       defaultColor: false,
       transformers: [...baseTransformers, codeBlock],
     });
   } catch {
-    return highlighter.codeToHtml(code, {
-      lang: "text",
-      themes,
-      defaultColor: false,
-      transformers: [codeBlock],
-    });
+    warn(name);
+    return plain(code, name, meta);
   }
 }
 
@@ -245,15 +260,19 @@ md.renderer.rules.code_inline = (tokens, idx) => {
   const escaped = md.utils.escapeHtml(content);
   if (!meta?.lang) return `<code>${escaped}</code>`;
   if (!highlighter) return `<code data-pending data-lang="${md.utils.escapeHtml(meta.lang)}">${escaped}</code>`;
-  const lang = highlighter.getLoadedLanguages().includes(meta.lang) ? meta.lang : "text";
+  if (!highlighter.getLoadedLanguages().includes(meta.lang)) {
+    warn(meta.lang);
+    return `<code>${escaped}</code>`;
+  }
   try {
     return highlighter.codeToHtml(content, {
-      lang,
+      lang: meta.lang,
       themes,
       defaultColor: false,
       transformers: [codeInline],
     });
   } catch {
+    warn(meta.lang);
     return `<code>${escaped}</code>`;
   }
 };
@@ -319,7 +338,10 @@ function upgrade(container: HTMLElement) {
     const lang = el.dataset.lang || "text";
     el.removeAttribute("data-pending");
     el.removeAttribute("data-lang");
-    if (!highlighter.getLoadedLanguages().includes(lang)) continue;
+    if (!highlighter.getLoadedLanguages().includes(lang)) {
+      warn(lang);
+      continue;
+    }
     try {
       const fresh = parse(
         highlighter.codeToHtml(el.textContent || "", {
@@ -334,7 +356,8 @@ function upgrade(container: HTMLElement) {
       el.className = fresh.className;
       if (fresh.style.cssText) el.style.cssText = fresh.style.cssText;
     } catch {
-      console.error(`[anki-md] Failed to highlight inline code for language: ${lang}`);
+      warn(lang);
+      console.log(`[anki-md] Failed to highlight inline code for language: ${lang}`);
     }
   }
 }
@@ -372,8 +395,8 @@ export async function render(front: string, back: string) {
     try {
       await ready;
       for (const el of [frontEl, backEl]) if (el) upgrade(el);
-    } catch (error) {
-      console.error("[anki-md] Failed to load highlighter:", error);
+    } catch {
+      console.log("[anki-md] Failed to load highlighter");
     }
   }
 
