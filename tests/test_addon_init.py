@@ -84,18 +84,20 @@ class FakeMedia:
 
 
 class FakeModels:
-    def __init__(self, model=None):
-        self.model = model
+    def __init__(self):
+        self.models = {}
         self.saved = []
         self.added = []
+        self.newed = []
 
-    def by_name(self, _name):
-        return self.model
+    def by_name(self, name):
+        return self.models.get(name)
 
     def save(self, model):
         self.saved.append(model)
 
     def new(self, name):
+        self.newed.append(name)
         return {"name": name, "flds": [], "tmpls": []}
 
     def new_field(self, name):
@@ -111,7 +113,7 @@ class FakeModels:
         model["tmpls"].append(template)
 
     def add(self, model):
-        self.model = model
+        self.models[model["name"]] = model
         self.added.append(model)
 
 
@@ -143,6 +145,22 @@ class FakeWebContent:
         self.css = []
 
 
+class FakeBackend:
+    def __init__(self):
+        self.calls = []
+
+    def get_stock_notetype_legacy(self, kind):
+        self.calls.append(kind)
+        return json.dumps(
+            {
+                "name": "Cloze",
+                "type": 1,
+                "flds": [{"name": "Text"}, {"name": "Extra"}],
+                "tmpls": [{"name": "Cloze", "qfmt": "stock-front", "afmt": "stock-back"}],
+            }
+        )
+
+
 @pytest.fixture
 def addon(monkeypatch, tmp_path):
     cfg = {
@@ -156,14 +174,17 @@ def addon(monkeypatch, tmp_path):
     tpl.mkdir()
     (tpl / "front.html").write_text("<div>front</div>", encoding="utf-8")
     (tpl / "back.html").write_text("<div>back</div>", encoding="utf-8")
+    (tpl / "cloze-front.html").write_text("<div>cloze-front</div>", encoding="utf-8")
+    (tpl / "cloze-back.html").write_text("<div>cloze-back</div>", encoding="utf-8")
 
     media = FakeMedia(tmp_path / "media")
     media.path.mkdir()
     models = FakeModels()
+    backend = FakeBackend()
     addon_manager = FakeAddonManager()
     menu = FakeMenu()
     mw = types.SimpleNamespace(
-        col=types.SimpleNamespace(media=media, models=models),
+        col=types.SimpleNamespace(media=media, models=models, _backend=backend),
         addonManager=addon_manager,
         form=types.SimpleNamespace(menuTools=menu),
     )
@@ -192,7 +213,16 @@ def addon(monkeypatch, tmp_path):
     settings = types.ModuleType("anki_markdown.settings")
     settings.show_settings = lambda: None
 
+    anki = types.ModuleType("anki")
+    stdmodels = types.ModuleType("anki.stdmodels")
+    stdmodels.StockNotetypeKind = types.SimpleNamespace(KIND_CLOZE="cloze")
+    utils = types.ModuleType("anki.utils")
+    utils.from_json_bytes = json.loads
+
     for name in [
+        "anki",
+        "anki.stdmodels",
+        "anki.utils",
         "anki_markdown",
         "anki_markdown.shiki",
         "anki_markdown.settings",
@@ -207,6 +237,9 @@ def addon(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "aqt.qt", qt)
     monkeypatch.setitem(sys.modules, "aqt.editor", editor)
     monkeypatch.setitem(sys.modules, "aqt.webview", webview)
+    monkeypatch.setitem(sys.modules, "anki", anki)
+    monkeypatch.setitem(sys.modules, "anki.stdmodels", stdmodels)
+    monkeypatch.setitem(sys.modules, "anki.utils", utils)
     monkeypatch.setitem(sys.modules, "anki_markdown.shiki", shiki)
     monkeypatch.setitem(sys.modules, "anki_markdown.settings", settings)
 
@@ -230,6 +263,7 @@ def addon(monkeypatch, tmp_path):
         media=media,
         hooks=hooks,
         addon_manager=addon_manager,
+        backend=backend,
         menu=menu,
     )
 
@@ -251,6 +285,7 @@ class TestOnMungeHtml:
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote(None))) == txt
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Basic"))) == txt
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Anki Markdown"))) == "**x**"
+        assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Anki Markdown Cloze"))) == "**x**"
 
 
 class TestEnsureNotetype:
@@ -259,7 +294,7 @@ class TestEnsureNotetype:
             "tmpls": [{"qfmt": "old-front", "afmt": "old-back"}],
             "flds": [{"name": "Front"}, {"name": "Back", "plainText": False}],
         }
-        addon.models.model = model
+        addon.models.models["Anki Markdown"] = model
 
         addon.mod.ensure_notetype()
 
@@ -280,6 +315,40 @@ class TestEnsureNotetype:
         assert model["tmpls"][0]["qfmt"].endswith("<div>front</div>")
         assert model["tmpls"][0]["afmt"].endswith("<div>back</div>")
         assert model["css"] == addon.mod.DEFAULT_CSS
+
+
+class TestEnsureClozeNotetype:
+    def test_creates_cloze_model(self, addon):
+        addon.mod.ensure_cloze_notetype()
+
+        assert len(addon.models.added) == 1
+        model = addon.models.added[0]
+        assert model["name"] == "Anki Markdown Cloze"
+        assert model["type"] == 1
+        assert [f["name"] for f in model["flds"]] == ["Text", "Extra"]
+        assert all(f["plainText"] is True for f in model["flds"])
+        assert model["tmpls"][0]["name"] == "Cloze"
+        assert model["tmpls"][0]["qfmt"].endswith("<div>cloze-front</div>")
+        assert model["tmpls"][0]["afmt"].endswith("<div>cloze-back</div>")
+        assert model["css"] == addon.mod.DEFAULT_CSS
+        assert addon.backend.calls == ["cloze"]
+        assert "Anki Markdown Cloze" not in addon.models.newed
+
+    def test_updates_existing_cloze_model(self, addon):
+        model = {
+            "type": 1,
+            "tmpls": [{"qfmt": "old", "afmt": "old"}],
+            "flds": [{"name": "Text"}, {"name": "Extra", "plainText": False}],
+        }
+        addon.models.models["Anki Markdown Cloze"] = model
+
+        addon.mod.ensure_cloze_notetype()
+
+        assert addon.models.saved == [model]
+        assert model["type"] == 1
+        assert model["tmpls"][0]["qfmt"].endswith("<div>cloze-front</div>")
+        assert model["tmpls"][0]["afmt"].endswith("<div>cloze-back</div>")
+        assert all(f["plainText"] is True for f in model["flds"])
 
 
 class TestSyncMedia:
