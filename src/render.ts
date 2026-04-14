@@ -13,6 +13,7 @@ import {
   transformerNotationErrorLevel,
   transformerNotationFocus,
 } from "@shikijs/transformers";
+import { processCloze, postProcessCloze, type Side } from "./cloze";
 
 // Config from inline JSON (injected by Python)
 interface Config {
@@ -362,43 +363,78 @@ function upgrade(container: HTMLElement) {
   }
 }
 
-/** Render front/back fields to card DOM. */
-export async function render(front: string, back: string) {
-  const wrapper = document.querySelector(".anki-md-wrapper");
-
-  // Normalize dark mode classes into .night-mode on :root
-  // - Desktop: nightMode + night_mode on <body> (qt/aqt/theme.py body_classes_for_card_ord)
-  //   https://github.com/ankitects/anki/blob/main/qt/aqt/theme.py
-  // - AnkiDroid: night_mode on <body>
-  //   https://github.com/ankidroid/Anki-Android/wiki/Advanced-formatting
-  // - AnkiMobile: nightMode on card element
-  //   https://docs.ankimobile.net/night-mode.html
+// Normalize dark mode classes into .night-mode on :root
+// - Desktop: nightMode + night_mode on <body> (qt/aqt/theme.py body_classes_for_card_ord)
+//   https://github.com/ankitects/anki/blob/main/qt/aqt/theme.py
+// - AnkiDroid: night_mode on <body>
+//   https://github.com/ankidroid/Anki-Android/wiki/Advanced-formatting
+// - AnkiMobile: nightMode on card element
+//   https://docs.ankimobile.net/night-mode.html
+function normalizeDarkMode() {
   const dark =
     document.body.classList.contains("nightMode") ||
     document.body.classList.contains("night_mode") ||
     matchMedia("(prefers-color-scheme: dark)").matches;
   if (dark) document.documentElement.classList.add("night-mode");
+}
 
-  const frontEl = document.querySelector<HTMLElement>(".front");
-  const backEl = document.querySelector<HTMLElement>(".back");
-  const frontText = decode(front);
-  const backText = decode(back);
-
-  wrapper?.setAttribute("data-state", "loading");
-  if (config.cardless) wrapper?.classList.add("cardless");
-
-  if (frontEl) frontEl.innerHTML = md.render(frontText);
-  if (backEl) backEl.innerHTML = md.render(backText);
-  wrapper?.classList.add("ready");
-
+async function upgradeHighlighter(...els: (HTMLElement | null)[]) {
   if (!highlighter) {
     try {
       await ready;
-      for (const el of [frontEl, backEl]) if (el) upgrade(el);
+      for (const el of els) if (el) upgrade(el);
     } catch {
       console.log("[anki-md] Failed to load highlighter");
     }
   }
+}
+
+/** Render front/back fields to card DOM. */
+export async function render(front: string, back: string) {
+  const wrapper = document.querySelector(".anki-md-wrapper");
+  normalizeDarkMode();
+
+  const frontEl = document.querySelector<HTMLElement>(".front");
+  const backEl = document.querySelector<HTMLElement>(".back");
+
+  wrapper?.setAttribute("data-state", "loading");
+  if (config.cardless) wrapper?.classList.add("cardless");
+
+  if (frontEl) frontEl.innerHTML = md.render(decode(front));
+  if (backEl) backEl.innerHTML = md.render(decode(back));
+  wrapper?.classList.add("ready");
+
+  await upgradeHighlighter(frontEl, backEl);
+
+  wrapper?.setAttribute("data-state", "ready");
+  wrapper?.classList.add("ready");
+}
+
+/** Render cloze deletion card to DOM. */
+export async function renderCloze(
+  text: string,
+  extra: string,
+  ordinal: number,
+  side: Side,
+) {
+  const wrapper = document.querySelector(".anki-md-wrapper");
+  normalizeDarkMode();
+
+  const frontEl = document.querySelector<HTMLElement>(".front");
+  const backEl = document.querySelector<HTMLElement>(".back");
+  const raw = decode(text);
+
+  wrapper?.setAttribute("data-state", "loading");
+  if (config.cardless) wrapper?.classList.add("cardless");
+
+  const processed = processCloze(raw, ordinal, side);
+  if (frontEl) frontEl.innerHTML = postProcessCloze(md.render(processed));
+
+  const extraText = decode(extra);
+  if (backEl && extraText.trim()) backEl.innerHTML = md.render(extraText);
+
+  wrapper?.classList.add("ready");
+  await upgradeHighlighter(frontEl, backEl);
 
   wrapper?.setAttribute("data-state", "ready");
   wrapper?.classList.add("ready");

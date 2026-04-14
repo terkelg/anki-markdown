@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="./_review.css" />
+<div class="anki-md-wrapper">
+  <div class="front"></div>
+  <div class="back"></div>
+</div>
+<!-- Anki requires {{cloze:Text}} in the template to generate cards per cloze number.
+     Hidden because we render cloze ourselves in JS from the raw {{Text}} field below. -->
+<div style="display:none">{{cloze:Text}}</div>
+<script id="data-text" type="text/plain">
+  {{Text}}
+</script>
+<script id="data-extra" type="text/plain">
+  {{Extra}}
+</script>
+<script type="module">
+  import { renderCloze } from "./_review.js";
+  const text = document.getElementById("data-text").textContent;
+  const extra = document.getElementById("data-extra").textContent;
+  const ord = parseInt(document.querySelector(".card")?.className.match(/card(\d+)/)?.[1] || "1");
+  renderCloze(text, extra, ord, "back");
+</script>
