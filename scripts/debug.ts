@@ -31,9 +31,9 @@ process.on("SIGINT", () => {
 
 // Wait for main webview target
 process.stdout.write("Waiting for Anki...");
-let ws: string | undefined;
+let frontend: string | undefined;
 const deadline = Date.now() + 30_000;
-while (!ws) {
+while (!frontend) {
   if (Date.now() > deadline) {
     console.error("\nTimed out waiting for Anki main webview");
     process.exit(1);
@@ -43,14 +43,16 @@ while (!ws) {
       (r) => r.json(),
     );
     const main = targets.find((t) => t.title === "main webview");
-    if (main) ws = main.webSocketDebuggerUrl.replace("ws://", "");
+    if (main) frontend = main.devtoolsFrontendUrl;
   } catch {
     // Connection refused while Anki is starting up
   }
-  if (!ws) await Bun.sleep(500);
+  if (!frontend) await Bun.sleep(500);
 }
 console.log(" ready");
 
-// Open Chrome DevTools inspector for main webview
-const url = `devtools://devtools/bundled/inspector.html?ws=${ws}`;
+// Open Qt WebEngine's own DevTools frontend (avoids Chrome protocol mismatch)
+const url = `http://localhost:${port}${frontend}`;
 await $`osascript -e ${`tell application "Google Chrome" to open location "${url}"`}`;
+
+await anki.exited;
