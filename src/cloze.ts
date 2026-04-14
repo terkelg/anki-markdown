@@ -38,6 +38,10 @@ function wrap(text: string, start: string, end: string): string {
   return `${start}${text}${end}`;
 }
 
+function tag(text: string): boolean {
+  return /\{[^{}\n]*$/.test(text);
+}
+
 function parseTag(text: string, at: number): [Tag, number] | null {
   if (!text.startsWith("{{c", at)) return null;
 
@@ -80,9 +84,9 @@ function parseTag(text: string, at: number): [Tag, number] | null {
     }
 
     if (text.startsWith("}}", i)) {
-      // Skip }} when followed by } and body ends with unclosed {word pattern
+      // Skip }} when followed by } and body ends with an unclosed {lang} tag
       // (handles `code`{js}}} where } closes {lang} and }} closes cloze)
-      if (text[i + 2] === "}" && /\{\w+$/.test(seen ? hint : buf)) {
+      if (text[i + 2] === "}" && tag(seen ? hint : buf)) {
         if (seen) hint += text[i];
         else buf += text[i];
         i++;

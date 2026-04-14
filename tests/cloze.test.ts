@@ -114,6 +114,7 @@ function mount() {
   g.matchMedia = () => ({ matches: false });
 
   return {
+    front,
     back,
     restore() {
       g.document = oldDoc;
@@ -179,6 +180,29 @@ describe("processCloze", () => {
     );
     expect(view(processCloze(text, 1, "back"))).toBe(
       "<active>`const { a, b } = obj`{js}</active> works.",
+    );
+  });
+
+  test("inline code with {.lang} syntax inside clozes", () => {
+    const text = "Use {{c1::`const x = 1`{.js}}} here.";
+    expect(view(processCloze(text, 1, "front"))).toBe(
+      "Use <blank>[...]</blank> here.",
+    );
+    expect(view(processCloze(text, 1, "back"))).toBe(
+      "Use <active>`const x = 1`{.js}</active> here.",
+    );
+  });
+
+  test("inline code with punctuated language tags inside clozes", () => {
+    const text = "{{c1::`value`{objective-c}}} and {{c2::`n`{c++}}}.";
+    expect(view(processCloze(text, 1, "front"))).toBe(
+      "<blank>[...]</blank> and `n`{c++}.",
+    );
+    expect(view(processCloze(text, 1, "back"))).toBe(
+      "<active>`value`{objective-c}</active> and `n`{c++}.",
+    );
+    expect(view(processCloze(text, 2, "back"))).toBe(
+      "`value`{objective-c} and <active>`n`{c++}</active>.",
     );
   });
 
@@ -271,6 +295,26 @@ describe("renderCloze", () => {
       const extra = "    code";
       await renderCloze("{{c1::answer}}", extra, 1, "back");
       expect(dom.back.innerHTML).toBe(out.render(extra));
+    } finally {
+      console.log = log;
+      dom.restore();
+    }
+  });
+});
+
+describe("render", () => {
+  test("parses punctuated inline code language tags", async () => {
+    const dom = mount();
+    const log = console.log;
+    console.log = () => {};
+
+    try {
+      const { render } = await loadRender();
+      await render("Use `value`{objective-c} and `name`{.c++}.", "");
+      expect(dom.front.innerHTML).toContain("<code>value</code>");
+      expect(dom.front.innerHTML).toContain("<code>name</code>");
+      expect(dom.front.innerHTML).not.toContain("{objective-c}");
+      expect(dom.front.innerHTML).not.toContain("{.c++}");
     } finally {
       console.log = log;
       dom.restore();
