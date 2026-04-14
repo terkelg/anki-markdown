@@ -13,7 +13,7 @@
     "test:ts": "bun test tests/cloze.test.ts",
     "test": ".venv/bin/pytest tests/ -v -m offline",
     "test:online": ".venv/bin/pytest tests/ -v -m online",
-    "test:all": ".venv/bin/pytest tests/ -v",
+    "test:all": "bun run test:ts && .venv/bin/pytest tests/ -v",
     "format": "prettier --write .",
     "release": "bun scripts/release.ts"
   },
