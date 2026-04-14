@@ -85,6 +85,10 @@ body {
 
   > .back {
     border-block-start: 1px solid var(--_border);
+
+    &:empty {
+      display: none;
+    }
   }
 
   @container (inline-size >= 700px) {
@@ -420,6 +424,32 @@ kbd {
 
   &.markdown-alert-caution {
     --alert-color: var(--_color-caution);
+  }
+}
+
+.cloze-blank {
+  color: var(--_color-note);
+  font-weight: 600;
+}
+
+span.cloze-active:not(:has(code)) {
+  text-decoration: underline;
+  text-decoration-color: var(--_color-note);
+  text-underline-offset: 2px;
+}
+
+.cloze-blur {
+  filter: blur(4px);
+  user-select: none;
+}
+
+.cloze-reveal {
+  animation: cloze-reveal 0.2s ease-out;
+}
+
+@keyframes cloze-reveal {
+  from {
+    filter: blur(4px);
   }
 }
 
