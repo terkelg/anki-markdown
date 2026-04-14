@@ -178,6 +178,16 @@ def ensure_notetype():
     mm.add(m)
 
 
+def fix_cloze_fields(model):
+    fields = model["flds"]
+    if fields:
+        fields[0]["name"] = "Text"
+    if len(fields) > 1:
+        fields[1]["name"] = "Extra"
+    for field in fields:
+        field["plainText"] = True
+
+
 def ensure_cloze_notetype():
     mm = mw.col.models
     m = mm.by_name(NOTETYPE_CLOZE)
@@ -186,8 +196,7 @@ def ensure_cloze_notetype():
         m["type"] = 1
         m["tmpls"][0]["qfmt"] = get_template("cloze-front.html")
         m["tmpls"][0]["afmt"] = get_template("cloze-back.html")
-        for f in m["flds"]:
-            f["plainText"] = True
+        fix_cloze_fields(m)
         mm.save(m)
         return
 
@@ -201,8 +210,7 @@ def ensure_cloze_notetype():
     m["css"] = DEFAULT_CSS
     m["tmpls"][0]["qfmt"] = get_template("cloze-front.html")
     m["tmpls"][0]["afmt"] = get_template("cloze-back.html")
-    for f in m["flds"]:
-        f["plainText"] = True
+    fix_cloze_fields(m)
 
     mm.add(m)
 

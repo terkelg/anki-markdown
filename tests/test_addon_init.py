@@ -155,7 +155,7 @@ class FakeBackend:
             {
                 "name": "Cloze",
                 "type": 1,
-                "flds": [{"name": "Text"}, {"name": "Extra"}],
+                "flds": [{"name": "Text"}, {"name": "Back Extra"}],
                 "tmpls": [{"name": "Cloze", "qfmt": "stock-front", "afmt": "stock-back"}],
             }
         )
@@ -338,7 +338,7 @@ class TestEnsureClozeNotetype:
         model = {
             "type": 1,
             "tmpls": [{"qfmt": "old", "afmt": "old"}],
-            "flds": [{"name": "Text"}, {"name": "Extra", "plainText": False}],
+            "flds": [{"name": "Texte"}, {"name": "Rückseite Extra", "plainText": False}],
         }
         addon.models.models["Anki Markdown Cloze"] = model
 
@@ -348,6 +348,7 @@ class TestEnsureClozeNotetype:
         assert model["type"] == 1
         assert model["tmpls"][0]["qfmt"].endswith("<div>cloze-front</div>")
         assert model["tmpls"][0]["afmt"].endswith("<div>cloze-back</div>")
+        assert [f["name"] for f in model["flds"]] == ["Text", "Extra"]
         assert all(f["plainText"] is True for f in model["flds"])
 
 
