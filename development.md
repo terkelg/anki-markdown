@@ -44,6 +44,7 @@ python3 -m venv .venv && .venv/bin/pip install pytest
 
 ```bash
 bun run test           # offline (reads from node_modules)
+bun run test:ts        # TypeScript tests (cloze parser)
 bun run test:online    # online only (hits esm.sh)
 bun run test:all       # all tests
 ```

@@ -57,6 +57,61 @@ Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy
 
 ---
 
+## Cloze Deletions
+
+Cloze deletions create fill-in-the-blank cards. Use the **Anki Markdown Cloze** note type with `Text` and `Extra` fields.
+
+### Syntax
+
+```markdown
+{{c1::answer}}              -> shows [...] on front
+{{c1::answer::a hint}}      -> shows [a hint] on front
+{{c1::answer::blur}}        -> shows blurred content on front
+```
+
+Full markdown works inside cloze deletions:
+
+```markdown
+The {{c1::**vertex shader**}} runs once per vertex.
+Use {{c2::`gl_Position`{glsl}}} to set the output coordinate.
+```
+
+### Multiple Cards
+
+Each cloze number generates a separate card. `{{c1::...}}` and `{{c2::...}}` in the same note produce two cards, each hiding its own cloze on the front.
+
+Using the same number multiple times hides all instances on the same card:
+
+```markdown
+{{c1::JavaScript}} was created by {{c2::Brendan Eich}} at {{c1::Netscape}}.
+```
+
+Card 1 hides both "JavaScript" and "Netscape". Card 2 hides "Brendan Eich".
+
+### Nested Cloze
+
+Cloze deletions can be nested. The outer cloze hides everything including the inner one:
+
+```markdown
+{{c1::Canberra was {{c2::founded}}}} in 1913.
+```
+
+Card 1 hides "Canberra was founded". Card 2 only hides "founded" and shows "Canberra was" as context.
+
+### Blur Mode
+
+Use `blur` as the hint to show the content shape without revealing it. The text renders with a CSS blur filter. Flip the card to reveal.
+
+```markdown
+The answer is {{c1::**photosynthesis**::blur}}.
+```
+
+### Extra Field
+
+The `Extra` field is shown on the back of every card. Use it for supplementary context, references, or notes. It supports full markdown.
+
+---
+
 ## Code Blocks
 
 Fenced code blocks with syntax highlighting powered by [Shiki](https://shiki.style):
@@ -265,7 +320,7 @@ Files are only downloaded once and cached locally.
 
 ## AI Agents
 
-Anki Markdown works well with AI tools because the note fields are plain markdown. When using an agent, write markdown in the `Front` and `Back` fields and use fenced code blocks with language tags when needed.
+Anki Markdown works well with AI tools because the note fields are plain markdown. When using an agent, write markdown in the `Front` and `Back` fields (or `Text` and `Extra` for cloze) and use fenced code blocks with language tags when needed.
 
 This works well with MCP-based Anki tools such as [anki-mcp-server](https://github.com/nailuoGG/anki-mcp-server).
 
@@ -329,6 +384,24 @@ Example:
 ```
 
 Night mode automatically uses brighter defaults for visibility.
+
+### Cloze Styling
+
+Cloze elements use these CSS classes you can customize:
+
+| Class           | Element                                    |
+| --------------- | ------------------------------------------ |
+| `.cloze-blank`  | The `[...]` or `[hint]` text on the front  |
+| `.cloze-active` | Revealed answer on the back                |
+| `.cloze-blur`   | Blurred content on the front               |
+
+By default, `.cloze-active` has no styling so revealed content renders naturally. Add your own if you want to highlight answers:
+
+```css
+.cloze-active {
+  border-block-end: 2px solid var(--note);
+}
+```
 
 ---
 
