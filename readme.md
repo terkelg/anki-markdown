@@ -11,10 +11,8 @@ Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks
   </picture>
 </p>
 
-Requires [Anki](https://apps.ankiweb.net/) 25.x or later.
-
 > [!NOTE]
-> In Anki, go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install.
+> Requires [Anki](https://apps.ankiweb.net/) 25.x or later. Go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install.
 > See the [documentation](docs.md) for all supported features.
 
 - **Syntax highlighting** with 300+ languages and 60+ themes, only your selections are downloaded and synced
