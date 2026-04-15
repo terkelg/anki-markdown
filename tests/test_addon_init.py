@@ -351,6 +351,23 @@ class TestEnsureClozeNotetype:
         assert [f["name"] for f in model["flds"]] == ["Text", "Extra"]
         assert all(f["plainText"] is True for f in model["flds"])
 
+    def test_restores_missing_extra_field(self, addon):
+        model = {
+            "type": 1,
+            "tmpls": [{"qfmt": "old", "afmt": "old"}],
+            "flds": [{"name": "Texte", "plainText": False}],
+        }
+        addon.models.models["Anki Markdown Cloze"] = model
+
+        addon.mod.ensure_cloze_notetype()
+
+        assert addon.models.saved == [model]
+        assert model["type"] == 1
+        assert model["tmpls"][0]["qfmt"].endswith("<div>cloze-front</div>")
+        assert model["tmpls"][0]["afmt"].endswith("<div>cloze-back</div>")
+        assert [f["name"] for f in model["flds"]] == ["Text", "Extra"]
+        assert all(f["plainText"] is True for f in model["flds"])
+
 
 class TestSyncMedia:
     def test_deletes_removed_and_syncs_current_files(self, addon):
