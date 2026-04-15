@@ -10,7 +10,13 @@ from .settings import show_settings
 
 ADDON_DIR = Path(__file__).parent
 NOTETYPE = "Anki Markdown"
+NOTETYPE_CLOZE = "Anki Markdown Cloze"
 MENU = "Anki Markdown"
+
+
+def is_anki_markdown(notetype) -> bool:
+    """Check if a note type is any Anki Markdown variant."""
+    return notetype and notetype["name"] in (NOTETYPE, NOTETYPE_CLOZE)
 
 
 def read(name: str) -> str:
@@ -46,8 +52,7 @@ def on_munge_html(txt: str, editor: Editor) -> str:
     """Convert HTML to markdown before saving."""
     if not editor.note:
         return txt
-    notetype = editor.note.note_type()
-    if not notetype or notetype["name"] != NOTETYPE:
+    if not is_anki_markdown(editor.note.note_type()):
         return txt
     return html_to_markdown(txt)
 
@@ -66,8 +71,9 @@ def on_profile_loaded():
         )
     # Sync all media files to collection.media
     sync_media()
-    # Create/update note type with current config
+    # Create/update note types with current config
     ensure_notetype()
+    ensure_cloze_notetype()
     # Register web exports and settings action
     mw.addonManager.setWebExports(__name__, r"(web/.*|_.*)")
     mw.addonManager.setConfigAction(__name__, show_settings)
@@ -172,6 +178,47 @@ def ensure_notetype():
     mm.add(m)
 
 
+def fix_cloze_fields(mm, model):
+    fields = model["flds"]
+    if not fields:
+        mm.add_field(model, mm.new_field("Text"))
+        fields = model["flds"]
+    if len(fields) == 1:
+        mm.add_field(model, mm.new_field("Extra"))
+        fields = model["flds"]
+    fields[0]["name"] = "Text"
+    fields[1]["name"] = "Extra"
+    for field in fields:
+        field["plainText"] = True
+
+
+def ensure_cloze_notetype():
+    mm = mw.col.models
+    m = mm.by_name(NOTETYPE_CLOZE)
+
+    if m:
+        m["type"] = 1
+        m["tmpls"][0]["qfmt"] = get_template("cloze-front.html")
+        m["tmpls"][0]["afmt"] = get_template("cloze-back.html")
+        fix_cloze_fields(mm, m)
+        mm.save(m)
+        return
+
+    from anki.stdmodels import StockNotetypeKind
+    from anki.utils import from_json_bytes
+
+    m = from_json_bytes(
+        mw.col._backend.get_stock_notetype_legacy(StockNotetypeKind.KIND_CLOZE)
+    )
+    m["name"] = NOTETYPE_CLOZE
+    m["css"] = DEFAULT_CSS
+    m["tmpls"][0]["qfmt"] = get_template("cloze-front.html")
+    m["tmpls"][0]["afmt"] = get_template("cloze-back.html")
+    fix_cloze_fields(mm, m)
+
+    mm.add(m)
+
+
 def on_webview_set_content(content: WebContent, context):
     """Inject editor JS/CSS."""
     if isinstance(context, Editor):
@@ -184,8 +231,7 @@ def on_editor_load_note(editor: Editor):
     """Notify JS when Anki Markdown note is loaded."""
     if not editor.note:
         return
-    notetype = editor.note.note_type()
-    if notetype and notetype["name"] == NOTETYPE:
+    if is_anki_markdown(editor.note.note_type()):
         editor.web.eval("window.ankiMdActivate && ankiMdActivate()")
     else:
         editor.web.eval("window.ankiMdDeactivate && ankiMdDeactivate()")

@@ -4,11 +4,12 @@ Guidance for coding agents working in this repository.
 
 ## Scope
 
-This project is an Anki add-on that creates the `Anki Markdown` note type, stores note content in `Front` and `Back` fields, renders those fields as markdown during review, and adds Shiki-based syntax highlighting for code.
+This project is an Anki add-on that creates two note types (`Anki Markdown` and `Anki Markdown Cloze`), stores note content as plain markdown, renders fields as markdown during review, and adds Shiki-based syntax highlighting for code.
 
 ## Documentation Split
 
-- `readme.md` — project overview, installation, development, release
+- `readme.md` — project overview, installation
+- `development.md` — build, test, release, and local dev workflow
 - `docs.md` — end-user syntax, settings, customization, AI-agent usage
 - `docs/editor-markdown-highlighting-spec.md` — editor highlighting notes
 - `skills/anki/SKILL.md` — bundled Anki companion skill for agents
@@ -50,9 +51,9 @@ bun run release     # Bump version, tag, and push
 ```text
 src/                     TypeScript sources for card rendering and editor integration
 anki_markdown/           Python add-on package plus built assets
-anki_markdown/templates/ Note type templates used by Front/Back cards
+anki_markdown/templates/ Note type templates used by Front/Back and Cloze cards
 scripts/                 Generate, debug, and release scripts
-tests/                   Python tests for shiki.py
+tests/                   Python tests for shiki.py and TypeScript tests for cloze.ts
 fixtures/                Importable Anki fixtures, including the kitchen-sink deck
 skills/anki/             Bundled Anki companion skill and helper script
 ```
@@ -74,13 +75,13 @@ If a change affects rendering, editor behavior, or Shiki metadata, run `bun run 
 
 1. downloads missing Shiki languages and themes with `store.sync(get_config())`
 2. syncs `_`-prefixed media files into `collection.media`
-3. creates or updates the `Anki Markdown` note type
+3. creates or updates the `Anki Markdown` and `Anki Markdown Cloze` note types
 4. registers `web/editor.js` and `web/editor.css` for the editor webview
 5. registers the settings dialog
 
 ### Editor Save Path
 
-`editor_will_munge_html` converts simple HTML back into markdown before save for `Anki Markdown` notes. That keeps stored field content clean even if Anki emits HTML while editing.
+`editor_will_munge_html` converts simple HTML back into markdown before save for both `Anki Markdown` and `Anki Markdown Cloze` notes. That keeps stored field content clean even if Anki emits HTML while editing.
 
 ### Card Rendering
 
@@ -93,11 +94,11 @@ If a change affects rendering, editor behavior, or Shiki metadata, run `bun run 
 - normalizes dark mode to `html.night-mode`
 - do not call `console.error()` or `console.warn()` in reviewer code; some Anki mobile webviews expose a partial `console`, and calling missing methods can crash card rendering. If you need reviewer logs, use plain `console.log()` and fail soft instead.
 
-Field values are passed through hidden `<script type="text/plain">` nodes with ids `data-front` and `data-back`. Keep those ids stable.
+Field values are passed through hidden `<script type="text/plain">` nodes with ids `data-front` and `data-back` (basic) or `data-text` and `data-extra` (cloze). Keep those ids stable.
 
 ### Editor Integration
 
-`src/editor.ts` activates only for the `Anki Markdown` note type. It uses:
+`src/editor.ts` activates for both `Anki Markdown` and `Anki Markdown Cloze` note types. It uses:
 
 - `anki/ui` for the `loaded` promise
 - `anki/NoteEditor` for field access
@@ -153,7 +154,7 @@ The repo includes the bundled Anki agent skill at `skills/anki/SKILL.md`.
 If you change agent-facing note conventions or workflows:
 
 - keep `skills/anki/SKILL.md`, `readme.md`, and `docs.md` in sync
-- preserve the skill requirement to use the `Anki Markdown` note type
+- preserve the skill requirement to use `Anki Markdown` or `Anki Markdown Cloze` note types
 - preserve the requirement to get explicit user approval before adding cards to Anki
 
 ## Verification
@@ -169,18 +170,19 @@ For a quick smoke test in Anki, import `fixtures/kitchen-sink-deck.apkg`.
 
 ## Invariants
 
-- The note type name must stay `Anki Markdown`.
-- The note fields must stay `Front` and `Back`.
+- The note type name must stay `Anki Markdown`. The cloze variant must stay `Anki Markdown Cloze`.
+- Basic note fields must stay `Front` and `Back`. Cloze note fields must stay `Text` and `Extra`.
 - `_`-prefixed files are synced to `collection.media` and must remain mobile-safe.
 - `web/` assets are desktop-only add-on web exports.
-- `front.html` and `back.html` must keep the same script ids and wrapper structure. `back.html` is the only one with a `.back` container.
+- `front.html` and `back.html` must keep the same script ids and wrapper structure. `back.html` is the only one with a `.back` container. Same applies to `cloze-front.html` and `cloze-back.html`.
 - Update existing rendered nodes in place. Do not replace the parent wrapper with `innerHTML`, because Anki caches reviewer DOM references.
 - Preserve the progressive code-rendering path in `src/render.ts`: fallback code blocks should keep the styled toolbar shell and upgrade in place after Shiki loads.
 - The safe inline/block HTML allow-list in `src/render.ts` is intentionally narrow: `img`, `a`, `b`, `i`, `em`, `strong`, `br`, `kbd`.
 
 ## When Editing
 
-- If you change template structure, update both `anki_markdown/templates/front.html` and `anki_markdown/templates/back.html`.
+- If you change template structure, update the relevant templates in `anki_markdown/templates/`.
+- If you change cloze processing logic, keep `tests/cloze.test.ts` aligned.
 - If you change editor activation logic, verify both `src/editor.ts` and `src/editor.css`.
 - If you change Shiki config or versioning, run `bun run generate`.
 - If you change Python sync logic, keep `tests/test_shiki.py` aligned.

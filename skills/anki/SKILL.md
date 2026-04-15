@@ -33,7 +33,7 @@ For potentially destructive or irreversible actions:
 
 ## Guidelines
 
-- **MUST** use the `Anki Markdown` note type
+- **MUST** use the `Anki Markdown` note type for basic cards or `Anki Markdown Cloze` for cloze deletions
 - Use markdown for both front and back fields
 - Test exactly one fact or idea per card
 - Make questions atomic and simple
@@ -47,6 +47,77 @@ For potentially destructive or irreversible actions:
 - Connect cards to personal goals and projects to avoid "orphan" facts
 - Always use syntax highlighting for code (see Code Snippets section)
 - When creating multiple related cards, use bulk operations for efficiency
+
+## Choosing Card Type
+
+Use **Anki Markdown** (Front/Back) for question-answer pairs where you write a specific question.
+Use **Anki Markdown Cloze** (Text/Extra) for fill-in-the-blank cards where hiding parts of a statement is more natural than writing a question.
+
+## Cloze Cards
+
+Use `Anki Markdown Cloze` for fill-in-the-blank cards. Fields are `Text` and `Extra`.
+
+### Syntax
+
+Three forms:
+- `{{c1::answer}}` - shows **[...]** on front
+- `{{c1::answer::hint}}` - shows **[hint]** on front
+- `{{c1::answer::blur}}` - shows blurred content on front (reveals shape but not text)
+
+Full markdown works inside cloze deletions: bold, italic, highlights, inline code with language tags, links, images, code blocks, and tables.
+
+### Multiple Cards
+
+Each cloze number (c1, c2, c3...) generates a separate card. Use different numbers to test different facts from the same note:
+
+```
+{"Text": "{{c1::HTML}} provides structure, {{c2::CSS}} provides style."}
+```
+
+This produces 2 cards. Card 1 hides "HTML", card 2 hides "CSS".
+
+Using the same number multiple times hides all instances on the same card:
+
+```
+{"Text": "{{c1::React}} and {{c1::Vue}} are frontend frameworks."}
+```
+
+This produces 1 card that hides both "React" and "Vue".
+
+### Nested Cloze
+
+Cloze deletions can be nested. The outer cloze hides everything including the inner:
+
+```
+{"Text": "{{c1::Canberra was {{c2::founded}}}} in 1913."}
+```
+
+Card 1 hides "Canberra was founded". Card 2 only hides "founded".
+
+### Inline Code in Cloze
+
+Inline code with language tags works inside cloze. Note the triple closing braces (`}}}`) when code uses `{lang}` syntax:
+
+```
+{"Text": "Use {{c1::`querySelector()`{js}}} to find DOM elements."}
+```
+
+### Extra Field
+
+The `Extra` field appears on the back of every card. Use it for context, examples, or references. It supports full markdown including code blocks and callouts.
+
+### Cloze Examples
+
+```bash
+# Basic cloze
+$ANKI add "MyDeck" "Anki Markdown Cloze" '{"Text":"The {{c1::CPU}} executes {{c2::instructions}}.","Extra":"Basic computer architecture."}' --tags "cs"
+
+# Cloze with hint
+$ANKI add "MyDeck" "Anki Markdown Cloze" '{"Text":"{{c1::JavaScript::language}} was created in {{c2::1995::year}}.","Extra":"Created by Brendan Eich."}' --tags "history"
+
+# Cloze with blur
+$ANKI add "MyDeck" "Anki Markdown Cloze" '{"Text":"The speed of light is {{c1::299,792,458 m/s::blur}}.","Extra":"Often approximated as 3 x 10^8 m/s."}' --tags "physics"
+```
 
 ## Front Field Format
 
