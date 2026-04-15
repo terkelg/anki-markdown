@@ -246,7 +246,7 @@ md.core.ruler.after("inline", "inline-code-lang", (state) => {
       if (token.children[i].type !== "code_inline") continue;
       const next = token.children[i + 1];
       if (next?.type !== "text") continue;
-      const match = next.content.match(/^\{\.?([^}\s]+)\}(.*)$/);
+      const match = next.content.match(/^\{\.?([^{}\s]+)\}(.*)$/);
       if (!match) continue;
       const [, lang, rest] = match;
       token.children[i].meta = { lang };

@@ -320,4 +320,19 @@ describe("render", () => {
       dom.restore();
     }
   });
+
+  test("does not treat literal double braces as a language tag", async () => {
+    const dom = mount();
+    const log = console.log;
+    console.log = () => {};
+
+    try {
+      const { render } = await loadRender();
+      await render("Use `value`{{c1::answer}} here.", "");
+      expect(dom.front.innerHTML).toContain("<code>value</code>{{c1::answer}}");
+    } finally {
+      console.log = log;
+      dom.restore();
+    }
+  });
 });
