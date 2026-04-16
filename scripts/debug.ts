@@ -8,7 +8,7 @@ import process from "process";
 
 // Default port on Linux is set to 9222 because this is what
 // chrome://inspect/#devices scans for by default on localhost.
-const PORT = Number(process.argv[2]) || os.platform() === "linux" ? 9222 : 9230;
+const PORT = Number(process.argv[2]) || (os.platform() === "linux" ? 9222 : 9230);
 
 // Get the addon path for the current platform.
 function addon(): string {
@@ -28,7 +28,7 @@ function addon(): string {
 // on fresh launch.
 async function ensureAnkiStopped(): Promise<void> {
   switch (os.platform()) {
-    case "darwin":
+    case "darwin": {
       const running = await $`pgrep -f Anki.app/Contents/MacOS`.quiet().nothrow();
       if (running.exitCode === 0) {
         console.log("Quitting Anki...");
@@ -37,12 +37,13 @@ async function ensureAnkiStopped(): Promise<void> {
           await Bun.sleep(500);
       }
       break;
+    }
     case "linux":
       // I am not 100% sure that this is a clean way to kill Anki.
       // Remember to always make backups :)
       try {
         await $`pkill -f 'python.*anki$'`
-        await $`sleep 1`;
+        await Bun.sleep(1000);
       } catch (err) {
         console.warn(`Couldn't kill Anki. Perhaps it was not running in the first place? Error: ${err}`);
       }
@@ -52,14 +53,14 @@ async function ensureAnkiStopped(): Promise<void> {
   }
 }
 
-async function launchAnki(): Promise<{frontend: string, anki: unknown}> {
+async function launchAnki(): Promise<{frontend: string, anki: Subprocess}> {
   let bin: string;
   switch (os.platform()) {
     case "darwin":
       // Launch Anki with remote debugging (invoke binary directly; `open -a` strips env vars)
       bin = "/Applications/Anki.app/Contents/MacOS/launcher";
       break;
-    case "linux":
+    case "linux": {
       // Dynamically get Anki's path.
       let resp = await $`which anki`;
       if (resp.exitCode !== 0) {
@@ -67,6 +68,7 @@ async function launchAnki(): Promise<{frontend: string, anki: unknown}> {
       }
       bin = resp.stdout.toString().trim();
       break
+    }
     default:
       throw new Error(`Anki launching not supported on platform = ${os.platform()}`);
   }
