@@ -66,7 +66,6 @@ async function launchAnki(): Promise<{frontend: string, anki: unknown}> {
         throw new Error(`'which anki' failed with exit code ${resp.exitCode}`)
       }
       bin = resp.stdout.toString().trim();
-      console.log(bin)
       break
     default:
       throw new Error(`Anki launching not supported on platform = ${os.platform()}`);
