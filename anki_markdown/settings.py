@@ -344,8 +344,8 @@ class ShikiSettingsDialog(QDialog):
             sync_media(removed)
 
             # Update note type templates
-            from . import ensure_notetype
-            ensure_notetype()
+            from . import ensure_basic_notetype
+            ensure_basic_notetype()
 
             QApplication.restoreOverrideCursor()
 
