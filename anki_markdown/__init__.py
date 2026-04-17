@@ -11,12 +11,15 @@ from .settings import show_settings
 ADDON_DIR = Path(__file__).parent
 NOTETYPE = "Anki Markdown"
 NOTETYPE_CLOZE = "Anki Markdown Cloze"
+NOTETYPE_TYPE_IN = "Anki Markdown Type-In"
 MENU = "Anki Markdown"
+
+MARKDOWN_NOTETYPES = (NOTETYPE, NOTETYPE_CLOZE, NOTETYPE_TYPE_IN)
 
 
 def is_anki_markdown(notetype) -> bool:
     """Check if a note type is any Anki Markdown variant."""
-    return notetype and notetype["name"] in (NOTETYPE, NOTETYPE_CLOZE)
+    return notetype and notetype["name"] in MARKDOWN_NOTETYPES
 
 
 def read(name: str) -> str:
@@ -73,6 +76,7 @@ def on_profile_loaded():
     sync_media()
     # Create/update note types with current config
     ensure_notetype()
+    ensure_typein_notetype()
     ensure_cloze_notetype()
     # Register web exports and settings action
     mw.addonManager.setWebExports(__name__, r"(web/.*|_.*)")
@@ -125,6 +129,35 @@ def get_template(name: str) -> str:
     return config_script + "\n" + template
 
 
+def ensure_basic_notetype(name: str, front_template: str, back_template: str):
+    mm = mw.col.models
+    m = mm.by_name(name)
+
+    if m:
+        m["tmpls"][0]["qfmt"] = get_template(front_template)
+        m["tmpls"][0]["afmt"] = get_template(back_template)
+        for f in m["flds"]:
+            f["plainText"] = True
+        mm.save(m)
+        return
+
+    m = mm.new(name)
+    m["css"] = DEFAULT_CSS
+    front = mm.new_field("Front")
+    front["plainText"] = True
+    mm.add_field(m, front)
+    back = mm.new_field("Back")
+    back["plainText"] = True
+    mm.add_field(m, back)
+
+    t = mm.new_template("Default")
+    t["qfmt"] = get_template(front_template)
+    t["afmt"] = get_template(back_template)
+    mm.add_template(m, t)
+
+    mm.add(m)
+
+
 DEFAULT_CSS = (
     "/* Uncomment to customize:\n"
     ".card {\n"
@@ -150,18 +183,32 @@ DEFAULT_CSS = (
 
 
 def ensure_notetype():
+    ensure_basic_notetype(NOTETYPE, "front.html", "back.html")
+
+
+def fix_typein_fields(mm, model):
+    fields = model["flds"]
+    while len(fields) < 3:
+        mm.add_field(model, mm.new_field(["Front", "Back", "Extra"][len(fields)]))
+        fields = model["flds"]
+    for i, field in enumerate(fields):
+        if i < 3:
+            field["name"] = ["Front", "Back", "Extra"][i]
+        field["plainText"] = True
+
+
+def ensure_typein_notetype():
     mm = mw.col.models
-    m = mm.by_name(NOTETYPE)
+    m = mm.by_name(NOTETYPE_TYPE_IN)
 
     if m:
-        m["tmpls"][0]["qfmt"] = get_template("front.html")
-        m["tmpls"][0]["afmt"] = get_template("back.html")
-        for f in m["flds"]:
-            f["plainText"] = True
+        m["tmpls"][0]["qfmt"] = get_template("typein-front.html")
+        m["tmpls"][0]["afmt"] = get_template("typein-back.html")
+        fix_typein_fields(mm, m)
         mm.save(m)
         return
 
-    m = mm.new(NOTETYPE)
+    m = mm.new(NOTETYPE_TYPE_IN)
     m["css"] = DEFAULT_CSS
     front = mm.new_field("Front")
     front["plainText"] = True
@@ -169,10 +216,13 @@ def ensure_notetype():
     back = mm.new_field("Back")
     back["plainText"] = True
     mm.add_field(m, back)
+    extra = mm.new_field("Extra")
+    extra["plainText"] = True
+    mm.add_field(m, extra)
 
     t = mm.new_template("Default")
-    t["qfmt"] = get_template("front.html")
-    t["afmt"] = get_template("back.html")
+    t["qfmt"] = get_template("typein-front.html")
+    t["afmt"] = get_template("typein-back.html")
     mm.add_template(m, t)
 
     mm.add(m)

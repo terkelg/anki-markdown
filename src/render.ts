@@ -410,6 +410,46 @@ export async function render(front: string, back: string) {
   wrapper?.classList.add("ready");
 }
 
+/** Finalize the back of type-in cards: divider before comparison, optional extra. */
+export async function renderTypeinBack(extra: string) {
+  const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper.anki-md-typein");
+  if (!wrapper) return;
+
+  normalizeDarkMode();
+
+  const answerEl = wrapper.querySelector<HTMLElement>(".typein-answer");
+  if (answerEl && !wrapper.querySelector(".typein-divider-answer")) {
+    const divider = document.createElement("hr");
+    divider.className = "typein-divider typein-divider-answer";
+    wrapper.insertBefore(divider, answerEl);
+  }
+
+  const extraText = decode(extra).trim();
+  let extraDivider = wrapper.querySelector<HTMLElement>(".typein-divider-extra");
+  let extraEl = wrapper.querySelector<HTMLElement>(".typein-extra");
+
+  if (!extraText) {
+    extraDivider?.remove();
+    extraEl?.remove();
+    return;
+  }
+
+  if (!extraDivider) {
+    extraDivider = document.createElement("hr");
+    extraDivider.className = "typein-divider typein-divider-extra";
+    wrapper.append(extraDivider);
+  }
+
+  if (!extraEl) {
+    extraEl = document.createElement("div");
+    extraEl.className = "typein-extra";
+    wrapper.append(extraEl);
+  }
+
+  extraEl.innerHTML = md.render(decode(extra));
+  await upgradeHighlighter(extraEl);
+}
+
 /** Render cloze deletion card to DOM. */
 export async function renderCloze(
   text: string,

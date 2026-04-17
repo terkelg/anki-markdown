@@ -174,6 +174,8 @@ def addon(monkeypatch, tmp_path):
     tpl.mkdir()
     (tpl / "front.html").write_text("<div>front</div>", encoding="utf-8")
     (tpl / "back.html").write_text("<div>back</div>", encoding="utf-8")
+    (tpl / "typein-front.html").write_text("<div>typein-front</div>", encoding="utf-8")
+    (tpl / "typein-back.html").write_text("<div>typein-back</div>", encoding="utf-8")
     (tpl / "cloze-front.html").write_text("<div>cloze-front</div>", encoding="utf-8")
     (tpl / "cloze-back.html").write_text("<div>cloze-back</div>", encoding="utf-8")
 
@@ -285,6 +287,7 @@ class TestOnMungeHtml:
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote(None))) == txt
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Basic"))) == txt
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Anki Markdown"))) == "**x**"
+        assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Anki Markdown Type-In"))) == "**x**"
         assert addon.mod.on_munge_html(txt, FakeEditor(FakeNote("Anki Markdown Cloze"))) == "**x**"
 
 
@@ -315,6 +318,36 @@ class TestEnsureNotetype:
         assert model["tmpls"][0]["qfmt"].endswith("<div>front</div>")
         assert model["tmpls"][0]["afmt"].endswith("<div>back</div>")
         assert model["css"] == addon.mod.DEFAULT_CSS
+
+
+class TestEnsureTypeinNotetype:
+    def test_creates_typein_model(self, addon):
+        addon.mod.ensure_typein_notetype()
+
+        assert len(addon.models.added) == 1
+        model = addon.models.added[0]
+        assert model["name"] == "Anki Markdown Type-In"
+        assert [field["name"] for field in model["flds"]] == ["Front", "Back", "Extra"]
+        assert all(field["plainText"] is True for field in model["flds"])
+        assert model["tmpls"][0]["name"] == "Default"
+        assert model["tmpls"][0]["qfmt"].endswith("<div>typein-front</div>")
+        assert model["tmpls"][0]["afmt"].endswith("<div>typein-back</div>")
+        assert model["css"] == addon.mod.DEFAULT_CSS
+
+    def test_updates_existing_typein_model(self, addon):
+        model = {
+            "tmpls": [{"qfmt": "old-front", "afmt": "old-back"}],
+            "flds": [{"name": "Front", "plainText": False}, {"name": "Back", "plainText": False}],
+        }
+        addon.models.models["Anki Markdown Type-In"] = model
+
+        addon.mod.ensure_typein_notetype()
+
+        assert addon.models.saved == [model]
+        assert model["tmpls"][0]["qfmt"].endswith("<div>typein-front</div>")
+        assert model["tmpls"][0]["afmt"].endswith("<div>typein-back</div>")
+        assert [field["name"] for field in model["flds"]] == ["Front", "Back", "Extra"]
+        assert all(field["plainText"] is True for field in model["flds"])
 
 
 class TestEnsureClozeNotetype:

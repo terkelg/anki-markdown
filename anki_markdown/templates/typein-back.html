@@ -1,0 +1,9 @@
+{{FrontSide}}
+<script id="data-extra" type="text/plain">
+  {{Extra}}
+</script>
+<script type="module">
+  import { renderTypeinBack } from "./_review.js";
+  const extra = document.getElementById("data-extra").textContent;
+  renderTypeinBack(extra);
+</script>
