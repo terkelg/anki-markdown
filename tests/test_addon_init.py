@@ -172,8 +172,8 @@ def addon(monkeypatch, tmp_path):
 
     tpl = tmp_path / "templates"
     tpl.mkdir()
-    (tpl / "front.html").write_text("<div>front</div>", encoding="utf-8")
-    (tpl / "back.html").write_text("<div>back</div>", encoding="utf-8")
+    (tpl / "basic-front.html").write_text("<div>front</div>", encoding="utf-8")
+    (tpl / "basic-back.html").write_text("<div>back</div>", encoding="utf-8")
     (tpl / "typein-front.html").write_text("<div>typein-front</div>", encoding="utf-8")
     (tpl / "typein-back.html").write_text("<div>typein-back</div>", encoding="utf-8")
     (tpl / "cloze-front.html").write_text("<div>cloze-front</div>", encoding="utf-8")
