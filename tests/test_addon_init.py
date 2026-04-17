@@ -299,7 +299,7 @@ class TestEnsureNotetype:
         }
         addon.models.models["Anki Markdown"] = model
 
-        addon.mod.ensure_notetype()
+        addon.mod.ensure_basic_notetype()
 
         assert addon.models.saved == [model]
         assert model["tmpls"][0]["qfmt"].endswith("<div>front</div>")
@@ -307,7 +307,7 @@ class TestEnsureNotetype:
         assert all(field["plainText"] is True for field in model["flds"])
 
     def test_creates_missing_model(self, addon):
-        addon.mod.ensure_notetype()
+        addon.mod.ensure_basic_notetype()
 
         assert len(addon.models.added) == 1
         model = addon.models.added[0]
