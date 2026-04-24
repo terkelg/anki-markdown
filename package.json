@@ -28,6 +28,9 @@
   "overrides": {
     "vite": "npm:rolldown-vite@7.3.1"
   },
+  "prettier": {
+    "printWidth": 120
+  },
   "dependencies": {
     "@shikijs/core": "4.0.2",
     "@shikijs/engine-javascript": "4.0.2",
