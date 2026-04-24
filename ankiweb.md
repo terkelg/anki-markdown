@@ -5,7 +5,7 @@ Write flashcards in Markdown with the same syntax highlighting you know from you
 - **Full Markdown** with bold, italic, lists, blockquotes, tables, images, alerts, and more
 - **Clean card design** with polished light/dark styling that matches Anki's native UI
 - **Settings panel** to dynamically pick languages and themes
-- **Mobile** works on AnkiDroid and AnkiMobile
+- **Cross-platform** works on desktop, AnkiDroid, AnkiMobile, and AnkiWeb
 - **AI agent friendly** built-in [agent skill](https://github.com/terkelg/anki-markdown#ai-agent-skill) lets AI agents create and manage flashcards via [AnkiConnect](https://foosoft.net/projects/anki-connect/)
 
 See the [documentation](https://github.com/terkelg/anki-markdown/blob/main/docs.md) for all features and syntax guide.

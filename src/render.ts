@@ -349,19 +349,22 @@ function upgrade(container: HTMLElement) {
   }
 }
 
-// Normalize dark mode classes into .night-mode on :root
+// Mirror the host's dark-mode class onto our wrapper so theming stays scoped.
 // - Desktop: nightMode + night_mode on <body> (qt/aqt/theme.py body_classes_for_card_ord)
 //   https://github.com/ankitects/anki/blob/main/qt/aqt/theme.py
 // - AnkiDroid: night_mode on <body>
 //   https://github.com/ankidroid/Anki-Android/wiki/Advanced-formatting
 // - AnkiMobile: nightMode on card element
 //   https://docs.ankimobile.net/night-mode.html
-function normalizeDarkMode() {
+// - AnkiWeb: no class — always light
+function normalizeDarkMode(wrapper: HTMLElement | null) {
+  if (!wrapper) return;
+  const card = document.querySelector(".card");
   const dark =
     document.body.classList.contains("nightMode") ||
     document.body.classList.contains("night_mode") ||
-    matchMedia("(prefers-color-scheme: dark)").matches;
-  if (dark) document.documentElement.classList.add("night-mode");
+    card?.classList.contains("nightMode");
+  if (dark) wrapper.classList.add("night-mode");
 }
 
 async function upgradeHighlighter(...els: (HTMLElement | null)[]) {
@@ -377,8 +380,8 @@ async function upgradeHighlighter(...els: (HTMLElement | null)[]) {
 
 /** Render front/back fields to card DOM. */
 export async function render(front: string, back: string) {
-  const wrapper = document.querySelector(".anki-md-wrapper");
-  normalizeDarkMode();
+  const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper");
+  normalizeDarkMode(wrapper);
 
   const frontEl = document.querySelector<HTMLElement>(".front");
   const backEl = document.querySelector<HTMLElement>(".back");
@@ -398,8 +401,8 @@ export async function render(front: string, back: string) {
 
 /** Render cloze deletion card to DOM. */
 export async function renderCloze(text: string, extra: string, ordinal: number, side: Side) {
-  const wrapper = document.querySelector(".anki-md-wrapper");
-  normalizeDarkMode();
+  const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper");
+  normalizeDarkMode(wrapper);
 
   const frontEl = document.querySelector<HTMLElement>(".front");
   const backEl = document.querySelector<HTMLElement>(".back");
