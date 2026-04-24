@@ -64,9 +64,9 @@ Cloze deletions create fill-in-the-blank cards. Use the **Anki Markdown Cloze** 
 ### Syntax
 
 ```markdown
-{{c1::answer}}              -> shows [...] on front
-{{c1::answer::a hint}}      -> shows [a hint] on front
-{{c1::answer::blur}}        -> shows blurred content on front
+{{c1::answer}} -> shows [...] on front
+{{c1::answer::a hint}} -> shows [a hint] on front
+{{c1::answer::blur}} -> shows blurred content on front
 ```
 
 Full markdown works inside cloze deletions:
@@ -347,12 +347,12 @@ Override default styles in your note type's Styling section (**Browse > Cards > 
 
 ### CSS Variables
 
-| Variable              | Default | Description                    |
-| --------------------- | ------- | ------------------------------ |
-| `--font-size`         | `14px`  | Font size on wide screens      |
-| `--font-size-mobile`  | `12px`  | Font size on small screens     |
-| `--line-height`       | `1.5`   | Line height for text           |
-| `--content-max-width` | `34rem` | Maximum width of card content  |
+| Variable              | Default | Description                   |
+| --------------------- | ------- | ----------------------------- |
+| `--font-size`         | `14px`  | Font size on wide screens     |
+| `--font-size-mobile`  | `12px`  | Font size on small screens    |
+| `--line-height`       | `1.5`   | Line height for text          |
+| `--content-max-width` | `34rem` | Maximum width of card content |
 
 Example:
 
@@ -389,11 +389,11 @@ Night mode automatically uses brighter defaults for visibility.
 
 Cloze elements use these CSS classes you can customize:
 
-| Class           | Element                                    |
-| --------------- | ------------------------------------------ |
-| `.cloze-blank`  | The `[...]` or `[hint]` text on the front  |
-| `.cloze-active` | Revealed answer on the back                |
-| `.cloze-blur`   | Blurred content on the front               |
+| Class           | Element                                   |
+| --------------- | ----------------------------------------- |
+| `.cloze-blank`  | The `[...]` or `[hint]` text on the front |
+| `.cloze-active` | Revealed answer on the back               |
+| `.cloze-blur`   | Blurred content on the front              |
 
 By default, `.cloze-active` has no styling so revealed content renders naturally. Add your own if you want to highlight answers:
 

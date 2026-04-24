@@ -133,97 +133,57 @@ function loadRender() {
 describe("processCloze", () => {
   test("hides repeated ordinals on the same front", () => {
     const text = "{{c1::JavaScript}} and {{c1::TypeScript}}";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "<blank>[...]</blank> and <blank>[...]</blank>",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank> and <blank>[...]</blank>");
   });
 
   test("renders hints and blur mode", () => {
-    expect(view(processCloze("The {{c1::answer::city}}.", 1, "front"))).toBe(
-      "The <blank>[city]</blank>.",
-    );
-    expect(view(processCloze("The {{c1::answer::blur}}.", 1, "front"))).toBe(
-      "The <blur>answer</blur>.",
-    );
-    expect(view(processCloze("The {{c1::answer::blur}}.", 1, "back"))).toBe(
-      "The <reveal>answer</reveal>.",
-    );
+    expect(view(processCloze("The {{c1::answer::city}}.", 1, "front"))).toBe("The <blank>[city]</blank>.");
+    expect(view(processCloze("The {{c1::answer::blur}}.", 1, "front"))).toBe("The <blur>answer</blur>.");
+    expect(view(processCloze("The {{c1::answer::blur}}.", 1, "back"))).toBe("The <reveal>answer</reveal>.");
   });
 
   test("supports nested clozes", () => {
     const text = "{{c1::Canberra was {{c2::founded}}}} in 1913";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "<blank>[...]</blank> in 1913",
-    );
-    expect(view(processCloze(text, 1, "back"))).toBe(
-      "<active>Canberra was founded</active> in 1913",
-    );
-    expect(view(processCloze(text, 2, "front"))).toBe(
-      "Canberra was <blank>[...]</blank> in 1913",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank> in 1913");
+    expect(view(processCloze(text, 1, "back"))).toBe("<active>Canberra was founded</active> in 1913");
+    expect(view(processCloze(text, 2, "front"))).toBe("Canberra was <blank>[...]</blank> in 1913");
   });
 
   test("inline code with {lang} syntax (triple braces)", () => {
     const text = "Use {{c1::`addEventListener()`{js}}} to bind.";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "Use <blank>[...]</blank> to bind.",
-    );
-    expect(view(processCloze(text, 1, "back"))).toBe(
-      "Use <active>`addEventListener()`{js}</active> to bind.",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("Use <blank>[...]</blank> to bind.");
+    expect(view(processCloze(text, 1, "back"))).toBe("Use <active>`addEventListener()`{js}</active> to bind.");
   });
 
   test("destructuring braces inside inline code", () => {
     const text = "{{c1::`const { a, b } = obj`{js}}} works.";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "<blank>[...]</blank> works.",
-    );
-    expect(view(processCloze(text, 1, "back"))).toBe(
-      "<active>`const { a, b } = obj`{js}</active> works.",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank> works.");
+    expect(view(processCloze(text, 1, "back"))).toBe("<active>`const { a, b } = obj`{js}</active> works.");
   });
 
   test("inline code with {.lang} syntax inside clozes", () => {
     const text = "Use {{c1::`const x = 1`{.js}}} here.";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "Use <blank>[...]</blank> here.",
-    );
-    expect(view(processCloze(text, 1, "back"))).toBe(
-      "Use <active>`const x = 1`{.js}</active> here.",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("Use <blank>[...]</blank> here.");
+    expect(view(processCloze(text, 1, "back"))).toBe("Use <active>`const x = 1`{.js}</active> here.");
   });
 
   test("inline code with punctuated language tags inside clozes", () => {
     const text = "{{c1::`value`{objective-c}}} and {{c2::`n`{c++}}}.";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "<blank>[...]</blank> and `n`{c++}.",
-    );
-    expect(view(processCloze(text, 1, "back"))).toBe(
-      "<active>`value`{objective-c}</active> and `n`{c++}.",
-    );
-    expect(view(processCloze(text, 2, "back"))).toBe(
-      "`value`{objective-c} and <active>`n`{c++}</active>.",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank> and `n`{c++}.");
+    expect(view(processCloze(text, 1, "back"))).toBe("<active>`value`{objective-c}</active> and `n`{c++}.");
+    expect(view(processCloze(text, 2, "back"))).toBe("`value`{objective-c} and <active>`n`{c++}</active>.");
   });
 
   test("inactive cloze strips markers", () => {
     const text = "{{c1::HTML}} and {{c2::CSS}}";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "<blank>[...]</blank> and CSS",
-    );
-    expect(view(processCloze(text, 2, "front"))).toBe(
-      "HTML and <blank>[...]</blank>",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank> and CSS");
+    expect(view(processCloze(text, 2, "front"))).toBe("HTML and <blank>[...]</blank>");
   });
 
   test("adjacent clozes with no space", () => {
     const text = "{{c1::Hello}}{{c2::World}}";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "<blank>[...]</blank>World",
-    );
-    expect(view(processCloze(text, 2, "front"))).toBe(
-      "Hello<blank>[...]</blank>",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank>World");
+    expect(view(processCloze(text, 2, "front"))).toBe("Hello<blank>[...]</blank>");
   });
 
   test("block content uses newline-wrapped sentinels", () => {
@@ -234,19 +194,13 @@ describe("processCloze", () => {
 
   test("blur with inline code and {lang}", () => {
     const text = "Use {{c1::`const MAX: u32 = 100`{rust}::blur}}.";
-    expect(view(processCloze(text, 1, "front"))).toBe(
-      "Use <blur>`const MAX: u32 = 100`{rust}</blur>.",
-    );
-    expect(view(processCloze(text, 1, "back"))).toBe(
-      "Use <reveal>`const MAX: u32 = 100`{rust}</reveal>.",
-    );
+    expect(view(processCloze(text, 1, "front"))).toBe("Use <blur>`const MAX: u32 = 100`{rust}</blur>.");
+    expect(view(processCloze(text, 1, "back"))).toBe("Use <reveal>`const MAX: u32 = 100`{rust}</reveal>.");
   });
 
   test("three cloze numbers", () => {
     const text = "{{c1::A}}-{{c2::B}}-{{c3::C}}";
-    expect(view(processCloze(text, 2, "front"))).toBe(
-      "A-<blank>[...]</blank>-C",
-    );
+    expect(view(processCloze(text, 2, "front"))).toBe("A-<blank>[...]</blank>-C");
   });
 
   // Upstream Anki `main` supports `{{c1,2::...}}`, but released Anki 25.09 does not yet.
@@ -258,15 +212,9 @@ describe("processCloze", () => {
   });
 
   test("treats single-line block markdown as block content", () => {
-    expect(view(processCloze("{{c1::# Heading}}", 1, "back"))).toBe(
-      "\n\n<active>\n\n# Heading\n\n</active>\n\n",
-    );
-    expect(view(processCloze("{{c1::- item}}", 1, "back"))).toBe(
-      "\n\n<active>\n\n- item\n\n</active>\n\n",
-    );
-    expect(view(processCloze("{{c1::> quote}}", 1, "back"))).toBe(
-      "\n\n<active>\n\n> quote\n\n</active>\n\n",
-    );
+    expect(view(processCloze("{{c1::# Heading}}", 1, "back"))).toBe("\n\n<active>\n\n# Heading\n\n</active>\n\n");
+    expect(view(processCloze("{{c1::- item}}", 1, "back"))).toBe("\n\n<active>\n\n- item\n\n</active>\n\n");
+    expect(view(processCloze("{{c1::> quote}}", 1, "back"))).toBe("\n\n<active>\n\n> quote\n\n</active>\n\n");
   });
 
   test("no cloze markers passes through unchanged", () => {
@@ -277,9 +225,9 @@ describe("processCloze", () => {
 
 describe("postProcessCloze", () => {
   test("upgrades block sentinels into wrapper divs", () => {
-    expect(
-      postProcessCloze("<p>\uE004</p><p>line</p><p>\uE005</p>"),
-    ).toBe('<div class="cloze-active"><p>line</p></div>');
+    expect(postProcessCloze("<p>\uE004</p><p>line</p><p>\uE005</p>")).toBe(
+      '<div class="cloze-active"><p>line</p></div>',
+    );
   });
 });
 

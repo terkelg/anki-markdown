@@ -12,8 +12,7 @@ const running = await $`pgrep -f Anki.app/Contents/MacOS`.quiet().nothrow();
 if (running.exitCode === 0) {
   console.log("Quitting Anki...");
   await $`osascript -e 'tell application "Anki" to quit'`;
-  while ((await $`pgrep -f Anki.app/Contents/MacOS`.quiet().nothrow()).exitCode === 0)
-    await Bun.sleep(500);
+  while ((await $`pgrep -f Anki.app/Contents/MacOS`.quiet().nothrow()).exitCode === 0) await Bun.sleep(500);
 }
 
 // Symlink add-on
@@ -39,9 +38,7 @@ while (!frontend) {
     process.exit(1);
   }
   try {
-    const targets: any[] = await fetch(`http://localhost:${port}/json`).then(
-      (r) => r.json(),
-    );
+    const targets: any[] = await fetch(`http://localhost:${port}/json`).then((r) => r.json());
     const main = targets.find((t) => t.title === "main webview");
     if (main) frontend = main.devtoolsFrontendUrl;
   } catch {

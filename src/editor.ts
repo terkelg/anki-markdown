@@ -25,8 +25,7 @@ const active = () => document.body.classList.contains("anki-md-active");
 const settings = ["setCloseHTMLTags", "setShrinkImages", "setMathjaxEnabled"];
 
 // Get boolean array matching field count
-const fields = async (val: boolean) =>
-  (await instances[0]?.fields)?.map(() => val);
+const fields = async (val: boolean) => (await instances[0]?.fields)?.map(() => val);
 
 async function setPlainText(val: boolean): Promise<void> {
   const list = await fields(val);
@@ -60,8 +59,7 @@ loaded.then(() => {
     globalThis[fn] = (val: boolean) => orig(active() ? false : val);
   }
   const orig = globalThis.setPlainTexts;
-  globalThis.setPlainTexts = (vals: boolean[]) =>
-    orig(active() ? vals.map(() => true) : vals);
+  globalThis.setPlainTexts = (vals: boolean[]) => orig(active() ? vals.map(() => true) : vals);
 });
 
 // Disable highlighting on any plain-text input that mounts while active

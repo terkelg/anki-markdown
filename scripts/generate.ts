@@ -49,9 +49,7 @@ for (const theme of [config.themes.light, config.themes.dark]) {
 
 await Bun.write(
   `${ADDON_DIR}/shiki-data.json`,
-  JSON.stringify(
-    { version: shikiVersion, languages: languageNames, themes: themeNames },
-  ) + "\n",
+  JSON.stringify({ version: shikiVersion, languages: languageNames, themes: themeNames }) + "\n",
 );
 
 await Bun.write(
@@ -76,9 +74,7 @@ for (const file of files) {
   }
 }
 
-console.log(
-  `✓ Generated shiki-data.json (${languageNames.length} languages, ${themeNames.length} themes)`,
-);
+console.log(`✓ Generated shiki-data.json (${languageNames.length} languages, ${themeNames.length} themes)`);
 console.log(`✓ Updated ${ADDON_DIR}/config.json`);
 console.log(`✓ SHIKI_VERSION = "${shikiVersion}"`);
 if (cleaned > 0) {

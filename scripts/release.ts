@@ -22,10 +22,7 @@ if (version === pkg.version) {
 
 pkg.version = manifest.version = version;
 await Bun.write("package.json", JSON.stringify(pkg, null, 2) + "\n");
-await Bun.write(
-  "anki_markdown/manifest.json",
-  JSON.stringify(manifest, null, 2) + "\n",
-);
+await Bun.write("anki_markdown/manifest.json", JSON.stringify(manifest, null, 2) + "\n");
 
 await $`git add package.json anki_markdown/manifest.json`;
 await $`git commit -m ${"chore: release v" + version}`;

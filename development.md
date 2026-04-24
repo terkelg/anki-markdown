@@ -30,6 +30,7 @@ Default languages and themes are configured in `config.json`:
 ```
 
 The build runs `bun run generate` which:
+
 - Generates `anki_markdown/shiki-data.json` (version, languages, themes)
 - Updates `anki_markdown/config.json` with defaults
 - Cleans stray `_lang-*.js` / `_theme-*.js` files

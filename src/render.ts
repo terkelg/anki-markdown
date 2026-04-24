@@ -39,9 +39,7 @@ const themes = config.themes;
 
 async function loadLanguages() {
   const results = await Promise.allSettled(
-    config.languages.map(
-      (name) => import(/* @vite-ignore */ `./_lang-${name}.js`),
-    ),
+    config.languages.map((name) => import(/* @vite-ignore */ `./_lang-${name}.js`)),
   );
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default].flat();
@@ -52,9 +50,7 @@ async function loadLanguages() {
 
 async function loadThemes() {
   const names = [...new Set([config.themes.light, config.themes.dark])];
-  const results = await Promise.allSettled(
-    names.map((name) => import(/* @vite-ignore */ `./_theme-${name}.js`)),
-  );
+  const results = await Promise.allSettled(names.map((name) => import(/* @vite-ignore */ `./_theme-${name}.js`)));
   return results.flatMap((r, i) => {
     if (r.status === "fulfilled") return [r.value.default];
     console.log(`[anki-md] Failed to load theme: ${names[i]}`);
@@ -98,8 +94,7 @@ function lang(node: Element): string {
 const codeBlock: ShikiTransformer = {
   name: "code-block",
   pre(node) {
-    const name =
-      typeof this.options.lang === "string" ? this.options.lang : lang(node);
+    const name = typeof this.options.lang === "string" ? this.options.lang : lang(node);
     const style = node.properties.style;
     const figure: Element = {
       type: "element",
@@ -229,8 +224,7 @@ const ready = initHighlighter().then((value) => (highlighter = value));
 // Only allow safe HTML tags, strip everything else
 const ALLOWED = /^<\/?(img|a|b|i|em|strong|br|kbd)(\s[^>]*)?>$/i;
 const sanitize = (html: string) => (ALLOWED.test(html.trim()) ? html : "");
-md.renderer.rules.html_inline = (tokens, idx) =>
-  sanitize(tokens[idx].content);
+md.renderer.rules.html_inline = (tokens, idx) => sanitize(tokens[idx].content);
 md.renderer.rules.html_block = (tokens, idx) => sanitize(tokens[idx].content);
 md.renderer.rules.fence = (tokens, idx) => {
   const { content, info } = tokens[idx];
@@ -294,9 +288,7 @@ card?.addEventListener("click", (e) => {
   }
   const copy = target.closest(".copy") as HTMLElement;
   if (copy) {
-    navigator.clipboard.writeText(
-      block.querySelector("code")?.textContent || "",
-    );
+    navigator.clipboard.writeText(block.querySelector("code")?.textContent || "");
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1500);
   }
@@ -315,15 +307,11 @@ function decode(text: string): string {
  * Swaps content and copies attributes in-place so layout never shifts.
  */
 function upgrade(container: HTMLElement) {
-  for (const fig of container.querySelectorAll<HTMLElement>(
-    ".code-block[data-pending]",
-  )) {
+  for (const fig of container.querySelectorAll<HTMLElement>(".code-block[data-pending]")) {
     const code = fig.querySelector("code");
     if (!code) continue;
     const lang = fig.querySelector(".lang")?.textContent || "text";
-    const fresh = parse(
-      highlight(code.textContent?.replace(/\n$/, "") || "", lang, fig.dataset.meta),
-    );
+    const fresh = parse(highlight(code.textContent?.replace(/\n$/, "") || "", lang, fig.dataset.meta));
     if (!fresh) continue;
     const inner = fresh.querySelector("code");
     if (inner) code.innerHTML = inner.innerHTML;
@@ -333,9 +321,7 @@ function upgrade(container: HTMLElement) {
     fig.removeAttribute("data-meta");
   }
 
-  for (const el of container.querySelectorAll<HTMLElement>(
-    "code[data-pending]",
-  )) {
+  for (const el of container.querySelectorAll<HTMLElement>("code[data-pending]")) {
     const lang = el.dataset.lang || "text";
     el.removeAttribute("data-pending");
     el.removeAttribute("data-lang");
@@ -411,12 +397,7 @@ export async function render(front: string, back: string) {
 }
 
 /** Render cloze deletion card to DOM. */
-export async function renderCloze(
-  text: string,
-  extra: string,
-  ordinal: number,
-  side: Side,
-) {
+export async function renderCloze(text: string, extra: string, ordinal: number, side: Side) {
   const wrapper = document.querySelector(".anki-md-wrapper");
   normalizeDarkMode();
 

@@ -12,6 +12,7 @@ ANKI="$(dirname "$SKILL_PATH")/scripts/anki.sh"
 ```
 
 Preflight:
+
 - Ensure Anki desktop is running with AnkiConnect enabled
 - Ensure `curl` and `jq` are available in PATH
 
@@ -20,6 +21,7 @@ Preflight:
 **NEVER add cards to Anki without explicit user approval.**
 
 Before adding any cards:
+
 1. Display all proposed cards in full (front + back)
 2. Ask user to confirm: "Ready to add these cards?"
 3. Only proceed after explicit "yes" / approval
@@ -27,6 +29,7 @@ Before adding any cards:
 This is non-negotiable. Users must review card quality before adding.
 
 For potentially destructive or irreversible actions:
+
 - `delete`: ask explicit confirmation before deleting notes
 - `update`: confirm exact fields/IDs before updating notes
 - `rate`: show card + suggested rating, then wait for user confirmation before submitting
@@ -60,6 +63,7 @@ Use `Anki Markdown Cloze` for fill-in-the-blank cards. Fields are `Text` and `Ex
 ### Syntax
 
 Three forms:
+
 - `{{c1::answer}}` - shows **[...]** on front
 - `{{c1::answer::hint}}` - shows **[hint]** on front
 - `{{c1::answer::blur}}` - shows blurred content on front (reveals shape but not text)
@@ -122,6 +126,7 @@ $ANKI add "MyDeck" "Anki Markdown Cloze" '{"Text":"The speed of light is {{c1::2
 ## Front Field Format
 
 Use markdown on the front to highlight key terms the question is about:
+
 - Use **bold** or `==highlight==` for the main concept being tested
 - Use inline code for technical terms, functions, or syntax
 
@@ -130,6 +135,7 @@ Example: `What does **vertex_index** return in WGSL?`
 ## Back Field Format
 
 Use this format for the Back field:
+
 1. **Bold one-liner** with the direct answer
 2. Blank line
 3. Additional context in normal text (optional)
@@ -153,10 +159,11 @@ Press <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> to open the command palette.
 
 Always use syntax highlighting:
 
-- Fenced blocks: Use triple backticks with language (```js, ```python, ```rust, etc.)
+- Fenced blocks: Use triple backticks with language (`js, `python, ```rust, etc.)
 - Inline code: Use `` `code`{lang} `` syntax (e.g., `` `const x = 1`{js} ``)
 
 Advanced features:
+
 - Line highlighting: ```js {2} to highlight line 2
 - Word highlighting: ```js /pattern/ to highlight specific words
 - Focus mode: Add `// [!code focus]` comment to focus specific lines
@@ -194,22 +201,22 @@ The shader uses `@builtin(vertex_index)`{wgsl} to generate positions ==procedura
 
 Run via `$ANKI <action> [args...]`:
 
-| Action | Description | Example |
-|--------|-------------|---------|
-| `sync` | Trigger AnkiWeb sync | `$ANKI sync` |
-| `decks` | List decks | `$ANKI decks --stats` |
-| `models` | List note types | `$ANKI models` |
-| `fields` | Fields for a model | `$ANKI fields "Anki Markdown"` |
-| `find` | Search notes | `$ANKI find "deck:Spanish tag:verb"` |
-| `info` | Note details | `$ANKI info 1234 5678` |
-| `add` | Add one note | `$ANKI add "My Deck" "Anki Markdown" '{"Front":"Q","Back":"A"}' --tags "t1 t2"` |
-| `add-bulk` | Add many notes | `$ANKI add-bulk "My Deck" "Anki Markdown" '[{"Front":"Q1","Back":"A1"}]'` |
-| `update` | Update fields | `$ANKI update 1234 '{"Front":"New Q"}'` |
-| `delete` | Delete notes | `$ANKI delete 1234 5678` |
-| `due` | Get due cards | `$ANKI due "My Deck" --limit 5` |
-| `review` | Show card | `$ANKI review 1234` |
-| `rate` | Rate card (1-4) | `$ANKI rate 1234 3` |
-| `tags` | List tags | `$ANKI tags --pattern "verb"` |
+| Action     | Description          | Example                                                                         |
+| ---------- | -------------------- | ------------------------------------------------------------------------------- |
+| `sync`     | Trigger AnkiWeb sync | `$ANKI sync`                                                                    |
+| `decks`    | List decks           | `$ANKI decks --stats`                                                           |
+| `models`   | List note types      | `$ANKI models`                                                                  |
+| `fields`   | Fields for a model   | `$ANKI fields "Anki Markdown"`                                                  |
+| `find`     | Search notes         | `$ANKI find "deck:Spanish tag:verb"`                                            |
+| `info`     | Note details         | `$ANKI info 1234 5678`                                                          |
+| `add`      | Add one note         | `$ANKI add "My Deck" "Anki Markdown" '{"Front":"Q","Back":"A"}' --tags "t1 t2"` |
+| `add-bulk` | Add many notes       | `$ANKI add-bulk "My Deck" "Anki Markdown" '[{"Front":"Q1","Back":"A1"}]'`       |
+| `update`   | Update fields        | `$ANKI update 1234 '{"Front":"New Q"}'`                                         |
+| `delete`   | Delete notes         | `$ANKI delete 1234 5678`                                                        |
+| `due`      | Get due cards        | `$ANKI due "My Deck" --limit 5`                                                 |
+| `review`   | Show card            | `$ANKI review 1234`                                                             |
+| `rate`     | Rate card (1-4)      | `$ANKI rate 1234 3`                                                             |
+| `tags`     | List tags            | `$ANKI tags --pattern "verb"`                                                   |
 
 ### Typical workflow
 

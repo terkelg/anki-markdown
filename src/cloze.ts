@@ -16,19 +16,22 @@ const ACTIVE_OPEN = "\uE004";
 const ACTIVE_CLOSE = "\uE005";
 const REVEAL_OPEN = "\uE006";
 const REVEAL_CLOSE = "\uE007";
-const BLOCK =
-  /^(?: {0,3}(?:#{1,6}(?:\s|$)|[-+*]\s|>\s?|```|~~~|\d+[.)]\s)|(?: {4}|\t)\S)/;
+const BLOCK = /^(?: {0,3}(?:#{1,6}(?:\s|$)|[-+*]\s|>\s?|```|~~~|\d+[.)]\s)|(?: {4}|\t)\S)/;
 
 function push(list: Node[], text: string) {
   if (text) list.push(text);
 }
 
 function nums(text: string): number[] {
-  return [...new Set(text.split(",").flatMap((item) => {
-    if (!item) return [];
-    const num = Number.parseInt(item, 10);
-    return Number.isNaN(num) ? [] : [num];
-  }))];
+  return [
+    ...new Set(
+      text.split(",").flatMap((item) => {
+        if (!item) return [];
+        const num = Number.parseInt(item, 10);
+        return Number.isNaN(num) ? [] : [num];
+      }),
+    ),
+  ];
 }
 
 function wrap(text: string, start: string, end: string): string {
@@ -93,10 +96,7 @@ function parseTag(text: string, at: number): [Tag, number] | null {
         continue;
       }
       if (!seen) push(body, buf);
-      return [
-        { body, hint: seen ? hint : undefined, ords },
-        i + 2,
-      ];
+      return [{ body, hint: seen ? hint : undefined, ords }, i + 2];
     }
 
     if (seen) hint += text[i];
@@ -148,17 +148,13 @@ function show(list: Node[], ord: number, side: Side, skip?: number): string {
       if (node.hint === "blur") {
         out += wrap(show(node.body, ord, side, ord), BLUR_OPEN, BLUR_CLOSE);
       } else {
-        out += node.hint
-          ? `${BLANK_OPEN}[${node.hint}]${BLANK_CLOSE}`
-          : `${BLANK_OPEN}[...]${BLANK_CLOSE}`;
+        out += node.hint ? `${BLANK_OPEN}[${node.hint}]${BLANK_CLOSE}` : `${BLANK_OPEN}[...]${BLANK_CLOSE}`;
       }
       continue;
     }
 
     const body = show(node.body, ord, side, ord);
-    out += node.hint === "blur"
-      ? wrap(body, REVEAL_OPEN, REVEAL_CLOSE)
-      : wrap(body, ACTIVE_OPEN, ACTIVE_CLOSE);
+    out += node.hint === "blur" ? wrap(body, REVEAL_OPEN, REVEAL_CLOSE) : wrap(body, ACTIVE_OPEN, ACTIVE_CLOSE);
   }
 
   return out;
