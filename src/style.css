@@ -1,4 +1,4 @@
-:root {
+.anki-md-wrapper {
   --_mono: "Berkeley Mono Variable", ui-monospace, "JetBrains Mono", "Fira Code", monospace;
   --_radius: var(--border-radius, 5px);
   --_fg: var(--fg, #020202);
@@ -154,7 +154,7 @@ body {
     }
   }
 
-  .night-mode & {
+  .anki-md-wrapper.night-mode & {
     span {
       color: var(--shiki-dark);
       font-style: var(--shiki-dark-font-style);
@@ -269,7 +269,7 @@ mark {
   padding: 1px 2px;
   border-radius: 2px;
 
-  .night-mode & {
+  .anki-md-wrapper.night-mode & {
     background: rgb(255 255 0 / 0.4);
   }
 }
@@ -390,7 +390,7 @@ kbd {
     background: rgb(0 0 0 / 0.06);
     border-color: rgb(0 0 0 / 0.1);
 
-    .night-mode & {
+    .anki-md-wrapper.night-mode & {
       background: rgb(255 255 255 / 0.1);
       border-color: rgb(255 255 255 / 0.15);
     }
