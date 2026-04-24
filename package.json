@@ -14,7 +14,7 @@
     "test": ".venv/bin/pytest tests/ -v -m offline",
     "test:online": ".venv/bin/pytest tests/ -v -m online",
     "test:all": "bun run test:ts && .venv/bin/pytest tests/ -v",
-    "format": "prettier --write .",
+    "format": "prettier --write . '!anki_markdown/shiki-data.json'",
     "release": "bun scripts/release.ts"
   },
   "devDependencies": {
