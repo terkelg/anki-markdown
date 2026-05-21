@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="./_review.css" />
+<div class="anki-md-wrapper anki-md-typein">
+  <div class="front"></div>
+  <div class="typein-answer">{{type:Back}}</div>
+</div>
+<script id="data-front" type="text/plain">
+  {{Front}}
+</script>
+<script type="module">
+  import { render } from "./_review.js";
+  const front = document.getElementById("data-front").textContent;
+  render(front, "");
+</script>
