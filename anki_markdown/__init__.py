@@ -1,5 +1,10 @@
 from pathlib import Path
+import base64
+import json
+import os
 import re
+import tempfile
+import time
 from aqt import mw, gui_hooks
 from aqt.qt import QAction, QMessageBox
 from aqt.editor import Editor
@@ -233,11 +238,156 @@ def on_editor_load_note(editor: Editor):
         return
     if is_anki_markdown(editor.note.note_type()):
         editor.web.eval("window.ankiMdActivate && ankiMdActivate()")
+        # Inject paste handler via Python (bypasses editor.js loading issues)
+        _inject_paste_handler(editor)
     else:
         editor.web.eval("window.ankiMdDeactivate && ankiMdDeactivate()")
+        # Deactivate paste interception for non-Anki-Markdown notes
+        editor.web.eval("window.__ankiMdPasteActive = false")
+
+
+# Maximum image size: 10 MB
+_MAX_IMAGE_BYTES = 10 * 1024 * 1024
+# Allowed image extensions
+_ALLOWED_EXTENSIONS = {"png", "jpg", "gif", "webp", "svg", "bmp", "tiff"}
+
+
+def _inject_paste_handler(editor: Editor):
+    """Inject image paste handler directly into the editor WebView."""
+    max_b64_len = int(_MAX_IMAGE_BYTES * 4 / 3) + 4  # base64 overhead
+    js_code = r"""
+    (function() {
+        // Mark paste interception as active for this note
+        window.__ankiMdPasteActive = true;
+
+        // Only install the listener once per WebView
+        if (window.__ankiMdPasteInstalled) return;
+        window.__ankiMdPasteInstalled = true;
+
+        var MAX_B64_LEN = """ + str(max_b64_len) + r""";
+        var ALLOWED_TYPES = ["image/png", "image/jpeg", "image/gif",
+                             "image/webp", "image/svg+xml", "image/bmp"];
+
+        document.addEventListener("paste", function(e) {
+            // Only intercept when Anki Markdown note is active
+            if (!window.__ankiMdPasteActive) return;
+
+            var items = Array.from(e.clipboardData && e.clipboardData.items ? e.clipboardData.items : []);
+            var imageItem = null;
+            for (var i = 0; i < items.length; i++) {
+                if (ALLOWED_TYPES.indexOf(items[i].type) !== -1) {
+                    imageItem = items[i];
+                    break;
+                }
+            }
+            if (!imageItem) return;
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            var file = imageItem.getAsFile();
+            if (!file) return;
+
+            // Check size limit (raw file size, before base64)
+            if (file.size > MAX_B64_LEN * 0.75) {
+                pycmd("anki-md-paste-too-large:" + Math.round(file.size / 1024 / 1024) + "MB");
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function() {
+                var result = reader.result;
+                var commaIdx = result.indexOf(",");
+                var header = result.slice(0, commaIdx);
+                var b64 = result.slice(commaIdx + 1);
+                var extMatch = header.match(/image\/(\w+)/);
+                var ext = extMatch ? extMatch[1] : "png";
+                if (ext === "jpeg") ext = "jpg";
+                if (ext === "svg+xml") ext = "svg";
+                
+                pycmd("anki-md-paste:" + ext + ":" + b64);
+            };
+            reader.readAsDataURL(file);
+        }, true);
+    })();
+    """
+    editor.web.eval(js_code)
+
+
+def on_paste_js_message(handled, message: str, context) -> tuple:
+    """Handle image paste messages from the editor JS."""
+    if not isinstance(context, Editor):
+        return handled
+
+    if message.startswith("anki-md-paste-too-large:"):
+        size_info = message.split(":", 1)[1]
+        from aqt.utils import tooltip
+        tooltip(f"⚠️ Image too large ({size_info}), max 10 MB", period=5000)
+        return (True, None)
+
+    if not message.startswith("anki-md-paste:"):
+        return handled
+
+    try:
+        # Format: anki-md-paste:ext:base64data
+        parts = message.split(":", 2)
+        ext = parts[1] if len(parts) > 1 else "png"
+        b64data = parts[2] if len(parts) > 2 else ""
+
+        if ext not in _ALLOWED_EXTENSIONS:
+            from aqt.utils import tooltip
+            tooltip(f"⚠️ Unsupported image format: {ext}", period=3000)
+            return (True, None)
+
+        data = base64.b64decode(b64data)
+
+        if len(data) > _MAX_IMAGE_BYTES:
+            from aqt.utils import tooltip
+            tooltip("⚠️ Image too large, max 10 MB", period=5000)
+            return (True, None)
+
+        timestamp = int(time.time() * 1000)
+        paste_filename = f"paste-{timestamp}.{ext}"
+        tmpdir = tempfile.gettempdir()
+        tmppath = os.path.join(tmpdir, paste_filename)
+        try:
+            with open(tmppath, "wb") as f:
+                f.write(data)
+            filename = mw.col.media.add_file(tmppath)
+        finally:
+            try:
+                os.unlink(tmppath)
+            except OSError:
+                pass
+
+        md_text = f"![]({filename})"
+
+        # Insert directly using execCommand from JS side.
+        # This keeps the cursor perfectly in place and triggers all native Anki events
+        # without needing a disruptive `loadNoteKeepingFocus()`.
+        # We wrap it in a try-catch and focus restoration just in case the editor lost focus.
+        js_inject = f"""
+        (function() {{
+            document.execCommand("insertText", false, "{md_text}");
+        }})();
+        """
+        context.web.eval(js_inject)
+        
+        from aqt.utils import tooltip
+        tooltip(f"✅ Image pasted: {filename}", period=3000)
+
+    except Exception as exc:
+        QMessageBox.critical(None, "anki-md paste error", str(exc))
+    return (True, None)
+
+
+
+
+
 
 
 gui_hooks.profile_did_open.append(on_profile_loaded)
 gui_hooks.editor_will_munge_html.append(on_munge_html)
 gui_hooks.webview_will_set_content.append(on_webview_set_content)
 gui_hooks.editor_did_load_note.append(on_editor_load_note)
+gui_hooks.webview_did_receive_js_message.append(on_paste_js_message)
