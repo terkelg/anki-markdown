@@ -32,6 +32,7 @@
     "@shikijs/core": "4.0.2",
     "@shikijs/engine-javascript": "4.0.2",
     "@shikijs/transformers": "4.0.2",
+    "@vscode/markdown-it-katex": "^1.1.2",
     "markdown-exit": "1.0.0-beta.9",
     "markdown-it-github-alerts": "^1.0.1",
     "markdown-it-mark": "^4.0.0",

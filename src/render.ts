@@ -1,7 +1,9 @@
+import "katex/dist/katex.min.css";
 import "./style.css";
 import mark from "markdown-it-mark";
 import alerts from "markdown-it-github-alerts";
 import { createMarkdownExit } from "markdown-exit";
+import markdownItKatex from "@vscode/markdown-it-katex";
 import { createHighlighterCore } from "@shikijs/core";
 import { createJavaScriptRegexEngine } from "@shikijs/engine-javascript";
 import type { HighlighterCore } from "@shikijs/core";
@@ -219,6 +221,24 @@ function highlight(code: string, name: string, meta?: string) {
 const md = createMarkdownExit({ html: true });
 md.use(mark as never);
 md.use(alerts as never);
+md.use(markdownItKatex, {
+  throwOnError: false,
+});
+md.inline.ruler.before("escape", "math-brackets", (state, silent) => {
+  const opening = state.src.slice(state.pos, state.pos + 2);
+  const closing = opening === "\\(" ? "\\)" : opening === "\\[" ? "\\]" : "";
+  if (!closing) return false;
+
+  const end = state.src.indexOf(closing, state.pos + 2);
+  if (end < 0) return false;
+
+  if (!silent) {
+    const token = state.push(opening === "\\(" ? "math_inline" : "math_inline_block", "math", 0);
+    token.content = state.src.slice(state.pos + 2, end);
+  }
+  state.pos = end + 2;
+  return true;
+});
 const ready = initHighlighter().then((value) => (highlighter = value));
 
 // Only allow safe HTML tags, strip everything else
