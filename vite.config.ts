@@ -11,7 +11,7 @@ const renderer = defineConfig({
     },
     outDir: "anki_markdown",
     emptyOutDir: false,
-    rollupOptions: {
+    rolldownOptions: {
       // Keep dynamic imports external - they load from collection.media at runtime
       external: (id) => {
         // Match ./_lang-*.js and ./_theme-*.js dynamic imports
@@ -34,7 +34,7 @@ const editor = defineConfig({
     },
     outDir: "anki_markdown",
     emptyOutDir: false,
-    rollupOptions: {
+    rolldownOptions: {
       external: (id) => /^(anki|svelte)(\/|$)/.test(id),
       output: {
         assetFileNames: "web/editor[extname]",
