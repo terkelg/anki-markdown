@@ -65,15 +65,8 @@ function parseTag(text: string, at: number): [Tag, number] | null {
   let buf = "";
   let hint = "";
   let seen = false;
-  let math = -1;
 
   while (i < text.length) {
-    // Braces inside a complete equation cannot close a cloze around that equation.
-    if (i >= math) {
-      const opening = text.slice(i, i + 2);
-      const closing = opening === "\\(" ? "\\)" : opening === "\\[" ? "\\]" : "";
-      math = closing ? text.indexOf(closing, i + 2) : -1;
-    }
     if (!seen) {
       const tag = parseTag(text, i);
       if (tag) {
@@ -93,7 +86,7 @@ function parseTag(text: string, at: number): [Tag, number] | null {
       }
     }
 
-    if (i >= math && text.startsWith("}}", i)) {
+    if (text.startsWith("}}", i)) {
       // Skip }} when followed by } and body ends with an unclosed {lang} tag
       // (handles `code`{js}}} where } closes {lang} and }} closes cloze)
       if (text[i + 2] === "}" && tag(seen ? hint : buf)) {
@@ -171,19 +164,10 @@ export function processCloze(text: string, ord: number, side: Side): string {
   return show(parse(text), ord, side);
 }
 
-/** Use TeX groups inside equations instead of inserting HTML into TeX source. */
+/** Match native math clozes: hints keep their TeX meaning, and blur falls back to a blank. */
 export function mathCloze(text: string): string {
-  return text
-    .replace(/\uE000([\s\S]*?)\uE001/g, (_, hint: string) => {
-      const escaped = hint.replace(/[\\{}$]/g, (char) => `\\${char}`);
-      return `\\class{cloze-blank}{\\text{${escaped}}}`;
-    })
-    .replaceAll(BLUR_OPEN, "\\class{cloze-blur}{")
-    .replaceAll(ACTIVE_OPEN, "\\class{cloze-active}{")
-    .replaceAll(REVEAL_OPEN, "\\class{cloze-active cloze-reveal}{")
-    .replaceAll(BLUR_CLOSE, "}")
-    .replaceAll(ACTIVE_CLOSE, "}")
-    .replaceAll(REVEAL_CLOSE, "}");
+  // Grouping a TeX fragment can split command arguments or insert literal commands inside \text.
+  return text.replace(/\uE002[\s\S]*?\uE003/g, "[...]").replace(/[\uE000-\uE007]/g, "");
 }
 
 export function postProcessCloze(html: string): string {

@@ -422,8 +422,7 @@ kbd {
   font-weight: 600;
 }
 
-span.cloze-active:not(:has(code)),
-.math .cloze-active {
+span.cloze-active:not(:has(code)) {
   text-decoration: underline;
   text-decoration-color: var(--_color-note);
   text-underline-offset: 2px;

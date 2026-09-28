@@ -382,7 +382,6 @@ async function upgradeHighlighter(...els: (HTMLElement | null)[]) {
 
 /** Render front/back fields to card DOM. */
 export async function render(front: string, back: string) {
-  const env = { math: !!(globalThis as { MathJax?: unknown }).MathJax };
   const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper");
   normalizeDarkMode(wrapper);
 
@@ -392,8 +391,8 @@ export async function render(front: string, back: string) {
   wrapper?.setAttribute("data-state", "loading");
   if (config.cardless) wrapper?.classList.add("cardless");
 
-  if (frontEl) frontEl.innerHTML = md.render(decode(front), env);
-  if (backEl) backEl.innerHTML = md.render(decode(back), env);
+  if (frontEl) frontEl.innerHTML = md.render(decode(front));
+  if (backEl) backEl.innerHTML = md.render(decode(back));
   wrapper?.classList.add("ready");
 
   await Promise.all([typeset(wrapper), upgradeHighlighter(frontEl, backEl)]);
@@ -404,7 +403,6 @@ export async function render(front: string, back: string) {
 
 /** Render cloze deletion card to DOM. */
 export async function renderCloze(text: string, extra: string, ordinal: number, side: Side) {
-  const env = { math: !!(globalThis as { MathJax?: unknown }).MathJax };
   const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper");
   normalizeDarkMode(wrapper);
 
@@ -416,10 +414,10 @@ export async function renderCloze(text: string, extra: string, ordinal: number, 
   if (config.cardless) wrapper?.classList.add("cardless");
 
   const processed = processCloze(raw, ordinal, side);
-  if (frontEl) frontEl.innerHTML = postProcessCloze(md.render(processed, env));
+  if (frontEl) frontEl.innerHTML = postProcessCloze(md.render(processed));
 
   const extraText = decode(extra);
-  if (backEl && extraText.trim()) backEl.innerHTML = md.render(extraText, env);
+  if (backEl && extraText.trim()) backEl.innerHTML = md.render(extraText);
 
   wrapper?.classList.add("ready");
   await Promise.all([typeset(wrapper), upgradeHighlighter(frontEl, backEl)]);
