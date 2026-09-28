@@ -485,10 +485,12 @@ def test_html_returned_by_another_mime_hook_is_not_inserted(addon, context):
     assert addon.mod.on_paste((False, None), "anki-markdown:paste", editor) == (True, None)
 
 
-def test_image_conversion_accepts_attributes_before_src(addon):
-    assert addon.mod.html_to_markdown('<img alt="caption" src="a b.png">') == "![](a%20b.png)"
-    assert addon.mod.html_to_markdown('<img data-src="wrong.png" src="right.png">') == "![](right.png)"
-    assert addon.mod.html_to_markdown('<img data-src="not-a-source.png">') == '<img data-src="not-a-source.png">'
+@pytest.mark.parametrize(
+    "html",
+    ['<img alt="caption" src="a b.png">', '<img width="300" src="diagram.png">'],
+)
+def test_image_conversion_preserves_attributes_before_src(addon, html):
+    assert addon.mod.html_to_markdown(html) == html
 
 
 @pytest.mark.parametrize("name", ["Anki Markdown", "Anki Markdown Cloze", "Basic"])
@@ -511,3 +513,20 @@ def test_menu_routes_only_markdown_paste_to_webengine(addon, context, name):
     callback = paste.triggered.connect.call_args.args[0]
     callback(False)
     web.triggerPageAction.assert_called_once_with(addon.mod.QWebEnginePage.WebAction.Paste)
+
+
+def test_menu_preserves_unexpected_paste_connection(addon, context):
+    editor, _ = context
+    web = editor.web
+    web.editor = editor
+    menu = MagicMock()
+    paste = MagicMock()
+    paste.text.return_value = "Paste"
+    paste.triggered.disconnect.side_effect = TypeError("slot is not connected")
+    menu.actions.return_value = [paste]
+
+    addon.mod.on_editor_menu(web, menu)
+
+    paste.triggered.disconnect.assert_called_once_with(web.onPaste)
+    paste.triggered.connect.assert_not_called()
+    web.triggerPageAction.assert_not_called()

@@ -37,7 +37,7 @@ def html_to_markdown(content: str) -> str:
         return f"![]({src})"
 
     text = re.sub(
-        r'<img\b[^>]*?\ssrc="([^"]+)"[^>]*/?>', img_replace, text, flags=re.IGNORECASE
+        r'<img\s+src="([^"]+)"[^>]*/?>', img_replace, text, flags=re.IGNORECASE
     )
     text = re.sub(
         r"<(b|strong)>(.*?)</\1>", r"**\2**", text, flags=re.DOTALL | re.IGNORECASE
@@ -274,7 +274,10 @@ def on_editor_menu(web, menu):
     for action in menu.actions():
         if action.text() == tr.editing_paste():
             # The native menu otherwise bypasses CodeMirror's DOM paste event.
-            action.triggered.disconnect(web.onPaste)
+            try:
+                action.triggered.disconnect(web.onPaste)
+            except TypeError:
+                return
             action.triggered.connect(
                 lambda _checked=False: web.triggerPageAction(
                     QWebEnginePage.WebAction.Paste
