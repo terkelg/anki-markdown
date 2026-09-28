@@ -10,10 +10,15 @@
 <script id="data-text" type="text/plain">{{Text}}</script>
 <!-- prettier-ignore -->
 <script id="data-extra" type="text/plain">{{Extra}}</script>
-<script type="module">
-  import { renderCloze } from "./_review.js";
-  const text = document.getElementById("data-text").textContent;
-  const extra = document.getElementById("data-extra").textContent;
-  const ord = parseInt(document.querySelector(".card")?.className.match(/card(\d+)/)?.[1] || "1");
-  renderCloze(text, extra, ord, "back");
+<script>
+  {
+    const ready = import("./_review.js").then(({ renderCloze }) => {
+      const text = document.getElementById("data-text").textContent;
+      const extra = document.getElementById("data-extra").textContent;
+      const ord = parseInt(document.querySelector(".card")?.className.match(/card(\d+)/)?.[1] || "1");
+      renderCloze(text, extra, ord, "back");
+    });
+    // Let Anki typeset after Markdown is inserted, without waiting for highlighting.
+    if (typeof onUpdateHook !== "undefined") onUpdateHook.push(() => ready);
+  }
 </script>

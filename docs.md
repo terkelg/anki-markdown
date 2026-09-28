@@ -57,6 +57,39 @@ Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy
 
 ---
 
+## Math
+
+Use Anki's native MathJax delimiters for inline equations and display equations:
+
+```markdown
+Inline: \(x^2 + y^2 = z^2\)
+
+\[
+\frac{1}{\sqrt{2}}
+\]
+```
+
+Math is kept intact while Markdown is rendered, then typeset by the reviewer's built-in MathJax. No additional math engine, fonts, or CDN requests are needed. If the viewer does not provide MathJax, the equation source stays visible. Dollar delimiters (`$...$` and `$$...$$`) are not supported. Use inline code or fenced code blocks to show literal TeX.
+
+Clozes can hide a whole equation or part of one:
+
+```markdown
+{{c1::\(x^2 + y^2 = z^2\)}}
+\(x + {{c1::y::variable}}\)
+```
+
+Inside an equation, hidden clozes show `[...]` or a bracketed hint. Hints use TeX syntax. Revealed content has no cloze styling, and `::blur` uses `[...]`. To blur a whole equation, put the cloze outside its math delimiters: `{{c1::\(x^2\)::blur}}`.
+
+The equation must remain valid when the hidden content is replaced by a blank. Right after `\begin{aligned}`, add `{}` before a cloze so TeX does not read `[hint]` as an optional argument: `\begin{aligned}{}{{c1::a &= b}}\end{aligned}`.
+
+Separate adjacent closing TeX braces with a space for compatibility with Anki's cloze parser. Also add a space before the cloze's closing `}}` when its body ends in `}`. TeX ignores these spaces:
+
+```markdown
+\(x + {{c1::\frac{1}{\sqrt{2} } }}\)
+```
+
+---
+
 ## Cloze Deletions
 
 Cloze deletions create fill-in-the-blank cards. Use the **Anki Markdown Cloze** note type with `Text` and `Extra` fields.

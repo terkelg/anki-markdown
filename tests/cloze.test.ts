@@ -180,6 +180,12 @@ describe("processCloze", () => {
     expect(view(processCloze(text, 2, "front"))).toBe("HTML and <blank>[...]</blank>");
   });
 
+  test("hides literal math delimiters in code without consuming later text", () => {
+    const text = "Opening: {{c1::`\\(`}}. Closing: `\\)`.";
+    expect(view(processCloze(text, 1, "front"))).toBe("Opening: <blank>[...]</blank>. Closing: `\\)`.");
+    expect(view(processCloze(text, 1, "back"))).toBe("Opening: <active>`\\(`</active>. Closing: `\\)`.");
+  });
+
   test("adjacent clozes with no space", () => {
     const text = "{{c1::Hello}}{{c2::World}}";
     expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank>World");

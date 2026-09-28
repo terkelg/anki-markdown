@@ -14,6 +14,7 @@ import {
   transformerNotationFocus,
 } from "@shikijs/transformers";
 import { processCloze, postProcessCloze, type Side } from "./cloze";
+import { math, typeset } from "./math";
 
 // Config from inline JSON (injected by Python)
 interface Config {
@@ -219,6 +220,7 @@ function highlight(code: string, name: string, meta?: string) {
 const md = createMarkdownExit({ html: true });
 md.use(mark as never);
 md.use(alerts as never);
+md.use(math);
 const ready = initHighlighter().then((value) => (highlighter = value));
 
 // Only allow safe HTML tags, strip everything else
@@ -393,7 +395,7 @@ export async function render(front: string, back: string) {
   if (backEl) backEl.innerHTML = md.render(decode(back));
   wrapper?.classList.add("ready");
 
-  await upgradeHighlighter(frontEl, backEl);
+  await Promise.all([typeset(wrapper), upgradeHighlighter(frontEl, backEl)]);
 
   wrapper?.setAttribute("data-state", "ready");
   wrapper?.classList.add("ready");
@@ -418,7 +420,7 @@ export async function renderCloze(text: string, extra: string, ordinal: number, 
   if (backEl && extraText.trim()) backEl.innerHTML = md.render(extraText);
 
   wrapper?.classList.add("ready");
-  await upgradeHighlighter(frontEl, backEl);
+  await Promise.all([typeset(wrapper), upgradeHighlighter(frontEl, backEl)]);
 
   wrapper?.setAttribute("data-state", "ready");
   wrapper?.classList.add("ready");

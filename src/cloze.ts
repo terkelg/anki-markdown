@@ -164,6 +164,12 @@ export function processCloze(text: string, ord: number, side: Side): string {
   return show(parse(text), ord, side);
 }
 
+/** Match native math clozes: hints keep their TeX meaning, and blur falls back to a blank. */
+export function mathCloze(text: string): string {
+  // Grouping a TeX fragment can split command arguments or insert literal commands inside \text.
+  return text.replace(/\uE002[\s\S]*?\uE003/g, "[...]").replace(/[\uE000-\uE007]/g, "");
+}
+
 export function postProcessCloze(html: string): string {
   return html
     .replaceAll("<p>\uE002</p>", '<div class="cloze-blur">')

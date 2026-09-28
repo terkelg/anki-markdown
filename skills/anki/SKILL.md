@@ -56,6 +56,16 @@ For potentially destructive or irreversible actions:
 Use **Anki Markdown** (Front/Back) for question-answer pairs where you write a specific question.
 Use **Anki Markdown Cloze** (Text/Extra) for fill-in-the-blank cards where hiding parts of a statement is more natural than writing a question.
 
+## Math
+
+Use Anki's native delimiters: `\(x^2\)` for inline math and `\[x^2\]` for display math. The reviewer uses Anki's built-in MathJax; do not add external scripts or fonts. Dollar delimiters are not supported. Use code formatting for literal TeX examples.
+
+Clozes can contain equations (`{{c1::\(x^2\)}}`) or appear inside them (`\(x + {{c1::y}}\)`). Inside math, hidden clozes show `[...]` or a bracketed TeX hint. Revealed content has no cloze styling, and `::blur` uses `[...]`. To blur a whole equation, put the cloze outside its math delimiters: `{{c1::\(x^2\)::blur}}`.
+
+Keep the remaining TeX valid when content is hidden. After `\begin{aligned}`, add `{}` before a cloze to prevent its hint becoming an optional argument.
+
+Separate adjacent closing TeX braces with a space, and add a space before the cloze's closing `}}` when its body ends in `}`. For example: `\(x + {{c1::\frac{1}{\sqrt{2} } }}\)`. This keeps Anki's cloze boundaries clear; TeX ignores the spaces.
+
 ## Cloze Cards
 
 Use `Anki Markdown Cloze` for fill-in-the-blank cards. Fields are `Text` and `Extra`.
