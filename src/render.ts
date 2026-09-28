@@ -14,6 +14,7 @@ import {
   transformerNotationFocus,
 } from "@shikijs/transformers";
 import { processCloze, postProcessCloze, type Side } from "./cloze";
+import { math, typeset } from "./math";
 
 // Config from inline JSON (injected by Python)
 interface Config {
@@ -219,6 +220,7 @@ function highlight(code: string, name: string, meta?: string) {
 const md = createMarkdownExit({ html: true });
 md.use(mark as never);
 md.use(alerts as never);
+md.use(math);
 const ready = initHighlighter().then((value) => (highlighter = value));
 
 // Only allow safe HTML tags, strip everything else
@@ -380,6 +382,7 @@ async function upgradeHighlighter(...els: (HTMLElement | null)[]) {
 
 /** Render front/back fields to card DOM. */
 export async function render(front: string, back: string) {
+  const env = { math: !!(globalThis as { MathJax?: unknown }).MathJax };
   const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper");
   normalizeDarkMode(wrapper);
 
@@ -389,11 +392,11 @@ export async function render(front: string, back: string) {
   wrapper?.setAttribute("data-state", "loading");
   if (config.cardless) wrapper?.classList.add("cardless");
 
-  if (frontEl) frontEl.innerHTML = md.render(decode(front));
-  if (backEl) backEl.innerHTML = md.render(decode(back));
+  if (frontEl) frontEl.innerHTML = md.render(decode(front), env);
+  if (backEl) backEl.innerHTML = md.render(decode(back), env);
   wrapper?.classList.add("ready");
 
-  await upgradeHighlighter(frontEl, backEl);
+  await Promise.all([typeset(wrapper), upgradeHighlighter(frontEl, backEl)]);
 
   wrapper?.setAttribute("data-state", "ready");
   wrapper?.classList.add("ready");
@@ -401,6 +404,7 @@ export async function render(front: string, back: string) {
 
 /** Render cloze deletion card to DOM. */
 export async function renderCloze(text: string, extra: string, ordinal: number, side: Side) {
+  const env = { math: !!(globalThis as { MathJax?: unknown }).MathJax };
   const wrapper = document.querySelector<HTMLElement>(".anki-md-wrapper");
   normalizeDarkMode(wrapper);
 
@@ -412,13 +416,13 @@ export async function renderCloze(text: string, extra: string, ordinal: number, 
   if (config.cardless) wrapper?.classList.add("cardless");
 
   const processed = processCloze(raw, ordinal, side);
-  if (frontEl) frontEl.innerHTML = postProcessCloze(md.render(processed));
+  if (frontEl) frontEl.innerHTML = postProcessCloze(md.render(processed, env));
 
   const extraText = decode(extra);
-  if (backEl && extraText.trim()) backEl.innerHTML = md.render(extraText);
+  if (backEl && extraText.trim()) backEl.innerHTML = md.render(extraText, env);
 
   wrapper?.classList.add("ready");
-  await upgradeHighlighter(frontEl, backEl);
+  await Promise.all([typeset(wrapper), upgradeHighlighter(frontEl, backEl)]);
 
   wrapper?.setAttribute("data-state", "ready");
   wrapper?.classList.add("ready");

@@ -6,9 +6,14 @@
 <script id="data-front" type="text/plain">{{Front}}</script>
 <!-- prettier-ignore -->
 <script id="data-back" type="text/plain">{{Back}}</script>
-<script type="module">
-  import { render } from "./_review.js";
-  const front = document.getElementById("data-front").textContent;
-  const back = document.getElementById("data-back").textContent;
-  render(front, back);
+<script>
+  {
+    const ready = import("./_review.js").then(({ render }) => {
+      const front = document.getElementById("data-front").textContent;
+      const back = document.getElementById("data-back").textContent;
+      render(front, back);
+    });
+    // Let Anki typeset after Markdown is inserted, without waiting for highlighting.
+    if (typeof onUpdateHook !== "undefined") onUpdateHook.push(() => ready);
+  }
 </script>

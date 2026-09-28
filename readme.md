@@ -18,6 +18,7 @@ Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks
 - **Syntax highlighting** with 300+ languages and 60+ themes, only your selections are downloaded and synced
 - **Advanced code annotations** including line highlighting, word highlighting, focus mode, and error/warning markers
 - **Full Markdown** with bold, italic, lists, blockquotes, tables, images, alerts, and more
+- **[Math](docs.md#math)** using Anki's built-in MathJax, with no bundled math engine or fonts
 - **Clean card design** with polished light/dark styling that matches Anki's native UI
 - **Settings panel** to dynamically pick languages and themes
 - **Cross-platform** works on desktop, AnkiDroid, AnkiMobile, and AnkiWeb
