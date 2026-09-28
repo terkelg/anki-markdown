@@ -20,6 +20,12 @@ Standard markdown syntax via [markdown-exit](https://markdown-exit.pages.dev):
 | `[link](url)`            | [link](url)       |
 | `![alt](image.jpg)`      | Image             |
 
+### Images
+
+In Anki's default desktop editor, paste a screenshot or copied image file with the keyboard or **Paste** menu. Anki saves it in the collection's media folder and inserts `![](filename)` at your selection. You can also drag image files into fields.
+
+Clipboard data containing HTML uses its plain-text fallback, which may be empty. This includes some browser **Copy Image** commands; image-only copies can work. Pasted image URLs stay as text. The experimental editor is not supported yet.
+
 ### Keyboard Keys
 
 Use HTML for keyboard shortcuts:
