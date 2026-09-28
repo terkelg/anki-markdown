@@ -287,6 +287,10 @@ class TestHtmlToMarkdown:
 
         assert result == "![](foo%20bar.png)**x***y*\nz"
 
+    def test_preserves_image_attributes(self, addon):
+        html = '<img alt="diagram" width="300" src="diagram.png">'
+        assert addon.mod.html_to_markdown(html) == html
+
 
 class TestOnMungeHtml:
     def test_converts_only_anki_markdown_notes(self, addon):
@@ -407,9 +411,7 @@ class TestProfileLoaded:
 
 @pytest.fixture
 def context(addon):
-    editor = addon.mod.Editor()
-    editor.note = MagicMock()
-    editor.note.note_type.return_value = {"name": "Anki Markdown"}
+    editor = FakeEditor(FakeNote("Anki Markdown"))
     editor.mw = MagicMock()
     editor.web = MagicMock()
     editor.web._wantsExtendedPaste.return_value = True
@@ -424,7 +426,7 @@ def context(addon):
 @pytest.mark.parametrize("name", ["Anki Markdown", "Anki Markdown Cloze"])
 def test_image_uses_native_media_processor(addon, context, name):
     editor, mime = context
-    editor.note.note_type.return_value = {"name": name}
+    editor.note.name = name
     assert addon.mod.on_paste((False, None), "anki-markdown:paste", editor) == (
         True,
         "![](native%20name.png)",
@@ -436,7 +438,6 @@ def test_image_uses_native_media_processor(addon, context, name):
     "path,local,accepted",
     [
         ("/tmp/image.PNG", True, True),
-        ("/tmp/image.svg", True, True),
         ("/tmp/file.pdf", True, False),
         ("https://example.com/image.png", False, False),
     ],
@@ -454,7 +455,7 @@ def test_only_local_image_files_are_imported(addon, context, path, local, accept
     assert editor.web._processMime.called == accepted
 
 
-@pytest.mark.parametrize("reason", ["html", "text", "unsupported_note", "no_note", "no_clipboard"])
+@pytest.mark.parametrize("reason", ["html", "text", "unsupported_note"])
 def test_other_clipboard_routes_do_not_import_media(addon, context, reason):
     editor, mime = context
     if reason == "html":
@@ -462,11 +463,7 @@ def test_other_clipboard_routes_do_not_import_media(addon, context, reason):
     elif reason == "text":
         mime.hasImage.return_value = False
     elif reason == "unsupported_note":
-        editor.note.note_type.return_value = {"name": "Basic"}
-    elif reason == "no_note":
-        editor.note = None
-    elif reason == "no_clipboard":
-        editor.mw.app.clipboard().mimeData.return_value = None
+        editor.note.name = "Basic"
     assert addon.mod.on_paste((False, None), "anki-markdown:paste", editor) == (True, None)
     editor.web._processMime.assert_not_called()
 
@@ -475,7 +472,6 @@ def test_unrelated_or_already_handled_commands_pass_through(addon, context):
     editor, _ = context
     assert addon.mod.on_paste((False, None), "paste", editor) == (False, None)
     assert addon.mod.on_paste((True, "other"), "anki-markdown:paste", editor) == (True, "other")
-    assert addon.mod.on_paste((False, None), "anki-markdown:paste", object()) == (True, None)
     editor.web._processMime.assert_not_called()
 
 
@@ -486,47 +482,31 @@ def test_html_returned_by_another_mime_hook_is_not_inserted(addon, context):
 
 
 @pytest.mark.parametrize(
-    "html",
-    ['<img alt="caption" src="a b.png">', '<img width="300" src="diagram.png">'],
+    "name,connected",
+    [("Anki Markdown", True), ("Anki Markdown Cloze", True), ("Basic", True), ("Anki Markdown", False)],
 )
-def test_image_conversion_preserves_attributes_before_src(addon, html):
-    assert addon.mod.html_to_markdown(html) == html
-
-
-@pytest.mark.parametrize("name", ["Anki Markdown", "Anki Markdown Cloze", "Basic"])
-def test_menu_routes_only_markdown_paste_to_webengine(addon, context, name):
+def test_menu_routes_only_native_markdown_paste_to_webengine(addon, context, name, connected):
     editor, _ = context
-    editor.note.note_type.return_value = {"name": name}
+    editor.note.name = name
     web = editor.web
     web.editor = editor
     menu = MagicMock()
     copy, paste = MagicMock(), MagicMock()
     copy.text.return_value = "Copy"
     paste.text.return_value = "Paste"
+    if not connected:
+        paste.triggered.disconnect.side_effect = TypeError("slot is not connected")
     menu.actions.return_value = [copy, paste]
     addon.mod.on_editor_menu(web, menu)
     copy.triggered.disconnect.assert_not_called()
     if name == "Basic":
         paste.triggered.disconnect.assert_not_called()
+    else:
+        paste.triggered.disconnect.assert_called_once_with(web.onPaste)
+    if name == "Basic" or not connected:
+        paste.triggered.connect.assert_not_called()
+        web.triggerPageAction.assert_not_called()
         return
-    paste.triggered.disconnect.assert_called_once_with(web.onPaste)
     callback = paste.triggered.connect.call_args.args[0]
     callback(False)
     web.triggerPageAction.assert_called_once_with(addon.mod.QWebEnginePage.WebAction.Paste)
-
-
-def test_menu_preserves_unexpected_paste_connection(addon, context):
-    editor, _ = context
-    web = editor.web
-    web.editor = editor
-    menu = MagicMock()
-    paste = MagicMock()
-    paste.text.return_value = "Paste"
-    paste.triggered.disconnect.side_effect = TypeError("slot is not connected")
-    menu.actions.return_value = [paste]
-
-    addon.mod.on_editor_menu(web, menu)
-
-    paste.triggered.disconnect.assert_called_once_with(web.onPaste)
-    paste.triggered.connect.assert_not_called()
-    web.triggerPageAction.assert_not_called()

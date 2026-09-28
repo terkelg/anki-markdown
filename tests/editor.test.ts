@@ -6,7 +6,7 @@ const source = readFileSync(new URL("../src/editor.ts", import.meta.url), "utf8"
 const code = new Bun.Transpiler({ loader: "ts" }).transformSync(source.replace('import "./editor.css";', ""));
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 
-function input() {
+async function setup(existing = true) {
   const listeners = new Set<Function>();
   const element = { isConnected: true };
   const editor = {
@@ -41,11 +41,6 @@ function input() {
     for (const listener of listeners) listener(editor, event);
     return event;
   }
-  return { api, editor, element, listeners, paste };
-}
-
-async function setup(existing = true) {
-  const field = input();
   const classes = new Set<string>();
   const mounts: Function[] = [];
   const destroys: Function[] = [];
@@ -54,7 +49,7 @@ async function setup(existing = true) {
     "anki/ui": { loaded: Promise.resolve() },
     "anki/NoteEditor": { instances: [{ fields: Promise.resolve([{}, {}]) }] },
     "anki/PlainTextInput": {
-      instances: existing ? [field.api] : [],
+      instances: existing ? [api] : [],
       lifecycle: {
         onMount: (callback: Function) => mounts.push(callback),
         onDestroy: (callback: Function) => destroys.push(callback),
@@ -85,11 +80,14 @@ async function setup(existing = true) {
   await host.ankiMdActivate();
   await flush();
   return {
-    ...field,
+    editor,
+    element,
+    listeners,
+    paste,
     host,
     requests,
-    mount: (api = field.api) => mounts.forEach((f) => f(api)),
-    destroy: () => destroys.forEach((f) => f(field.api)),
+    mount: () => mounts.forEach((f) => f(api)),
+    destroy: () => destroys.forEach((f) => f(api)),
   };
 }
 
@@ -111,18 +109,14 @@ test("ordinary text, URLs, and copied HTML retain CodeMirror's normal paste path
   expect(field.requests).toHaveLength(0);
 });
 
-test("declined native payload retains its text fallback", async () => {
+test.each([
+  [null, "a file path", "LEFT a file path RIGHT"],
+  ["", "", "LEFT REMOVE RIGHT"],
+])("native result %p preserves fallback text or the selection", async (result, fallback, expected) => {
   const field = await setup();
-  field.paste(1, "a file path");
-  field.requests[0].callback(null);
-  expect(field.editor.value).toBe("LEFT a file path RIGHT");
-});
-
-test("a failed image import does not delete selected text", async () => {
-  const field = await setup();
-  field.paste();
-  field.requests[0].callback("");
-  expect(field.editor.value).toBe("LEFT REMOVE RIGHT");
+  field.paste(1, fallback);
+  field.requests[0].callback(result);
+  expect(field.editor.value).toBe(expected);
 });
 
 for (const change of ["text", "document", "note", "inactive", "detached"] as const) {
@@ -147,19 +141,14 @@ test("non-Markdown notes do not intercept image paste", async () => {
 });
 
 test("existing and newly mounted inputs get one listener, removed on destruction", async () => {
-  const field = await setup();
-  field.mount();
-  await flush();
-  expect(field.listeners.size).toBe(1);
-  field.destroy();
-  expect(field.listeners.size).toBe(0);
-
-  const next = await setup(false);
-  next.mount();
-  await flush();
-  expect(next.listeners.size).toBe(1);
-  next.destroy();
-  expect(next.listeners.size).toBe(0);
+  for (const existing of [true, false]) {
+    const field = await setup(existing);
+    field.mount();
+    await flush();
+    expect(field.listeners.size).toBe(1);
+    field.destroy();
+    expect(field.listeners.size).toBe(0);
+  }
 });
 
 test("destroying an input before CodeMirror resolves leaves no listener", async () => {

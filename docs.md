@@ -22,11 +22,9 @@ Standard markdown syntax via [markdown-exit](https://markdown-exit.pages.dev):
 
 ### Images
 
-In Anki's default desktop editor, paste a screenshot or a copied image file into a Markdown field. Anki saves the image in the collection's media folder and inserts `![](filename)` at your selection. Keyboard paste and the Paste context-menu action both work.
+In Anki's default desktop editor, paste a screenshot or copied image file with the keyboard or **Paste** menu. Anki saves it in the collection's media folder and inserts `![](filename)` at your selection. You can also drag image files into fields.
 
-Copied web-page HTML uses its plain-text fallback. This also applies to a browser's **Copy Image** command when it includes HTML: the image is not imported, and the fallback text may be empty. Browser images copied without HTML can still work.
-
-Pasted image URLs stay as text. You can also drag an image file into a field. The experimental Anki editor is not supported yet.
+Clipboard data containing HTML uses its plain-text fallback, which may be empty. This includes some browser **Copy Image** commands; image-only copies can work. Pasted image URLs stay as text. The experimental editor is not supported yet.
 
 ### Keyboard Keys
 
