@@ -1,8 +1,9 @@
 from pathlib import Path
 import re
 from aqt import mw, gui_hooks
-from aqt.qt import QAction, QMessageBox
-from aqt.editor import Editor
+from aqt.qt import QAction, QClipboard, QMessageBox, QWebEnginePage
+from aqt.editor import Editor, pics
+from aqt.utils import tr
 from aqt.webview import WebContent
 
 from .shiki import store, get_config, generate_config_json
@@ -36,7 +37,7 @@ def html_to_markdown(content: str) -> str:
         return f"![]({src})"
 
     text = re.sub(
-        r'<img\s+src="([^"]+)"[^>]*/?>', img_replace, text, flags=re.IGNORECASE
+        r'<img\b[^>]*?\ssrc="([^"]+)"[^>]*/?>', img_replace, text, flags=re.IGNORECASE
     )
     text = re.sub(
         r"<(b|strong)>(.*?)</\1>", r"**\2**", text, flags=re.DOTALL | re.IGNORECASE
@@ -237,7 +238,54 @@ def on_editor_load_note(editor: Editor):
         editor.web.eval("window.ankiMdDeactivate && ankiMdDeactivate()")
 
 
+def on_paste(handled, message, context):
+    if handled[0] or message != "anki-markdown:paste":
+        return handled
+    if not isinstance(context, Editor) or not context.note:
+        return True, None
+    if not is_anki_markdown(context.note.note_type()):
+        return True, None
+
+    mime = context.mw.app.clipboard().mimeData(QClipboard.Mode.Clipboard)
+    # Copied HTML requires Anki's final JavaScript filter, which isn't exposed.
+    if not mime or mime.hasHtml():
+        return True, None
+    if mime.hasUrls():
+        if not all(
+            url.isLocalFile() and Path(url.toLocalFile()).suffix[1:].lower() in pics
+            for url in mime.urls()
+        ):
+            return True, None
+    elif not mime.hasImage():
+        return True, None
+
+    # Keep Anki's private clipboard API here; it owns conversion and media storage.
+    web = context.web
+    html, internal = web._processMime(mime, web._wantsExtendedPaste())
+    return True, html_to_markdown(html) if internal else None
+
+
+def on_editor_menu(web, menu):
+    editor = web.editor
+    if not isinstance(editor, Editor) or not editor.note:
+        return
+    if not is_anki_markdown(editor.note.note_type()):
+        return
+    for action in menu.actions():
+        if action.text() == tr.editing_paste():
+            # The native menu otherwise bypasses CodeMirror's DOM paste event.
+            action.triggered.disconnect(web.onPaste)
+            action.triggered.connect(
+                lambda _checked=False: web.triggerPageAction(
+                    QWebEnginePage.WebAction.Paste
+                )
+            )
+            return
+
+
 gui_hooks.profile_did_open.append(on_profile_loaded)
 gui_hooks.editor_will_munge_html.append(on_munge_html)
 gui_hooks.webview_will_set_content.append(on_webview_set_content)
 gui_hooks.editor_did_load_note.append(on_editor_load_note)
+gui_hooks.webview_did_receive_js_message.append(on_paste)
+gui_hooks.editor_will_show_context_menu.append(on_editor_menu)
