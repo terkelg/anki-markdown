@@ -466,6 +466,16 @@ For safety, only these HTML tags are allowed in cards:
 
 All other HTML is stripped during rendering.
 
+Use `<br>` to add a line break inside a table cell. Keep each table row on one source line:
+
+```markdown
+| Term    | Meaning                   |
+| ------- | ------------------------- |
+| Example | First line<br>Second line |
+```
+
+`<br/>` and `<br />` also work. Use real newlines for Markdown structure, such as lists and separate table rows.
+
 ---
 
 ## AnkiMobile: Swipe Conflicts

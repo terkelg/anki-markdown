@@ -25,10 +25,9 @@ def read(name: str) -> str:
 
 
 def html_to_markdown(content: str) -> str:
-    """Convert basic HTML tags to markdown syntax.
+    """Convert basic HTML formatting to markdown syntax.
 
-    Not strictly required since HTML is supported in the markdown renderer,
-    but keeps stored content as clean markdown without HTML tags.
+    Keep explicit <br> tags: source newlines would split Markdown table rows.
     """
     text = content
 
@@ -45,7 +44,6 @@ def html_to_markdown(content: str) -> str:
     text = re.sub(
         r"<(i|em)>(.*?)</\1>", r"*\2*", text, flags=re.DOTALL | re.IGNORECASE
     )
-    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
     return text
 
 

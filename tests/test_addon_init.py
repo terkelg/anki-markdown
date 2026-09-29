@@ -285,7 +285,7 @@ class TestHtmlToMarkdown:
             '<IMG src="foo bar.png"><STRONG>x</STRONG><em>y</em><br>z',
         )
 
-        assert result == "![](foo%20bar.png)**x***y*\nz"
+        assert result == "![](foo%20bar.png)**x***y*<br>z"
 
     def test_preserves_image_attributes(self, addon):
         html = '<img alt="diagram" width="300" src="diagram.png">'
@@ -293,6 +293,20 @@ class TestHtmlToMarkdown:
 
 
 class TestOnMungeHtml:
+    @pytest.mark.parametrize("name", ["Anki Markdown", "Anki Markdown Cloze"])
+    @pytest.mark.parametrize("br", ["<br>", "<br/>", "<br />", "<BR>"])
+    def test_preserves_line_breaks_in_markdown(self, addon, name, br):
+        text = (
+            "| Kind | Details |\n| --- | --- |\n"
+            f"| Strong | First{br}Second |\n"
+            f"| Weak | Intro{br}1. First{br}2. Second |\n\n"
+            f"Use `{br}` for a line break.\n\n"
+            f"```html\n{br}\n```\n\n"
+            "- One\n- Two\n\nLast paragraph."
+        )
+
+        assert addon.mod.on_munge_html(text, FakeEditor(FakeNote(name))) == text
+
     def test_converts_only_anki_markdown_notes(self, addon):
         txt = "<strong>x</strong>"
 
