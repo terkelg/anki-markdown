@@ -156,10 +156,7 @@ def ensure_notetype():
 
     if m:
         t = m["tmpls"][0]
-        # Avoid making Anki rename a custom template with the same name.
-        if t["name"] == "Default" and not any(
-            template["name"] == NOTETYPE for template in m["tmpls"]
-        ):
+        if t["name"] == "Default":
             t["name"] = NOTETYPE
         t["qfmt"] = get_template("front.html")
         t["afmt"] = get_template("back.html")

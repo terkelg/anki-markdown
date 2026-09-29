@@ -305,17 +305,16 @@ class TestOnMungeHtml:
 
 class TestEnsureNotetype:
     @pytest.mark.parametrize(
-        "name,extra,expected",
+        "name,expected",
         [
-            ("Default", "Reverse", "Anki Markdown"),
-            ("Anki Markdown", "Reverse", "Anki Markdown"),
-            ("My card", "Reverse", "My card"),
-            ("Default", "Anki Markdown", "Default"),
+            ("Default", "Anki Markdown"),
+            ("Anki Markdown", "Anki Markdown"),
+            ("My card", "My card"),
         ],
     )
-    def test_updates_existing_model(self, addon, name, extra, expected):
+    def test_updates_existing_model(self, addon, name, expected):
         template = {"name": name, "ord": 0, "qfmt": "old-front", "afmt": "old-back"}
-        reverse = {"name": extra, "ord": 1, "qfmt": "reverse-front", "afmt": "reverse-back"}
+        reverse = {"name": "Reverse", "ord": 1, "qfmt": "reverse-front", "afmt": "reverse-back"}
         model = {
             "tmpls": [template, reverse.copy()],
             "flds": [{"name": "Front"}, {"name": "Back", "plainText": False}],
