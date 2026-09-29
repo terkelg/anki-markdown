@@ -10,6 +10,8 @@ This symlinks the add-on into Anki, launches Anki with remote debugging enabled,
 
 ## Build
 
+Use Bun with Node.js 22.12 or newer for Vite 8.
+
 Compile TypeScript to the Anki add-on folder:
 
 ```bash
