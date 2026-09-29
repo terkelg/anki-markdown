@@ -304,9 +304,20 @@ class TestOnMungeHtml:
 
 
 class TestEnsureNotetype:
-    def test_updates_existing_model(self, addon):
+    @pytest.mark.parametrize(
+        "name,extra,expected",
+        [
+            ("Default", "Reverse", "Anki Markdown"),
+            ("Anki Markdown", "Reverse", "Anki Markdown"),
+            ("My card", "Reverse", "My card"),
+            ("Default", "Anki Markdown", "Default"),
+        ],
+    )
+    def test_updates_existing_model(self, addon, name, extra, expected):
+        template = {"name": name, "ord": 0, "qfmt": "old-front", "afmt": "old-back"}
+        reverse = {"name": extra, "ord": 1, "qfmt": "reverse-front", "afmt": "reverse-back"}
         model = {
-            "tmpls": [{"qfmt": "old-front", "afmt": "old-back"}],
+            "tmpls": [template, reverse.copy()],
             "flds": [{"name": "Front"}, {"name": "Back", "plainText": False}],
         }
         addon.models.models["Anki Markdown"] = model
@@ -314,6 +325,12 @@ class TestEnsureNotetype:
         addon.mod.ensure_notetype()
 
         assert addon.models.saved == [model]
+        assert addon.models.added == []
+        assert len(model["tmpls"]) == 2
+        assert model["tmpls"][0] is template
+        assert template["name"] == expected
+        assert template["ord"] == 0
+        assert model["tmpls"][1] == reverse
         assert model["tmpls"][0]["qfmt"].endswith("<div>front</div>")
         assert model["tmpls"][0]["afmt"].endswith("<div>back</div>")
         assert all(field["plainText"] is True for field in model["flds"])
@@ -326,7 +343,7 @@ class TestEnsureNotetype:
         assert model["name"] == "Anki Markdown"
         assert [field["name"] for field in model["flds"]] == ["Front", "Back"]
         assert all(field["plainText"] is True for field in model["flds"])
-        assert model["tmpls"][0]["name"] == "Default"
+        assert model["tmpls"][0]["name"] == "Anki Markdown"
         assert model["tmpls"][0]["qfmt"].endswith("<div>front</div>")
         assert model["tmpls"][0]["afmt"].endswith("<div>back</div>")
         assert model["css"] == addon.mod.DEFAULT_CSS

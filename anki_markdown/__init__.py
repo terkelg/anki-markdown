@@ -155,8 +155,14 @@ def ensure_notetype():
     m = mm.by_name(NOTETYPE)
 
     if m:
-        m["tmpls"][0]["qfmt"] = get_template("front.html")
-        m["tmpls"][0]["afmt"] = get_template("back.html")
+        t = m["tmpls"][0]
+        # Avoid making Anki rename a custom template with the same name.
+        if t["name"] == "Default" and not any(
+            template["name"] == NOTETYPE for template in m["tmpls"]
+        ):
+            t["name"] = NOTETYPE
+        t["qfmt"] = get_template("front.html")
+        t["afmt"] = get_template("back.html")
         for f in m["flds"]:
             f["plainText"] = True
         mm.save(m)
@@ -171,7 +177,7 @@ def ensure_notetype():
     back["plainText"] = True
     mm.add_field(m, back)
 
-    t = mm.new_template("Default")
+    t = mm.new_template(NOTETYPE)
     t["qfmt"] = get_template("front.html")
     t["afmt"] = get_template("back.html")
     mm.add_template(m, t)
