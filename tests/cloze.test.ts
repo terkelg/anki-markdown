@@ -257,6 +257,68 @@ describe("renderCloze", () => {
 });
 
 describe("render", () => {
+  test.each(["<br>", "<br/>", "<br />", "<BR>"])("keeps %s inside table cells on basic and cloze cards", async (br) => {
+    const dom = mount();
+    const table = `| Kind | Details |\n| --- | --- |\n| Strong | First${br}Second |\n| Weak | Intro${br}1. First${br}2. Second |`;
+
+    try {
+      const { render, renderCloze } = await loadRender();
+      await render(table, table);
+      for (const field of [dom.front, dom.back]) {
+        expect(field.innerHTML).toContain(`<td>First${br}Second</td>`);
+        expect(field.innerHTML).toContain(`<td>Intro${br}1. First${br}2. Second</td>`);
+        expect(field.innerHTML.match(/<tr>/g)).toHaveLength(3);
+        expect(field.innerHTML).not.toContain("<ol>");
+      }
+
+      const cloze = table.replace(`First${br}Second`, `{{c1::First${br}Second}}`);
+      for (const side of ["front", "back"] as const) {
+        await renderCloze(cloze, table, 1, side);
+        expect(dom.front.innerHTML.match(/<tr>/g)).toHaveLength(3);
+        expect(dom.front.innerHTML).toContain(`<td>Intro${br}1. First${br}2. Second</td>`);
+        expect(dom.front.innerHTML).toContain(
+          side === "front"
+            ? '<span class="cloze-blank">[...]</span>'
+            : `<span class="cloze-active">First${br}Second</span>`,
+        );
+        expect(dom.back.innerHTML).toContain(`<td>First${br}Second</td>`);
+      }
+    } finally {
+      dom.restore();
+    }
+  });
+
+  test("preserves code examples, Markdown newlines, and HTML line breaks", async () => {
+    const dom = mount();
+    const text = "Use `<br>` here.\n\n    <br/>\n\nFirst<br>Second\n\n- One\n- Two";
+
+    try {
+      const { render } = await loadRender();
+      await render(text, "");
+      expect(dom.front.innerHTML).toBe(markdown().render(text));
+      expect(dom.front.innerHTML).toContain("<code>&lt;br&gt;</code>");
+      expect(dom.front.innerHTML).toContain("<p>First<br>Second</p>");
+      expect(dom.front.innerHTML).toContain("<li>One</li>\n<li>Two</li>");
+      expect(dom.front.innerHTML).toContain("<pre><code>&lt;br/&gt;\n</code></pre>");
+    } finally {
+      dom.restore();
+    }
+  });
+
+  test("keeps following Markdown when a paragraph starts with a line break", async () => {
+    const dom = mount();
+
+    try {
+      const { render } = await loadRender();
+      await render("Before.\n\n<br>\nAfter **break**.\n\n<br/>\n- One\n- Two", "");
+      expect(dom.front.innerHTML).toContain("<p><br>\nAfter <strong>break</strong>.</p>");
+      expect(dom.front.innerHTML).toContain("<p><br/></p>");
+      expect(dom.front.innerHTML).toContain("<li>One</li>\n<li>Two</li>");
+    } finally {
+      dom.restore();
+    }
+  });
+
   test("parses punctuated inline code language tags", async () => {
     const dom = mount();
     const log = console.log;

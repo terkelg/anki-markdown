@@ -218,16 +218,17 @@ function highlight(code: string, name: string, meta?: string) {
 }
 
 const md = createMarkdownExit({ html: true });
+// Supported tags are inline; raw HTML blocks would hide the Markdown after <br>.
+md.disable("html_block");
 md.use(mark as never);
 md.use(alerts as never);
 md.use(math);
 const ready = initHighlighter().then((value) => (highlighter = value));
 
 // Only allow safe HTML tags, strip everything else
-const ALLOWED = /^<\/?(img|a|b|i|em|strong|br|kbd)(\s[^>]*)?>$/i;
+const ALLOWED = /^<\/?(img|a|b|i|em|strong|br|kbd)(\s[^>]*)?\/?>$/i;
 const sanitize = (html: string) => (ALLOWED.test(html.trim()) ? html : "");
 md.renderer.rules.html_inline = (tokens, idx) => sanitize(tokens[idx].content);
-md.renderer.rules.html_block = (tokens, idx) => sanitize(tokens[idx].content);
 md.renderer.rules.fence = (tokens, idx) => {
   const { content, info } = tokens[idx];
   const [lang, ...rest] = info.split(/\s+/);
@@ -300,7 +301,8 @@ card?.addEventListener("click", (e) => {
 const decoder = document.createElement("textarea");
 
 function decode(text: string): string {
-  decoder.innerHTML = text.replace(/<br\s*\/?>/gi, "\n");
+  // Keep <br> as inline HTML so it cannot split a Markdown table row.
+  decoder.innerHTML = text;
   return decoder.value;
 }
 
