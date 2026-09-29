@@ -209,7 +209,7 @@ describe("processCloze", () => {
     expect(view(processCloze(text, 2, "front"))).toBe("A-<blank>[...]</blank>-C");
   });
 
-  // Upstream Anki `main` supports `{{c1,2::...}}`, but released Anki 25.09 does not yet.
+  // Anki 26.05+ generates cards for comma-separated ordinals.
   test("supports comma-separated ordinals", () => {
     const text = "{{c1,2::answer}}";
     expect(view(processCloze(text, 1, "front"))).toBe("<blank>[...]</blank>");

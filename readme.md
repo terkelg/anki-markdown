@@ -13,6 +13,7 @@ Write flashcards in Markdown with full [syntax highlighting](docs.md#code-blocks
 
 > [!NOTE]
 > Requires [Anki](https://apps.ankiweb.net/) 25.x or later. Go to `Tools → Add-ons → Get Add-ons` and enter [`1172202975`](https://ankiweb.net/shared/info/1172202975) to install.
+> [Shared cloze deletions](docs.md#shared-deletions), such as `{{c1,2::text}}`, require Anki desktop 26.05 or later.
 > See the [documentation](docs.md) for all supported features.
 
 - **Syntax highlighting** with 300+ languages and 60+ themes, only your selections are downloaded and synced

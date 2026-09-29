@@ -127,6 +127,16 @@ Using the same number multiple times hides all instances on the same card:
 
 Card 1 hides both "JavaScript" and "Netscape". Card 2 hides "Brendan Eich".
 
+### Shared Deletions
+
+In Anki desktop 26.05 or later, separate cloze numbers with commas to hide the same text on multiple cards:
+
+```markdown
+The {{c1::CPU}} and {{c2::GPU}} both execute {{c1,2::instructions}}.
+```
+
+This note generates two cards. Card 1 hides "CPU" and "instructions". Card 2 hides "GPU" and "instructions".
+
 ### Nested Cloze
 
 Cloze deletions can be nested. The outer cloze hides everything including the inner one:

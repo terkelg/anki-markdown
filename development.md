@@ -59,6 +59,7 @@ Most tests read language/theme files from `node_modules/@shikijs/` instead of ma
 Requires Anki 25.x. Note that Anki caches the add-on, so you must restart Anki for changes to take effect. `bun run dev` requires macOS and Google Chrome.
 
 For a quick renderer smoke test, import [fixtures/kitchen-sink-deck.apkg](./fixtures/kitchen-sink-deck.apkg).
+The shared-cloze example requires Anki desktop 26.05 or later.
 
 > [!TIP]
 > Install add-on [31746032](https://ankiweb.net/shared/info/31746032) for easier debugging.
