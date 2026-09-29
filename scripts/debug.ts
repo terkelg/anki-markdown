@@ -19,7 +19,10 @@ if (running.exitCode === 0) {
 await $`ln -sfn ${process.cwd()}/anki_markdown ${addon}`;
 
 // Launch Anki with remote debugging (invoke binary directly; `open -a` strips env vars)
-const bin = "/Applications/Anki.app/Contents/MacOS/launcher";
+const appBundle = "/Applications/Anki.app";
+const infoPlist = `${appBundle}/Contents/Info.plist`;
+const executable = (await $`/usr/bin/plutil -extract CFBundleExecutable raw -o - ${infoPlist}`.text()).trim();
+const bin = `${appBundle}/Contents/MacOS/${executable}`;
 const anki = Bun.spawn([bin], {
   env: { ...process.env, QTWEBENGINE_REMOTE_DEBUGGING: String(port) },
 });
